@@ -1,9 +1,40 @@
 {
   "name": "jscrypto",
   "version": "0.0.0-beta.0",
-  "main": "index.js",
-  "repository": "https://github.com/Hinaser/jscrypto.git",
+  "main": "./dist",
+  "types": "./dist/types",
   "author": "Izumi Hoshino <rindo.hinase@gmail.com>",
   "license": "MIT",
-  "description": ""
+  "description": "",
+  "homepage": "https://hinaser.github.io/jscrypto/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hinaser/jscrypto.git"
+  },
+  "bugs": "https://github.com/Hinaser/jscrypto/issues",
+  "scripts": {
+    "test": "mocha --enable-source-maps ./test/specs",
+    "build": "webpack --config webpack.dev.js",
+    "build:prod": "webpack --config webpack.prod.es5.js",
+    "tsc": "tsc --emitDeclarationOnly --declaration --project tsconfig.json --declarationDir ./dist/types",
+    "tsdoc": "typedoc src/XSpy.ts --mode file --excludePrivate --excludeProtected --excludeNotExported --out docs --includeVersion --gaID UA-91245492-8"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "eslint": "^7.8.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsdoc": "^30.4.1",
+    "expect.js": "^0.3.1",
+    "fork-ts-checker-webpack-plugin": "^5.1.0",
+    "mocha": "^8.1.3",
+    "nyc": "^15.1.0",
+    "parallel-webpack": "^2.6.0",
+    "terser-webpack-plugin": "^4.2.0",
+    "ts-loader": "^8.0.3",
+    "typedoc": "^0.19.1",
+    "typescript": "^4.0.2",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  }
 }

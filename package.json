@@ -13,7 +13,7 @@
   },
   "bugs": "https://github.com/Hinaser/jscrypto/issues",
   "scripts": {
-    "test": "mocha --enable-source-maps ./test/specs",
+    "test": "mocha --enable-source-maps ./test/specs/",
     "build": "webpack --config webpack.dev.js",
     "build:prod": "webpack --config webpack.prod.es5.js",
     "tsc": "tsc --emitDeclarationOnly --declaration --project tsconfig.json --declarationDir ./dist/types",

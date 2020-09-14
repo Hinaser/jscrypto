@@ -1,4 +1,5 @@
 const expect = require("expect.js");
+const {Word32Array} = require("../../dist/Lib");
 const SHA256 = require("../../dist/SHA256");
 
 describe("sha256", function(){
@@ -31,6 +32,13 @@ describe("sha256", function(){
     }
     
     expect(sha256.finalize().toString()).to.be("f8146961d9b73d8da49ccd526fca65439cdd5b402f76971556d5f52fd129843e");
+  });
+  
+  it("input integrity", function(){
+    const message = new Word32Array([0x12345678]);
+    const expectedResult = message.toString();
+    SHA256.hash(message);
+    expect(message.toString()).to.be(expectedResult);
   });
   
   it("clone", function(){

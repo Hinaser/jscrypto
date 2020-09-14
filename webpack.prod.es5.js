@@ -5,6 +5,7 @@ module.exports = {
   mode: "production",
   entry: {
     SHA256: "./src/sha256.ts",
+    MD5: "./src/md5.ts",
     HMAC: "./src/hmac.ts",
     HMACSHA256: "./src/hmac-sha256.ts",
     Lib: "./src/lib/index.ts",

@@ -9,6 +9,7 @@ module.exports = {
     MD5: "./src/md5.ts",
     HMAC: "./src/hmac.ts",
     HMACSHA256: "./src/hmac-sha256.ts",
+    HMACMD5: "./src/hmac-md5.ts",
     Lib: "./src/lib/index.ts",
   },
   plugins: [

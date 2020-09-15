@@ -5,12 +5,12 @@ module.exports = {
   mode: "production",
   entry: {
     all: "./src/all.ts",
-    SHA256: "./src/main/hash/SHA256.ts",
-    MD5: "./src/main/hash/MD5.ts",
-    HMAC: "./src/main/hash/HMAC.ts",
-    HMACSHA256: "./src/main/hash/HMACSHA256.ts",
-    HMACMD5: "./src/main/hash/HMACMD5.ts",
-    Lib: "./src/lib/index.ts",
+    SHA256: "./src/SHA256.ts",
+    MD5: "./src/MD5.ts",
+    HMAC: "./src/HMAC.ts",
+    HMACSHA256: "./src/HMACSHA256.ts",
+    HMACMD5: "./src/HMACMD5.ts",
+    lib: "./src/lib/index.ts",
   },
   plugins: [
   ],

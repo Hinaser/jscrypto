@@ -2,7 +2,7 @@ const expect = require("expect.js");
 const Hmac = require("../../test/build/HMAC");
 const Sha256 = require("../../test/build/SHA256");
 const HmacSHA256 = require("../../test/build/HMACSHA256");
-const {Hex, Word32Array} = require("../../test/build/Lib");
+const {Hex, Word32Array} = require("../../test/build/lib");
 
 describe("hmac-sha256", function(){
   it("digest 'Hi There' as expected", function(){

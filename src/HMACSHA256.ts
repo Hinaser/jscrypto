@@ -1,4 +1,4 @@
-import {IWord32Array} from "../../lib/type";
+import {IWord32Array} from "./lib/type";
 import HMAC from "./HMAC";
 import SHA256 from "./SHA256";
 

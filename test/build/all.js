@@ -127,6 +127,465 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./src/HMAC.ts":
+/*!*********************!*\
+  !*** ./src/HMAC.ts ***!
+  \*********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HMAC; });
+/* harmony import */ var _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
+
+class HMAC {
+    constructor(hasher, key) {
+        this._hasher = hasher;
+        // Convert string to WordArray, else assume WordArray already
+        if (typeof key == "string") {
+            key = _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__["Utf8"].parse(key);
+        }
+        const hasherBlockSize = hasher.blockSize;
+        const hasherBlockSizeBytes = hasherBlockSize * 4;
+        // Allow arbitrary length keys
+        if (key.length() > hasherBlockSizeBytes) {
+            key = hasher.finalize(key);
+        }
+        // Clamp excess bits
+        key.clamp();
+        const oKey = this._oKey = key.clone();
+        const iKey = this._iKey = key.clone();
+        const oKeyWords = oKey.raw();
+        const iKeyWords = iKey.raw();
+        for (let i = 0; i < hasherBlockSize; i++) {
+            oKeyWords[i] ^= 0x5c5c5c5c;
+            iKeyWords[i] ^= 0x36363636;
+        }
+        iKey.setSignificantBytes(hasherBlockSizeBytes);
+        oKey.setSignificantBytes(hasherBlockSizeBytes);
+        // Set initial values
+        this.reset();
+    }
+    /**
+     * Resets this HMAC to its initial state.
+     *
+     * @example
+     *   hmacHasher.reset();
+     */
+    reset() {
+        this._hasher.reset();
+        this._hasher.update(this._iKey);
+    }
+    /**
+     * Updates this HMAC with a message.
+     *
+     * @param {IWord32Array|string} messageUpdate The message to append.
+     * @return {HMAC} This HMAC instance.
+     * @example
+     *   hmacHasher.update('message');
+     *   hmacHasher.update(wordArray);
+     */
+    update(messageUpdate) {
+        this._hasher.update(messageUpdate);
+        return this;
+    }
+    /**
+     * Finalizes the HMAC computation.
+     * Note that the finalize operation is effectively a destructive, read-once operation.
+     *
+     * @param {IWord32Array|string} messageUpdate (Optional) A final message update.
+     * @return {IWord32Array} The HMAC.
+     * @example
+     *   var hmac = hmacHasher.finalize();
+     *   var hmac = hmacHasher.finalize('message');
+     *   var hmac = hmacHasher.finalize(wordArray);
+     */
+    finalize(messageUpdate) {
+        const innerHash = this._hasher.finalize(messageUpdate);
+        this._hasher.reset();
+        return this._hasher.finalize(this._oKey.clone().concat(innerHash));
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/HMACMD5.ts":
+/*!************************!*\
+  !*** ./src/HMACMD5.ts ***!
+  \************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacMD5; });
+/* harmony import */ var _HMAC__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HMAC */ "./src/HMAC.ts");
+/* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MD5 */ "./src/MD5.ts");
+
+
+function HmacMD5(message, key) {
+    return new _HMAC__WEBPACK_IMPORTED_MODULE_0__["default"](new _MD5__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+}
+
+
+/***/ }),
+
+/***/ "./src/HMACSHA256.ts":
+/*!***************************!*\
+  !*** ./src/HMACSHA256.ts ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacSHA256; });
+/* harmony import */ var _HMAC__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HMAC */ "./src/HMAC.ts");
+/* harmony import */ var _SHA256__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA256 */ "./src/SHA256.ts");
+
+
+function HmacSHA256(message, key) {
+    return new _HMAC__WEBPACK_IMPORTED_MODULE_0__["default"](new _SHA256__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+}
+
+
+/***/ }),
+
+/***/ "./src/MD5.ts":
+/*!********************!*\
+  !*** ./src/MD5.ts ***!
+  \********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MD5; });
+/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
+
+
+// Constants table
+const T = [];
+(function computeConstant() {
+    for (let i = 0; i < 64; i++) {
+        T[i] = (Math.abs(Math.sin(i + 1)) * 0x100000000) | 0;
+    }
+})();
+function FF(a, b, c, d, x, s, t) {
+    const n = a + ((b & c) | (~b & d)) + x + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+}
+function GG(a, b, c, d, x, s, t) {
+    const n = a + ((b & d) | (c & ~d)) + x + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+}
+function HH(a, b, c, d, x, s, t) {
+    const n = a + (b ^ c ^ d) + x + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+}
+function II(a, b, c, d, x, s, t) {
+    const n = a + (c ^ (b | ~d)) + x + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+}
+/**
+ * MD5 hash algorithm
+ */
+class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
+    constructor(hash, blockSize, data, nBytes) {
+        super(blockSize, data, nBytes);
+        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([
+            0x67452301, 0xefcdab89,
+            0x98badcfe, 0x10325476
+        ]);
+        if (typeof hash !== "undefined") {
+            this._hash = hash.clone();
+        }
+    }
+    doReset() {
+        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([
+            0x67452301, 0xefcdab89,
+            0x98badcfe, 0x10325476
+        ]);
+    }
+    doProcessBlock(words, offset) {
+        // Swap endian
+        for (let i = 0; i < 16; i++) {
+            // Shortcuts
+            const offsetI = offset + i;
+            const wordsOffsetI = words[offsetI];
+            words[offsetI] = ((((wordsOffsetI << 8) | (wordsOffsetI >>> 24)) & 0x00ff00ff)
+                | (((wordsOffsetI << 24) | (wordsOffsetI >>> 8)) & 0xff00ff00));
+        }
+        // Shortcuts
+        const H = this._hash.raw();
+        const wordOffset0 = words[offset];
+        const wordOffset1 = words[offset + 1];
+        const wordOffset2 = words[offset + 2];
+        const wordOffset3 = words[offset + 3];
+        const wordOffset4 = words[offset + 4];
+        const wordOffset5 = words[offset + 5];
+        const wordOffset6 = words[offset + 6];
+        const wordOffset7 = words[offset + 7];
+        const wordOffset8 = words[offset + 8];
+        const wordOffset9 = words[offset + 9];
+        const wordOffset10 = words[offset + 10];
+        const wordOffset11 = words[offset + 11];
+        const wordOffset12 = words[offset + 12];
+        const wordOffset13 = words[offset + 13];
+        const wordOffset14 = words[offset + 14];
+        const wordOffset15 = words[offset + 15];
+        // Working variables
+        let a = H[0];
+        let b = H[1];
+        let c = H[2];
+        let d = H[3];
+        // Computation
+        a = FF(a, b, c, d, wordOffset0, 7, T[0]);
+        d = FF(d, a, b, c, wordOffset1, 12, T[1]);
+        c = FF(c, d, a, b, wordOffset2, 17, T[2]);
+        b = FF(b, c, d, a, wordOffset3, 22, T[3]);
+        a = FF(a, b, c, d, wordOffset4, 7, T[4]);
+        d = FF(d, a, b, c, wordOffset5, 12, T[5]);
+        c = FF(c, d, a, b, wordOffset6, 17, T[6]);
+        b = FF(b, c, d, a, wordOffset7, 22, T[7]);
+        a = FF(a, b, c, d, wordOffset8, 7, T[8]);
+        d = FF(d, a, b, c, wordOffset9, 12, T[9]);
+        c = FF(c, d, a, b, wordOffset10, 17, T[10]);
+        b = FF(b, c, d, a, wordOffset11, 22, T[11]);
+        a = FF(a, b, c, d, wordOffset12, 7, T[12]);
+        d = FF(d, a, b, c, wordOffset13, 12, T[13]);
+        c = FF(c, d, a, b, wordOffset14, 17, T[14]);
+        b = FF(b, c, d, a, wordOffset15, 22, T[15]);
+        a = GG(a, b, c, d, wordOffset1, 5, T[16]);
+        d = GG(d, a, b, c, wordOffset6, 9, T[17]);
+        c = GG(c, d, a, b, wordOffset11, 14, T[18]);
+        b = GG(b, c, d, a, wordOffset0, 20, T[19]);
+        a = GG(a, b, c, d, wordOffset5, 5, T[20]);
+        d = GG(d, a, b, c, wordOffset10, 9, T[21]);
+        c = GG(c, d, a, b, wordOffset15, 14, T[22]);
+        b = GG(b, c, d, a, wordOffset4, 20, T[23]);
+        a = GG(a, b, c, d, wordOffset9, 5, T[24]);
+        d = GG(d, a, b, c, wordOffset14, 9, T[25]);
+        c = GG(c, d, a, b, wordOffset3, 14, T[26]);
+        b = GG(b, c, d, a, wordOffset8, 20, T[27]);
+        a = GG(a, b, c, d, wordOffset13, 5, T[28]);
+        d = GG(d, a, b, c, wordOffset2, 9, T[29]);
+        c = GG(c, d, a, b, wordOffset7, 14, T[30]);
+        b = GG(b, c, d, a, wordOffset12, 20, T[31]);
+        a = HH(a, b, c, d, wordOffset5, 4, T[32]);
+        d = HH(d, a, b, c, wordOffset8, 11, T[33]);
+        c = HH(c, d, a, b, wordOffset11, 16, T[34]);
+        b = HH(b, c, d, a, wordOffset14, 23, T[35]);
+        a = HH(a, b, c, d, wordOffset1, 4, T[36]);
+        d = HH(d, a, b, c, wordOffset4, 11, T[37]);
+        c = HH(c, d, a, b, wordOffset7, 16, T[38]);
+        b = HH(b, c, d, a, wordOffset10, 23, T[39]);
+        a = HH(a, b, c, d, wordOffset13, 4, T[40]);
+        d = HH(d, a, b, c, wordOffset0, 11, T[41]);
+        c = HH(c, d, a, b, wordOffset3, 16, T[42]);
+        b = HH(b, c, d, a, wordOffset6, 23, T[43]);
+        a = HH(a, b, c, d, wordOffset9, 4, T[44]);
+        d = HH(d, a, b, c, wordOffset12, 11, T[45]);
+        c = HH(c, d, a, b, wordOffset15, 16, T[46]);
+        b = HH(b, c, d, a, wordOffset2, 23, T[47]);
+        a = II(a, b, c, d, wordOffset0, 6, T[48]);
+        d = II(d, a, b, c, wordOffset7, 10, T[49]);
+        c = II(c, d, a, b, wordOffset14, 15, T[50]);
+        b = II(b, c, d, a, wordOffset5, 21, T[51]);
+        a = II(a, b, c, d, wordOffset12, 6, T[52]);
+        d = II(d, a, b, c, wordOffset3, 10, T[53]);
+        c = II(c, d, a, b, wordOffset10, 15, T[54]);
+        b = II(b, c, d, a, wordOffset1, 21, T[55]);
+        a = II(a, b, c, d, wordOffset8, 6, T[56]);
+        d = II(d, a, b, c, wordOffset15, 10, T[57]);
+        c = II(c, d, a, b, wordOffset6, 15, T[58]);
+        b = II(b, c, d, a, wordOffset13, 21, T[59]);
+        a = II(a, b, c, d, wordOffset4, 6, T[60]);
+        d = II(d, a, b, c, wordOffset11, 10, T[61]);
+        c = II(c, d, a, b, wordOffset2, 15, T[62]);
+        b = II(b, c, d, a, wordOffset9, 21, T[63]);
+        // Intermediate hash value
+        H[0] = (H[0] + a) | 0;
+        H[1] = (H[1] + b) | 0;
+        H[2] = (H[2] + c) | 0;
+        H[3] = (H[3] + d) | 0;
+    }
+    doFinalize() {
+        // Shortcuts
+        const data = this._data;
+        const dataWords = data.raw();
+        const nBitsTotal = this._nBytes * 8;
+        const nBitsLeft = data.length() * 8;
+        // Add padding
+        dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+        const nBitsTotalH = Math.floor(nBitsTotal / 0x100000000);
+        const nBitsTotalL = nBitsTotal;
+        dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = ((((nBitsTotalH << 8) | (nBitsTotalH >>> 24)) & 0x00ff00ff) |
+            (((nBitsTotalH << 24) | (nBitsTotalH >>> 8)) & 0xff00ff00));
+        dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = ((((nBitsTotalL << 8) | (nBitsTotalL >>> 24)) & 0x00ff00ff) |
+            (((nBitsTotalL << 24) | (nBitsTotalL >>> 8)) & 0xff00ff00));
+        data.setSignificantBytes((dataWords.length + 1) * 4);
+        // Hash final blocks
+        this.process();
+        // Shortcuts
+        const hash = this._hash;
+        const H = hash.raw();
+        // Swap endian
+        for (let i = 0; i < 4; i++) {
+            // Shortcut
+            const Hi = H[i];
+            H[i] = (((Hi << 8) | (Hi >>> 24)) & 0x00ff00ff)
+                | (((Hi << 24) | (Hi >>> 8)) & 0xff00ff00);
+        }
+        // Return final computed hash
+        return hash;
+    }
+    clone() {
+        return new MD5(this._hash, this._blockSize, this._data, this._nBytes);
+    }
+    static hash(message) {
+        return new MD5().finalize(message);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/SHA256.ts":
+/*!***********************!*\
+  !*** ./src/SHA256.ts ***!
+  \***********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA256; });
+/* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
+/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
+
+
+// Hash values
+const H = [];
+// Round constants
+const K = [];
+function isPrime(n) {
+    const sqrtN = Math.sqrt(n);
+    for (let factor = 2; factor <= sqrtN; factor++) {
+        if (!(n % factor)) {
+            return false;
+        }
+    }
+    return true;
+}
+function getFractionalBits(n) {
+    return ((n - (n | 0)) * 0x100000000) | 0;
+}
+(function computeRoundConstants() {
+    let n = 2;
+    let nPrime = 0;
+    while (nPrime < 64) {
+        if (isPrime(n)) {
+            if (nPrime < 8) {
+                H[nPrime] = getFractionalBits(Math.pow(n, 1 / 2));
+            }
+            K[nPrime] = getFractionalBits(Math.pow(n, 1 / 3));
+            nPrime++;
+        }
+        n++;
+    }
+})();
+// Reusable object
+const W = [];
+class SHA256 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] {
+    constructor(hash, blockSize, data, nBytes) {
+        super(blockSize, data, nBytes);
+        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](H.slice(0));
+        if (typeof hash !== "undefined") {
+            this._hash = hash.clone();
+        }
+    }
+    doReset() {
+        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](H.slice(0));
+    }
+    doProcessBlock(words, offset) {
+        const _H = this._hash.raw();
+        let a = _H[0];
+        let b = _H[1];
+        let c = _H[2];
+        let d = _H[3];
+        let e = _H[4];
+        let f = _H[5];
+        let g = _H[6];
+        let h = _H[7];
+        for (let i = 0; i < 64; i++) {
+            if (i < 16) {
+                W[i] = words[offset + i] | 0;
+            }
+            else {
+                const gamma0x = W[i - 15];
+                const gamma0 = ((gamma0x << 25) | (gamma0x >>> 7))
+                    ^ ((gamma0x << 14) | (gamma0x >>> 18))
+                    ^ (gamma0x >>> 3);
+                const gamma1x = W[i - 2];
+                const gamma1 = ((gamma1x << 15) | (gamma1x >>> 17))
+                    ^ ((gamma1x << 13) | (gamma1x >>> 19))
+                    ^ (gamma1x >>> 10);
+                W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
+            }
+            const ch = (e & f) ^ (~e & g);
+            const maj = (a & b) ^ (a & c) ^ (b & c);
+            const sigma0 = ((a << 30) | (a >>> 2)) ^ ((a << 19) | (a >>> 13)) ^ ((a << 10) | (a >>> 22));
+            const sigma1 = ((e << 26) | (e >>> 6)) ^ ((e << 21) | (e >>> 11)) ^ ((e << 7) | (e >>> 25));
+            const t1 = h + sigma1 + ch + K[i] + W[i];
+            const t2 = sigma0 + maj;
+            h = g;
+            g = f;
+            f = e;
+            e = (d + t1) | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = (t1 + t2) | 0;
+        }
+        // Intermediate hash value
+        _H[0] = (_H[0] + a) | 0;
+        _H[1] = (_H[1] + b) | 0;
+        _H[2] = (_H[2] + c) | 0;
+        _H[3] = (_H[3] + d) | 0;
+        _H[4] = (_H[4] + e) | 0;
+        _H[5] = (_H[5] + f) | 0;
+        _H[6] = (_H[6] + g) | 0;
+        _H[7] = (_H[7] + h) | 0;
+    }
+    doFinalize() {
+        const words = this._data.raw();
+        const nBitsTotal = this._nBytes * 8;
+        const nBitsLeft = this._data.length() * 8;
+        // Add padding
+        words[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+        words[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
+        words[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
+        this._data.setSignificantBytes(words.length * 4);
+        // Hash final blocks
+        this.process();
+        // Return final computed hash
+        return this._hash;
+    }
+    clone() {
+        return new SHA256(this._hash, this._blockSize, this._data, this._nBytes);
+    }
+    static hash(message) {
+        return new SHA256().finalize(message);
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/all.ts":
 /*!********************!*\
   !*** ./src/all.ts ***!
@@ -136,20 +595,20 @@ module.exports = g;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _main_hash_HMAC__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./main/hash/HMAC */ "./src/main/hash/HMAC.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HMAC", function() { return _main_hash_HMAC__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+/* harmony import */ var _HMAC__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HMAC */ "./src/HMAC.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HMAC", function() { return _HMAC__WEBPACK_IMPORTED_MODULE_0__["default"]; });
 
-/* harmony import */ var _main_hash_HMACMD5__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./main/hash/HMACMD5 */ "./src/main/hash/HMACMD5.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HMACMD5", function() { return _main_hash_HMACMD5__WEBPACK_IMPORTED_MODULE_1__["default"]; });
+/* harmony import */ var _HMACMD5__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HMACMD5 */ "./src/HMACMD5.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HMACMD5", function() { return _HMACMD5__WEBPACK_IMPORTED_MODULE_1__["default"]; });
 
-/* harmony import */ var _main_hash_HMACSHA256__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./main/hash/HMACSHA256 */ "./src/main/hash/HMACSHA256.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HMACSHA256", function() { return _main_hash_HMACSHA256__WEBPACK_IMPORTED_MODULE_2__["default"]; });
+/* harmony import */ var _HMACSHA256__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./HMACSHA256 */ "./src/HMACSHA256.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HMACSHA256", function() { return _HMACSHA256__WEBPACK_IMPORTED_MODULE_2__["default"]; });
 
-/* harmony import */ var _main_hash_MD5__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./main/hash/MD5 */ "./src/main/hash/MD5.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MD5", function() { return _main_hash_MD5__WEBPACK_IMPORTED_MODULE_3__["default"]; });
+/* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./MD5 */ "./src/MD5.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MD5", function() { return _MD5__WEBPACK_IMPORTED_MODULE_3__["default"]; });
 
-/* harmony import */ var _main_hash_SHA256__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./main/hash/SHA256 */ "./src/main/hash/SHA256.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA256", function() { return _main_hash_SHA256__WEBPACK_IMPORTED_MODULE_4__["default"]; });
+/* harmony import */ var _SHA256__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SHA256 */ "./src/SHA256.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA256", function() { return _SHA256__WEBPACK_IMPORTED_MODULE_4__["default"]; });
 
 
 
@@ -661,465 +1120,6 @@ function makeRandFunction() {
 const random = makeRandFunction();
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node_modules/webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
-
-/***/ }),
-
-/***/ "./src/main/hash/HMAC.ts":
-/*!*******************************!*\
-  !*** ./src/main/hash/HMAC.ts ***!
-  \*******************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HMAC; });
-/* harmony import */ var _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lib/encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
-
-class HMAC {
-    constructor(hasher, key) {
-        this._hasher = hasher;
-        // Convert string to WordArray, else assume WordArray already
-        if (typeof key == "string") {
-            key = _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__["Utf8"].parse(key);
-        }
-        const hasherBlockSize = hasher.blockSize;
-        const hasherBlockSizeBytes = hasherBlockSize * 4;
-        // Allow arbitrary length keys
-        if (key.length() > hasherBlockSizeBytes) {
-            key = hasher.finalize(key);
-        }
-        // Clamp excess bits
-        key.clamp();
-        const oKey = this._oKey = key.clone();
-        const iKey = this._iKey = key.clone();
-        const oKeyWords = oKey.raw();
-        const iKeyWords = iKey.raw();
-        for (let i = 0; i < hasherBlockSize; i++) {
-            oKeyWords[i] ^= 0x5c5c5c5c;
-            iKeyWords[i] ^= 0x36363636;
-        }
-        iKey.setSignificantBytes(hasherBlockSizeBytes);
-        oKey.setSignificantBytes(hasherBlockSizeBytes);
-        // Set initial values
-        this.reset();
-    }
-    /**
-     * Resets this HMAC to its initial state.
-     *
-     * @example
-     *   hmacHasher.reset();
-     */
-    reset() {
-        this._hasher.reset();
-        this._hasher.update(this._iKey);
-    }
-    /**
-     * Updates this HMAC with a message.
-     *
-     * @param {IWord32Array|string} messageUpdate The message to append.
-     * @return {HMAC} This HMAC instance.
-     * @example
-     *   hmacHasher.update('message');
-     *   hmacHasher.update(wordArray);
-     */
-    update(messageUpdate) {
-        this._hasher.update(messageUpdate);
-        return this;
-    }
-    /**
-     * Finalizes the HMAC computation.
-     * Note that the finalize operation is effectively a destructive, read-once operation.
-     *
-     * @param {IWord32Array|string} messageUpdate (Optional) A final message update.
-     * @return {IWord32Array} The HMAC.
-     * @example
-     *   var hmac = hmacHasher.finalize();
-     *   var hmac = hmacHasher.finalize('message');
-     *   var hmac = hmacHasher.finalize(wordArray);
-     */
-    finalize(messageUpdate) {
-        const innerHash = this._hasher.finalize(messageUpdate);
-        this._hasher.reset();
-        return this._hasher.finalize(this._oKey.clone().concat(innerHash));
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/main/hash/HMACMD5.ts":
-/*!**********************************!*\
-  !*** ./src/main/hash/HMACMD5.ts ***!
-  \**********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacMD5; });
-/* harmony import */ var _HMAC__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HMAC */ "./src/main/hash/HMAC.ts");
-/* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MD5 */ "./src/main/hash/MD5.ts");
-
-
-function HmacMD5(message, key) {
-    return new _HMAC__WEBPACK_IMPORTED_MODULE_0__["default"](new _MD5__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
-}
-
-
-/***/ }),
-
-/***/ "./src/main/hash/HMACSHA256.ts":
-/*!*************************************!*\
-  !*** ./src/main/hash/HMACSHA256.ts ***!
-  \*************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacSHA256; });
-/* harmony import */ var _HMAC__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HMAC */ "./src/main/hash/HMAC.ts");
-/* harmony import */ var _SHA256__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA256 */ "./src/main/hash/SHA256.ts");
-
-
-function HmacSHA256(message, key) {
-    return new _HMAC__WEBPACK_IMPORTED_MODULE_0__["default"](new _SHA256__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
-}
-
-
-/***/ }),
-
-/***/ "./src/main/hash/MD5.ts":
-/*!******************************!*\
-  !*** ./src/main/hash/MD5.ts ***!
-  \******************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MD5; });
-/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lib/Word32Array */ "./src/lib/Word32Array.ts");
-/* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
-
-
-// Constants table
-const T = [];
-(function computeConstant() {
-    for (let i = 0; i < 64; i++) {
-        T[i] = (Math.abs(Math.sin(i + 1)) * 0x100000000) | 0;
-    }
-})();
-function FF(a, b, c, d, x, s, t) {
-    const n = a + ((b & c) | (~b & d)) + x + t;
-    return ((n << s) | (n >>> (32 - s))) + b;
-}
-function GG(a, b, c, d, x, s, t) {
-    const n = a + ((b & d) | (c & ~d)) + x + t;
-    return ((n << s) | (n >>> (32 - s))) + b;
-}
-function HH(a, b, c, d, x, s, t) {
-    const n = a + (b ^ c ^ d) + x + t;
-    return ((n << s) | (n >>> (32 - s))) + b;
-}
-function II(a, b, c, d, x, s, t) {
-    const n = a + (c ^ (b | ~d)) + x + t;
-    return ((n << s) | (n >>> (32 - s))) + b;
-}
-/**
- * MD5 hash algorithm
- */
-class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
-    constructor(hash, blockSize, data, nBytes) {
-        super(blockSize, data, nBytes);
-        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([
-            0x67452301, 0xefcdab89,
-            0x98badcfe, 0x10325476
-        ]);
-        if (typeof hash !== "undefined") {
-            this._hash = hash.clone();
-        }
-    }
-    doReset() {
-        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([
-            0x67452301, 0xefcdab89,
-            0x98badcfe, 0x10325476
-        ]);
-    }
-    doProcessBlock(words, offset) {
-        // Swap endian
-        for (let i = 0; i < 16; i++) {
-            // Shortcuts
-            const offsetI = offset + i;
-            const wordsOffsetI = words[offsetI];
-            words[offsetI] = ((((wordsOffsetI << 8) | (wordsOffsetI >>> 24)) & 0x00ff00ff)
-                | (((wordsOffsetI << 24) | (wordsOffsetI >>> 8)) & 0xff00ff00));
-        }
-        // Shortcuts
-        const H = this._hash.raw();
-        const wordOffset0 = words[offset];
-        const wordOffset1 = words[offset + 1];
-        const wordOffset2 = words[offset + 2];
-        const wordOffset3 = words[offset + 3];
-        const wordOffset4 = words[offset + 4];
-        const wordOffset5 = words[offset + 5];
-        const wordOffset6 = words[offset + 6];
-        const wordOffset7 = words[offset + 7];
-        const wordOffset8 = words[offset + 8];
-        const wordOffset9 = words[offset + 9];
-        const wordOffset10 = words[offset + 10];
-        const wordOffset11 = words[offset + 11];
-        const wordOffset12 = words[offset + 12];
-        const wordOffset13 = words[offset + 13];
-        const wordOffset14 = words[offset + 14];
-        const wordOffset15 = words[offset + 15];
-        // Working variables
-        let a = H[0];
-        let b = H[1];
-        let c = H[2];
-        let d = H[3];
-        // Computation
-        a = FF(a, b, c, d, wordOffset0, 7, T[0]);
-        d = FF(d, a, b, c, wordOffset1, 12, T[1]);
-        c = FF(c, d, a, b, wordOffset2, 17, T[2]);
-        b = FF(b, c, d, a, wordOffset3, 22, T[3]);
-        a = FF(a, b, c, d, wordOffset4, 7, T[4]);
-        d = FF(d, a, b, c, wordOffset5, 12, T[5]);
-        c = FF(c, d, a, b, wordOffset6, 17, T[6]);
-        b = FF(b, c, d, a, wordOffset7, 22, T[7]);
-        a = FF(a, b, c, d, wordOffset8, 7, T[8]);
-        d = FF(d, a, b, c, wordOffset9, 12, T[9]);
-        c = FF(c, d, a, b, wordOffset10, 17, T[10]);
-        b = FF(b, c, d, a, wordOffset11, 22, T[11]);
-        a = FF(a, b, c, d, wordOffset12, 7, T[12]);
-        d = FF(d, a, b, c, wordOffset13, 12, T[13]);
-        c = FF(c, d, a, b, wordOffset14, 17, T[14]);
-        b = FF(b, c, d, a, wordOffset15, 22, T[15]);
-        a = GG(a, b, c, d, wordOffset1, 5, T[16]);
-        d = GG(d, a, b, c, wordOffset6, 9, T[17]);
-        c = GG(c, d, a, b, wordOffset11, 14, T[18]);
-        b = GG(b, c, d, a, wordOffset0, 20, T[19]);
-        a = GG(a, b, c, d, wordOffset5, 5, T[20]);
-        d = GG(d, a, b, c, wordOffset10, 9, T[21]);
-        c = GG(c, d, a, b, wordOffset15, 14, T[22]);
-        b = GG(b, c, d, a, wordOffset4, 20, T[23]);
-        a = GG(a, b, c, d, wordOffset9, 5, T[24]);
-        d = GG(d, a, b, c, wordOffset14, 9, T[25]);
-        c = GG(c, d, a, b, wordOffset3, 14, T[26]);
-        b = GG(b, c, d, a, wordOffset8, 20, T[27]);
-        a = GG(a, b, c, d, wordOffset13, 5, T[28]);
-        d = GG(d, a, b, c, wordOffset2, 9, T[29]);
-        c = GG(c, d, a, b, wordOffset7, 14, T[30]);
-        b = GG(b, c, d, a, wordOffset12, 20, T[31]);
-        a = HH(a, b, c, d, wordOffset5, 4, T[32]);
-        d = HH(d, a, b, c, wordOffset8, 11, T[33]);
-        c = HH(c, d, a, b, wordOffset11, 16, T[34]);
-        b = HH(b, c, d, a, wordOffset14, 23, T[35]);
-        a = HH(a, b, c, d, wordOffset1, 4, T[36]);
-        d = HH(d, a, b, c, wordOffset4, 11, T[37]);
-        c = HH(c, d, a, b, wordOffset7, 16, T[38]);
-        b = HH(b, c, d, a, wordOffset10, 23, T[39]);
-        a = HH(a, b, c, d, wordOffset13, 4, T[40]);
-        d = HH(d, a, b, c, wordOffset0, 11, T[41]);
-        c = HH(c, d, a, b, wordOffset3, 16, T[42]);
-        b = HH(b, c, d, a, wordOffset6, 23, T[43]);
-        a = HH(a, b, c, d, wordOffset9, 4, T[44]);
-        d = HH(d, a, b, c, wordOffset12, 11, T[45]);
-        c = HH(c, d, a, b, wordOffset15, 16, T[46]);
-        b = HH(b, c, d, a, wordOffset2, 23, T[47]);
-        a = II(a, b, c, d, wordOffset0, 6, T[48]);
-        d = II(d, a, b, c, wordOffset7, 10, T[49]);
-        c = II(c, d, a, b, wordOffset14, 15, T[50]);
-        b = II(b, c, d, a, wordOffset5, 21, T[51]);
-        a = II(a, b, c, d, wordOffset12, 6, T[52]);
-        d = II(d, a, b, c, wordOffset3, 10, T[53]);
-        c = II(c, d, a, b, wordOffset10, 15, T[54]);
-        b = II(b, c, d, a, wordOffset1, 21, T[55]);
-        a = II(a, b, c, d, wordOffset8, 6, T[56]);
-        d = II(d, a, b, c, wordOffset15, 10, T[57]);
-        c = II(c, d, a, b, wordOffset6, 15, T[58]);
-        b = II(b, c, d, a, wordOffset13, 21, T[59]);
-        a = II(a, b, c, d, wordOffset4, 6, T[60]);
-        d = II(d, a, b, c, wordOffset11, 10, T[61]);
-        c = II(c, d, a, b, wordOffset2, 15, T[62]);
-        b = II(b, c, d, a, wordOffset9, 21, T[63]);
-        // Intermediate hash value
-        H[0] = (H[0] + a) | 0;
-        H[1] = (H[1] + b) | 0;
-        H[2] = (H[2] + c) | 0;
-        H[3] = (H[3] + d) | 0;
-    }
-    doFinalize() {
-        // Shortcuts
-        const data = this._data;
-        const dataWords = data.raw();
-        const nBitsTotal = this._nBytes * 8;
-        const nBitsLeft = data.length() * 8;
-        // Add padding
-        dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
-        const nBitsTotalH = Math.floor(nBitsTotal / 0x100000000);
-        const nBitsTotalL = nBitsTotal;
-        dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = ((((nBitsTotalH << 8) | (nBitsTotalH >>> 24)) & 0x00ff00ff) |
-            (((nBitsTotalH << 24) | (nBitsTotalH >>> 8)) & 0xff00ff00));
-        dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = ((((nBitsTotalL << 8) | (nBitsTotalL >>> 24)) & 0x00ff00ff) |
-            (((nBitsTotalL << 24) | (nBitsTotalL >>> 8)) & 0xff00ff00));
-        data.setSignificantBytes((dataWords.length + 1) * 4);
-        // Hash final blocks
-        this.process();
-        // Shortcuts
-        const hash = this._hash;
-        const H = hash.raw();
-        // Swap endian
-        for (let i = 0; i < 4; i++) {
-            // Shortcut
-            const Hi = H[i];
-            H[i] = (((Hi << 8) | (Hi >>> 24)) & 0x00ff00ff)
-                | (((Hi << 24) | (Hi >>> 8)) & 0xff00ff00);
-        }
-        // Return final computed hash
-        return hash;
-    }
-    clone() {
-        return new MD5(this._hash, this._blockSize, this._data, this._nBytes);
-    }
-    static hash(message) {
-        return new MD5().finalize(message);
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/main/hash/SHA256.ts":
-/*!*********************************!*\
-  !*** ./src/main/hash/SHA256.ts ***!
-  \*********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA256; });
-/* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
-/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../lib/Word32Array */ "./src/lib/Word32Array.ts");
-
-
-// Hash values
-const H = [];
-// Round constants
-const K = [];
-function isPrime(n) {
-    const sqrtN = Math.sqrt(n);
-    for (let factor = 2; factor <= sqrtN; factor++) {
-        if (!(n % factor)) {
-            return false;
-        }
-    }
-    return true;
-}
-function getFractionalBits(n) {
-    return ((n - (n | 0)) * 0x100000000) | 0;
-}
-(function computeRoundConstants() {
-    let n = 2;
-    let nPrime = 0;
-    while (nPrime < 64) {
-        if (isPrime(n)) {
-            if (nPrime < 8) {
-                H[nPrime] = getFractionalBits(Math.pow(n, 1 / 2));
-            }
-            K[nPrime] = getFractionalBits(Math.pow(n, 1 / 3));
-            nPrime++;
-        }
-        n++;
-    }
-})();
-// Reusable object
-const W = [];
-class SHA256 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] {
-    constructor(hash, blockSize, data, nBytes) {
-        super(blockSize, data, nBytes);
-        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](H.slice(0));
-        if (typeof hash !== "undefined") {
-            this._hash = hash.clone();
-        }
-    }
-    doReset() {
-        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](H.slice(0));
-    }
-    doProcessBlock(words, offset) {
-        const _H = this._hash.raw();
-        let a = _H[0];
-        let b = _H[1];
-        let c = _H[2];
-        let d = _H[3];
-        let e = _H[4];
-        let f = _H[5];
-        let g = _H[6];
-        let h = _H[7];
-        for (let i = 0; i < 64; i++) {
-            if (i < 16) {
-                W[i] = words[offset + i] | 0;
-            }
-            else {
-                const gamma0x = W[i - 15];
-                const gamma0 = ((gamma0x << 25) | (gamma0x >>> 7))
-                    ^ ((gamma0x << 14) | (gamma0x >>> 18))
-                    ^ (gamma0x >>> 3);
-                const gamma1x = W[i - 2];
-                const gamma1 = ((gamma1x << 15) | (gamma1x >>> 17))
-                    ^ ((gamma1x << 13) | (gamma1x >>> 19))
-                    ^ (gamma1x >>> 10);
-                W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
-            }
-            const ch = (e & f) ^ (~e & g);
-            const maj = (a & b) ^ (a & c) ^ (b & c);
-            const sigma0 = ((a << 30) | (a >>> 2)) ^ ((a << 19) | (a >>> 13)) ^ ((a << 10) | (a >>> 22));
-            const sigma1 = ((e << 26) | (e >>> 6)) ^ ((e << 21) | (e >>> 11)) ^ ((e << 7) | (e >>> 25));
-            const t1 = h + sigma1 + ch + K[i] + W[i];
-            const t2 = sigma0 + maj;
-            h = g;
-            g = f;
-            f = e;
-            e = (d + t1) | 0;
-            d = c;
-            c = b;
-            b = a;
-            a = (t1 + t2) | 0;
-        }
-        // Intermediate hash value
-        _H[0] = (_H[0] + a) | 0;
-        _H[1] = (_H[1] + b) | 0;
-        _H[2] = (_H[2] + c) | 0;
-        _H[3] = (_H[3] + d) | 0;
-        _H[4] = (_H[4] + e) | 0;
-        _H[5] = (_H[5] + f) | 0;
-        _H[6] = (_H[6] + g) | 0;
-        _H[7] = (_H[7] + h) | 0;
-    }
-    doFinalize() {
-        const words = this._data.raw();
-        const nBitsTotal = this._nBytes * 8;
-        const nBitsLeft = this._data.length() * 8;
-        // Add padding
-        words[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
-        words[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
-        words[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
-        this._data.setSignificantBytes(words.length * 4);
-        // Hash final blocks
-        this.process();
-        // Return final computed hash
-        return this._hash;
-    }
-    clone() {
-        return new SHA256(this._hash, this._blockSize, this._data, this._nBytes);
-    }
-    static hash(message) {
-        return new SHA256().finalize(message);
-    }
-}
-
 
 /***/ })
 

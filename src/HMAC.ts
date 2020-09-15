@@ -1,6 +1,6 @@
-import {Utf8} from "../../lib/encoder/Utf8";
-import {Hasher} from "../../lib/algorithm/Hasher";
-import {IWord32Array} from "../../lib/type";
+import {Utf8} from "./lib/encoder/Utf8";
+import {Hasher} from "./lib/algorithm/Hasher";
+import {IWord32Array} from "./lib/type";
 
 export default class HMAC {
   private _hasher: Hasher;

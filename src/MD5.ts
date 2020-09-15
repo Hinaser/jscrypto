@@ -1,6 +1,6 @@
-import {Word32Array} from "../../lib/Word32Array";
-import {Hasher} from "../../lib/algorithm/Hasher";
-import {IWord32Array} from "../../lib/type";
+import {Word32Array} from "./lib/Word32Array";
+import {Hasher} from "./lib/algorithm/Hasher";
+import {IWord32Array} from "./lib/type";
 
 // Constants table
 const T: number[] = [];

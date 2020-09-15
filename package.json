@@ -16,7 +16,7 @@
     "test": "mocha --enable-source-maps ./test/specs/",
     "build": "webpack --config webpack.dev.js",
     "build:prod": "webpack --config webpack.prod.es5.js",
-    "tsc": "tsc --emitDeclarationOnly --declaration --project tsconfig.json --declarationDir ./dist/types",
+    "tsc": "tsc --project tsconfig.es5.json --emitDeclarationOnly --declaration --declarationDir ./dist --allowJS false",
     "tsdoc": "typedoc src/XSpy.ts --mode file --excludePrivate --excludeProtected --excludeNotExported --out docs --includeVersion --gaID UA-91245492-8"
   },
   "devDependencies": {

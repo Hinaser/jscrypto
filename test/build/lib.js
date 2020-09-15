@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["Lib"] = factory();
+		exports["lib"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["Lib"] = factory();
+		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["lib"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -543,4 +543,4 @@ const random = makeRandFunction();
 
 /******/ })["default"];
 });
-//# sourceMappingURL=Lib.js.map
+//# sourceMappingURL=lib.js.map

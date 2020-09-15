@@ -1,5 +1,5 @@
 const expect = require("expect.js");
-const {Word32Array} = require("../../test/build/Lib");
+const {Word32Array} = require("../../test/build/lib");
 const MD5 = require("../../test/build/md5");
 
 describe("md5", function(){

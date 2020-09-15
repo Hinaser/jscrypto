@@ -5,11 +5,12 @@ module.exports = {
   mode: "development",
   context: __dirname, // to automatically find tsconfig.json
   entry: {
-    SHA256: "./src/sha256.ts",
-    MD5: "./src/md5.ts",
-    HMAC: "./src/hmac.ts",
-    HMACSHA256: "./src/hmac-sha256.ts",
-    HMACMD5: "./src/hmac-md5.ts",
+    all: "./src/all.ts",
+    SHA256: "./src/main/hash/SHA256.ts",
+    MD5: "./src/main/hash/MD5.ts",
+    HMAC: "./src/main/hash/HMAC.ts",
+    HMACSHA256: "./src/main/hash/HMACSHA256.ts",
+    HMACMD5: "./src/main/hash/HMACMD5.ts",
     Lib: "./src/lib/index.ts",
   },
   plugins: [
@@ -35,7 +36,7 @@ module.exports = {
     extensions: [".tsx", ".ts", "js"],
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "test", "build"),
     filename: "[name].js",
     library: ["JsCrypto", "[name]"],
     libraryExport: "default",

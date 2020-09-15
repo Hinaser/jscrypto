@@ -1,8 +1,8 @@
 {
   "name": "jscrypto",
   "version": "0.0.0-beta.0",
-  "main": "./dist",
-  "types": "./dist/types",
+  "main": "./dist/all.js",
+  "types": "./dist/",
   "author": "Izumi Hoshino <rindo.hinase@gmail.com>",
   "license": "MIT",
   "description": "",
@@ -17,6 +17,7 @@
     "build": "webpack --config webpack.dev.js",
     "build:prod": "webpack --config webpack.prod.es5.js",
     "tsc": "tsc --emitDeclarationOnly --declaration --project tsconfig.json --declarationDir ./dist/types",
+    "tsc2": "webpack --config webpack.ts.js",
     "tsdoc": "typedoc src/XSpy.ts --mode file --excludePrivate --excludeProtected --excludeNotExported --out docs --includeVersion --gaID UA-91245492-8"
   },
   "devDependencies": {

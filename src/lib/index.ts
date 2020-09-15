@@ -1,9 +1,9 @@
 import {random} from "./random";
-import {Word32Array} from "./word32array";
+import {Word32Array} from "./Word32Array";
 import {isIE} from "./browser";
-import {Utf8} from "./encoder/utf8";
-import {Latin1} from "./encoder/latin1";
-import {Hex} from "./encoder/hex";
+import {Utf8} from "./encoder/Utf8";
+import {Latin1} from "./encoder/Latin1";
+import {Hex} from "./encoder/Hex";
 
 export default {
   random,

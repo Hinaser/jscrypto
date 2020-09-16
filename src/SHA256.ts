@@ -40,7 +40,7 @@ function getFractionalBits(n: number) {
 const W: number[] = [];
 
 export default class SHA256 extends Hasher {
-  private _hash: IWord32Array = new Word32Array(H.slice(0));
+  protected _hash: IWord32Array = new Word32Array(H.slice(0));
   
   public constructor(hash?: IWord32Array, blockSize?: number, data?: IWord32Array, nBytes?: number) {
     super(blockSize, data, nBytes);

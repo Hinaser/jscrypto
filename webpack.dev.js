@@ -6,6 +6,8 @@ module.exports = {
   context: __dirname, // to automatically find tsconfig.json
   entry: {
     all: "./src/all.ts",
+    SHA1: "./src/SHA1.ts",
+    SHA224: "./src/SHA224.ts",
     SHA256: "./src/SHA256.ts",
     MD5: "./src/MD5.ts",
     Hmac: "./src/Hmac.ts",

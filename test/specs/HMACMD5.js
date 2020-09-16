@@ -1,7 +1,7 @@
 const expect = require("expect.js");
-const Hmac = require("../../test/build/HMAC");
+const Hmac = require("../../test/build/Hmac");
 const MD5 = require("../../test/build/MD5");
-const HmacMD5 = require("../../test/build/HMACMD5");
+const HmacMD5 = require("../../test/build/HmacMD5");
 const {Hex, Word32Array} = require("../../test/build/lib");
 
 describe("hmac-md5", function(){

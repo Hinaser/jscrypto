@@ -2,7 +2,7 @@ import {Utf8} from "./lib/encoder/Utf8";
 import {Hasher} from "./lib/algorithm/Hasher";
 import {IWord32Array} from "./lib/type";
 
-export default class HMAC {
+export default class Hmac {
   private _hasher: Hasher;
   private _oKey: IWord32Array;
   private _iKey: IWord32Array;
@@ -44,7 +44,7 @@ export default class HMAC {
   }
   
   /**
-   * Resets this HMAC to its initial state.
+   * Resets this Hmac to its initial state.
    *
    * @example
    *   hmacHasher.reset();
@@ -55,10 +55,10 @@ export default class HMAC {
   }
   
   /**
-   * Updates this HMAC with a message.
+   * Updates this Hmac with a message.
    *
    * @param {IWord32Array|string} messageUpdate The message to append.
-   * @return {HMAC} This HMAC instance.
+   * @return {Hmac} This Hmac instance.
    * @example
    *   hmacHasher.update('message');
    *   hmacHasher.update(wordArray);
@@ -69,11 +69,11 @@ export default class HMAC {
   }
   
   /**
-   * Finalizes the HMAC computation.
+   * Finalizes the Hmac computation.
    * Note that the finalize operation is effectively a destructive, read-once operation.
    *
    * @param {IWord32Array|string} messageUpdate (Optional) A final message update.
-   * @return {IWord32Array} The HMAC.
+   * @return {IWord32Array} The Hmac.
    * @example
    *   var hmac = hmacHasher.finalize();
    *   var hmac = hmacHasher.finalize('message');

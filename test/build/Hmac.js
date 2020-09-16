@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["HMAC"] = factory();
+		exports["Hmac"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["HMAC"] = factory();
+		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["Hmac"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/HMAC.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/Hmac.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -127,19 +127,19 @@ module.exports = g;
 
 /***/ }),
 
-/***/ "./src/HMAC.ts":
+/***/ "./src/Hmac.ts":
 /*!*********************!*\
-  !*** ./src/HMAC.ts ***!
+  !*** ./src/Hmac.ts ***!
   \*********************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HMAC; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Hmac; });
 /* harmony import */ var _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
 
-class HMAC {
+class Hmac {
     constructor(hasher, key) {
         this._hasher = hasher;
         // Convert string to WordArray, else assume WordArray already
@@ -168,7 +168,7 @@ class HMAC {
         this.reset();
     }
     /**
-     * Resets this HMAC to its initial state.
+     * Resets this Hmac to its initial state.
      *
      * @example
      *   hmacHasher.reset();
@@ -178,10 +178,10 @@ class HMAC {
         this._hasher.update(this._iKey);
     }
     /**
-     * Updates this HMAC with a message.
+     * Updates this Hmac with a message.
      *
      * @param {IWord32Array|string} messageUpdate The message to append.
-     * @return {HMAC} This HMAC instance.
+     * @return {Hmac} This Hmac instance.
      * @example
      *   hmacHasher.update('message');
      *   hmacHasher.update(wordArray);
@@ -191,11 +191,11 @@ class HMAC {
         return this;
     }
     /**
-     * Finalizes the HMAC computation.
+     * Finalizes the Hmac computation.
      * Note that the finalize operation is effectively a destructive, read-once operation.
      *
      * @param {IWord32Array|string} messageUpdate (Optional) A final message update.
-     * @return {IWord32Array} The HMAC.
+     * @return {IWord32Array} The Hmac.
      * @example
      *   var hmac = hmacHasher.finalize();
      *   var hmac = hmacHasher.finalize('message');
@@ -551,4 +551,4 @@ const random = makeRandFunction();
 
 /******/ })["default"];
 });
-//# sourceMappingURL=HMAC.js.map
+//# sourceMappingURL=Hmac.js.map

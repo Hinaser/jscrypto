@@ -26,7 +26,7 @@ export const Latin1: IEncoder = {
    * Converts a latin1 string to a word array.
    *
    * @param {string} latin1Str The latin1 string.
-   * @return {IWord32Array} The word array.
+   * @return {IWordArray} The word array.
    * @example
    *   var wordArray = Latin1.parse(latin1Str);
    */

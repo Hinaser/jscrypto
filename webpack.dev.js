@@ -9,6 +9,7 @@ module.exports = {
     SHA1: "./src/SHA1.ts",
     SHA224: "./src/SHA224.ts",
     SHA256: "./src/SHA256.ts",
+    SHA512: "./src/SHA512.ts",
     MD5: "./src/MD5.ts",
     Hmac: "./src/Hmac.ts",
     HmacSHA256: "./src/HmacSHA256.ts",

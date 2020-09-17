@@ -1,14 +1,14 @@
-import {IWord32Array} from "../type";
+import {IWordArray} from "../type";
 import {Word32Array} from "../Word32Array";
 import {Utf8} from "../encoder/Utf8";
 
 export abstract class BufferedBlockAlgorithm {
-  protected _data: IWord32Array;
+  protected _data: IWordArray;
   protected _nBytes: number;
   protected _minBufferSize: number = 0;
   protected _blockSize: number = 0;
   
-  public constructor(data?: IWord32Array, nBytes?: number) {
+  public constructor(data?: IWordArray, nBytes?: number) {
     this._data = typeof data !== "undefined" ? data.clone() : new Word32Array();
     this._nBytes = typeof nBytes === "number" ? nBytes : 0;
   }
@@ -19,7 +19,7 @@ export abstract class BufferedBlockAlgorithm {
    * @example
    *   bufferedBlockAlgorithm.reset();
    */
-  public reset(data?: IWord32Array, nBytes?: number){
+  public reset(data?: IWordArray, nBytes?: number){
     this._data = typeof data !== "undefined" ? data.clone() : new Word32Array();
     this._nBytes = typeof nBytes === "number" ? nBytes : 0;
   }
@@ -27,12 +27,12 @@ export abstract class BufferedBlockAlgorithm {
   /**
    * Adds new data to this block algorithm's buffer.
    *
-   * @param {IWord32Array|string} data The data to append. Strings are converted to a WordArray using UTF-8.
+   * @param {IWordArray|string} data The data to append. Strings are converted to a WordArray using UTF-8.
    * @example
    *   bufferedBlockAlgorithm.append('data');
    *   bufferedBlockAlgorithm.append(wordArray);
    */
-  protected append(data: IWord32Array|string){
+  protected append(data: IWordArray|string){
     if(typeof data === "string"){
       data = Utf8.parse(data);
     }
@@ -46,7 +46,7 @@ export abstract class BufferedBlockAlgorithm {
    * This method invokes doProcessBlock(offset), which must be implemented by a concrete subtype.
    *
    * @param {boolean?} doFlush Whether all blocks and partial blocks should be processed.
-   * @return {IWord32Array} The processed data.
+   * @return {IWordArray} The processed data.
    * @example
    *   var processedData = bufferedBlockAlgorithm.process();
    *   var processedData = bufferedBlockAlgorithm.process(!!'flush');

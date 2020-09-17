@@ -1,11 +1,10 @@
-import { Hasher } from "./lib/algorithm/Hasher";
 import { IWordArray } from "./lib/type";
-export default class SHA256 extends Hasher {
+import SHA256 from "./SHA256";
+export default class SHA224 extends SHA256 {
     protected _hash: IWordArray;
     constructor(hash?: IWordArray, blockSize?: number, data?: IWordArray, nBytes?: number);
     protected doReset(): void;
-    protected doProcessBlock(words: number[], offset: number): void;
     protected doFinalize(): IWordArray;
-    clone(): SHA256;
+    clone(): SHA224;
     static hash(message: IWordArray | string): IWordArray;
 }

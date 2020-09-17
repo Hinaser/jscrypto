@@ -1,4 +1,4 @@
-export interface IWord32Array {
+export interface IWordArray {
   /**
    * Converts this word array to a string.
    *
@@ -13,12 +13,12 @@ export interface IWord32Array {
   /**
    * Concatenates a word array to this word array.
    *
-   * @param {IWord32Array} w The word array to append.
-   * @return {IWord32Array} This word array.
+   * @param {IWordArray} w The word array to append.
+   * @return {IWordArray} This word array.
    * @example
    *   wordArray1.concat(wordArray2);
    */
-  concat: (w: IWord32Array) => IWord32Array;
+  concat: (w: IWordArray) => IWordArray;
   /**
    * Removes insignificant bits.
    *
@@ -29,11 +29,11 @@ export interface IWord32Array {
   /**
    * Creates a copy of this word array.
    *
-   * @return {IWord32Array} The clone.
+   * @return {IWordArray} The clone.
    * @example
    *   var clone = wordArray.clone();
    */
-  clone: () => IWord32Array;
+  clone: () => IWordArray;
   /**
    * Get raw reference of internal words.
    * Modification of this raw array will affect internal words.
@@ -56,5 +56,5 @@ export interface IWord32Array {
 
 export interface IEncoder {
   stringify: (words: number[], nSignificantBytes: number) => string;
-  parse: (s: string) => IWord32Array;
+  parse: (s: string) => IWordArray;
 }

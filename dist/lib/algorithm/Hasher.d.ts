@@ -1,8 +1,8 @@
 import { BufferedBlockAlgorithm } from "./BufferedBlockAlgorithm";
-import { IWord32Array } from "../type";
+import { IWordArray } from "../type";
 export declare abstract class Hasher extends BufferedBlockAlgorithm {
     protected _blockSize: number;
-    constructor(blockSize?: number, data?: IWord32Array, nBytes?: number);
+    constructor(blockSize?: number, data?: IWordArray, nBytes?: number);
     get blockSize(): number;
     /**
      * Resets this hasher to its initial state.
@@ -10,29 +10,29 @@ export declare abstract class Hasher extends BufferedBlockAlgorithm {
      * @example
      *   hasher.reset();
      */
-    reset(data?: IWord32Array, nBytes?: number): void;
+    reset(data?: IWordArray, nBytes?: number): void;
     /**
      * Updates this hasher with a message.
      *
-     * @param {IWord32Array|string} messageUpdate The message to append.
+     * @param {IWordArray|string} messageUpdate The message to append.
      * @return {Hasher} This hasher.
      * @example
      *   hasher.update('message');
      *   hasher.update(wordArray);
      */
-    update(messageUpdate: IWord32Array | string): this;
+    update(messageUpdate: IWordArray | string): this;
     /**
      * Finalizes the hash computation.
      * Note that the finalize operation is effectively a destructive, read-once operation.
      *
-     * @param {IWord32Array|string?} messageUpdate (Optional) A final message update.
-     * @return {IWord32Array} The hash.
+     * @param {IWordArray|string?} messageUpdate (Optional) A final message update.
+     * @return {IWordArray} The hash.
      * @example
      *   var hash = hasher.finalize();
      *   var hash = hasher.finalize('message');
      *   var hash = hasher.finalize(wordArray);
      */
-    finalize(messageUpdate?: IWord32Array | string): IWord32Array;
+    finalize(messageUpdate?: IWordArray | string): IWordArray;
     protected abstract doReset(): void;
-    protected abstract doFinalize(): IWord32Array;
+    protected abstract doFinalize(): IWordArray;
 }

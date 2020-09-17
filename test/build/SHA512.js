@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["HmacSHA256"] = factory();
+		exports["SHA512"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["HmacSHA256"] = factory();
+		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["SHA512"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/HmacSHA256.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/SHA512.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -127,237 +127,261 @@ module.exports = g;
 
 /***/ }),
 
-/***/ "./src/Hmac.ts":
-/*!*********************!*\
-  !*** ./src/Hmac.ts ***!
-  \*********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Hmac; });
-/* harmony import */ var _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
-
-class Hmac {
-    constructor(hasher, key) {
-        this._hasher = hasher;
-        // Convert string to WordArray, else assume WordArray already
-        if (typeof key == "string") {
-            key = _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__["Utf8"].parse(key);
-        }
-        const hasherBlockSize = hasher.blockSize;
-        const hasherBlockSizeBytes = hasherBlockSize * 4;
-        // Allow arbitrary length keys
-        if (key.length() > hasherBlockSizeBytes) {
-            key = hasher.finalize(key);
-        }
-        // Clamp excess bits
-        key.clamp();
-        const oKey = this._oKey = key.clone();
-        const iKey = this._iKey = key.clone();
-        const oKeyWords = oKey.raw();
-        const iKeyWords = iKey.raw();
-        for (let i = 0; i < hasherBlockSize; i++) {
-            oKeyWords[i] ^= 0x5c5c5c5c;
-            iKeyWords[i] ^= 0x36363636;
-        }
-        iKey.setSignificantBytes(hasherBlockSizeBytes);
-        oKey.setSignificantBytes(hasherBlockSizeBytes);
-        // Set initial values
-        this.reset();
-    }
-    /**
-     * Resets this Hmac to its initial state.
-     *
-     * @example
-     *   hmacHasher.reset();
-     */
-    reset() {
-        this._hasher.reset();
-        this._hasher.update(this._iKey);
-    }
-    /**
-     * Updates this Hmac with a message.
-     *
-     * @param {IWordArray|string} messageUpdate The message to append.
-     * @return {Hmac} This Hmac instance.
-     * @example
-     *   hmacHasher.update('message');
-     *   hmacHasher.update(wordArray);
-     */
-    update(messageUpdate) {
-        this._hasher.update(messageUpdate);
-        return this;
-    }
-    /**
-     * Finalizes the Hmac computation.
-     * Note that the finalize operation is effectively a destructive, read-once operation.
-     *
-     * @param {IWordArray|string} messageUpdate (Optional) A final message update.
-     * @return {IWordArray} The Hmac.
-     * @example
-     *   var hmac = hmacHasher.finalize();
-     *   var hmac = hmacHasher.finalize('message');
-     *   var hmac = hmacHasher.finalize(wordArray);
-     */
-    finalize(messageUpdate) {
-        const innerHash = this._hasher.finalize(messageUpdate);
-        this._hasher.reset();
-        return this._hasher.finalize(this._oKey.clone().concat(innerHash));
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/HmacSHA256.ts":
-/*!***************************!*\
-  !*** ./src/HmacSHA256.ts ***!
-  \***************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacSHA256; });
-/* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
-/* harmony import */ var _SHA256__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA256 */ "./src/SHA256.ts");
-
-
-function HmacSHA256(message, key) {
-    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"](new _SHA256__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
-}
-
-
-/***/ }),
-
-/***/ "./src/SHA256.ts":
+/***/ "./src/SHA512.ts":
 /*!***********************!*\
-  !*** ./src/SHA256.ts ***!
+  !*** ./src/SHA512.ts ***!
   \***********************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA256; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA512; });
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
-/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word64Array */ "./src/lib/Word64Array.ts");
 
 
-// Hash values
-const H = [];
-// Round constants
-const K = [];
-function isPrime(n) {
-    const sqrtN = Math.sqrt(n);
-    for (let factor = 2; factor <= sqrtN; factor++) {
-        if (!(n % factor)) {
-            return false;
-        }
-    }
-    return true;
-}
-function getFractionalBits(n) {
-    return ((n - (n | 0)) * 0x100000000) | 0;
-}
-(function computeRoundConstants() {
-    let n = 2;
-    let nPrime = 0;
-    while (nPrime < 64) {
-        if (isPrime(n)) {
-            if (nPrime < 8) {
-                H[nPrime] = getFractionalBits(Math.pow(n, 1 / 2));
-            }
-            K[nPrime] = getFractionalBits(Math.pow(n, 1 / 3));
-            nPrime++;
-        }
-        n++;
+const K = [
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x428a2f98, 0xd728ae22), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x71374491, 0x23ef65cd),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xb5c0fbcf, 0xec4d3b2f), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xe9b5dba5, 0x8189dbbc),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x3956c25b, 0xf348b538), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x59f111f1, 0xb605d019),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x923f82a4, 0xaf194f9b), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xab1c5ed5, 0xda6d8118),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xd807aa98, 0xa3030242), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x12835b01, 0x45706fbe),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x243185be, 0x4ee4b28c), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x550c7dc3, 0xd5ffb4e2),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x72be5d74, 0xf27b896f), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x80deb1fe, 0x3b1696b1),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x9bdc06a7, 0x25c71235), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xc19bf174, 0xcf692694),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xe49b69c1, 0x9ef14ad2), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xefbe4786, 0x384f25e3),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x0fc19dc6, 0x8b8cd5b5), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x240ca1cc, 0x77ac9c65),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x2de92c6f, 0x592b0275), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x4a7484aa, 0x6ea6e483),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x5cb0a9dc, 0xbd41fbd4), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x76f988da, 0x831153b5),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x983e5152, 0xee66dfab), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xa831c66d, 0x2db43210),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xb00327c8, 0x98fb213f), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xbf597fc7, 0xbeef0ee4),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xc6e00bf3, 0x3da88fc2), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xd5a79147, 0x930aa725),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x06ca6351, 0xe003826f), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x14292967, 0x0a0e6e70),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x27b70a85, 0x46d22ffc), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x2e1b2138, 0x5c26c926),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x4d2c6dfc, 0x5ac42aed), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x53380d13, 0x9d95b3df),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x650a7354, 0x8baf63de), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x766a0abb, 0x3c77b2a8),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x81c2c92e, 0x47edaee6), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x92722c85, 0x1482353b),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xa2bfe8a1, 0x4cf10364), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xa81a664b, 0xbc423001),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xc24b8b70, 0xd0f89791), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xc76c51a3, 0x0654be30),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xd192e819, 0xd6ef5218), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xd6990624, 0x5565a910),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xf40e3585, 0x5771202a), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x106aa070, 0x32bbd1b8),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x19a4c116, 0xb8d2d0c8), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x1e376c08, 0x5141ab53),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x2748774c, 0xdf8eeb99), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x34b0bcb5, 0xe19b48a8),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x391c0cb3, 0xc5c95a63), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x4ed8aa4a, 0xe3418acb),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x5b9cca4f, 0x7763e373), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x682e6ff3, 0xd6b2b8a3),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x748f82ee, 0x5defb2fc), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x78a5636f, 0x43172f60),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x84c87814, 0xa1f0ab72), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x8cc70208, 0x1a6439ec),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x90befffa, 0x23631e28), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xa4506ceb, 0xde82bde9),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xbef9a3f7, 0xb2c67915), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xc67178f2, 0xe372532b),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xca273ece, 0xea26619c), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xd186b8c7, 0x21c0c207),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xeada7dd6, 0xcde0eb1e), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xf57d4f7f, 0xee6ed178),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x06f067aa, 0x72176fba), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x0a637dc5, 0xa2c898a6),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x113f9804, 0xbef90dae), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x1b710b35, 0x131c471b),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x28db77f5, 0x23047d84), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x32caab7b, 0x40c72493),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x3c9ebe0a, 0x15c9bebc), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x431d67c4, 0x9c100d4c),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x4cc5d4be, 0xcb3e42b6), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x597f299c, 0xfc657e2a),
+    new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x5fcb6fab, 0x3ad6faec), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x6c44198c, 0x4a475817),
+];
+const W = [];
+(function computeConstants() {
+    for (let i = 0; i < 80; i++) {
+        W[i] = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0, 0);
     }
 })();
-// Reusable object
-const W = [];
-class SHA256 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] {
+class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] {
     constructor(hash, blockSize, data, nBytes) {
         super(blockSize, data, nBytes);
-        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](H.slice(0));
+        this._blockSize = 1024 / 32;
+        this._hash = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64Array"]([
+            new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x6a09e667, 0xf3bcc908), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xbb67ae85, 0x84caa73b),
+            new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x3c6ef372, 0xfe94f82b), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xa54ff53a, 0x5f1d36f1),
+            new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x510e527f, 0xade682d1), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x9b05688c, 0x2b3e6c1f),
+            new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x1f83d9ab, 0xfb41bd6b), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x5be0cd19, 0x137e2179)
+        ]);
         if (typeof hash !== "undefined") {
             this._hash = hash.clone();
         }
     }
     doReset() {
-        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](H.slice(0));
+        this._hash = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64Array"]([
+            new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x6a09e667, 0xf3bcc908), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xbb67ae85, 0x84caa73b),
+            new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x3c6ef372, 0xfe94f82b), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xa54ff53a, 0x5f1d36f1),
+            new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x510e527f, 0xade682d1), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x9b05688c, 0x2b3e6c1f),
+            new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x1f83d9ab, 0xfb41bd6b), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x5be0cd19, 0x137e2179)
+        ]);
     }
     doProcessBlock(words, offset) {
-        const _H = this._hash.raw();
-        let a = _H[0];
-        let b = _H[1];
-        let c = _H[2];
-        let d = _H[3];
-        let e = _H[4];
-        let f = _H[5];
-        let g = _H[6];
-        let h = _H[7];
-        for (let i = 0; i < 64; i++) {
+        // Shortcuts
+        const H = this._hash.raw();
+        const H0 = H[0];
+        const H1 = H[1];
+        const H2 = H[2];
+        const H3 = H[3];
+        const H4 = H[4];
+        const H5 = H[5];
+        const H6 = H[6];
+        const H7 = H[7];
+        const H0h = H0.high;
+        let H0l = H0.low;
+        const H1h = H1.high;
+        let H1l = H1.low;
+        const H2h = H2.high;
+        let H2l = H2.low;
+        const H3h = H3.high;
+        let H3l = H3.low;
+        const H4h = H4.high;
+        let H4l = H4.low;
+        const H5h = H5.high;
+        let H5l = H5.low;
+        const H6h = H6.high;
+        let H6l = H6.low;
+        const H7h = H7.high;
+        let H7l = H7.low;
+        // Working variables
+        let ah = H0h;
+        let al = H0l;
+        let bh = H1h;
+        let bl = H1l;
+        let ch = H2h;
+        let cl = H2l;
+        let dh = H3h;
+        let dl = H3l;
+        let eh = H4h;
+        let el = H4l;
+        let fh = H5h;
+        let fl = H5l;
+        let gh = H6h;
+        let gl = H6l;
+        let hh = H7h;
+        let hl = H7l;
+        // Rounds
+        for (let i = 0; i < 80; i++) {
+            let Wil;
+            let Wih;
+            // Shortcut
+            const Wi = W[i];
+            // Extend message
             if (i < 16) {
-                W[i] = words[offset + i] | 0;
+                Wih = Wi.high = words[offset + i * 2] | 0;
+                Wil = Wi.low = words[offset + i * 2 + 1] | 0;
             }
             else {
+                // Gamma0
                 const gamma0x = W[i - 15];
-                const gamma0 = ((gamma0x << 25) | (gamma0x >>> 7))
-                    ^ ((gamma0x << 14) | (gamma0x >>> 18))
-                    ^ (gamma0x >>> 3);
+                const gamma0xh = gamma0x.high;
+                const gamma0xl = gamma0x.low;
+                const gamma0h = ((gamma0xh >>> 1) | (gamma0xl << 31))
+                    ^ ((gamma0xh >>> 8) | (gamma0xl << 24))
+                    ^ (gamma0xh >>> 7);
+                const gamma0l = ((gamma0xl >>> 1) | (gamma0xh << 31))
+                    ^ ((gamma0xl >>> 8) | (gamma0xh << 24))
+                    ^ ((gamma0xl >>> 7) | (gamma0xh << 25));
+                // Gamma1
                 const gamma1x = W[i - 2];
-                const gamma1 = ((gamma1x << 15) | (gamma1x >>> 17))
-                    ^ ((gamma1x << 13) | (gamma1x >>> 19))
-                    ^ (gamma1x >>> 10);
-                W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
+                const gamma1xh = gamma1x.high;
+                const gamma1xl = gamma1x.low;
+                const gamma1h = ((gamma1xh >>> 19) | (gamma1xl << 13))
+                    ^ ((gamma1xh << 3) | (gamma1xl >>> 29)) ^ (gamma1xh >>> 6);
+                const gamma1l = ((gamma1xl >>> 19) | (gamma1xh << 13))
+                    ^ ((gamma1xl << 3) | (gamma1xh >>> 29)) ^ ((gamma1xl >>> 6) | (gamma1xh << 26));
+                // W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16]
+                const Wi7 = W[i - 7];
+                const Wi7h = Wi7.high;
+                const Wi7l = Wi7.low;
+                const Wi16 = W[i - 16];
+                const Wi16h = Wi16.high;
+                const Wi16l = Wi16.low;
+                Wil = gamma0l + Wi7l;
+                Wih = gamma0h + Wi7h + ((Wil >>> 0) < (gamma0l >>> 0) ? 1 : 0);
+                Wil = Wil + gamma1l;
+                Wih = Wih + gamma1h + ((Wil >>> 0) < (gamma1l >>> 0) ? 1 : 0);
+                Wil = Wil + Wi16l;
+                Wih = Wih + Wi16h + ((Wil >>> 0) < (Wi16l >>> 0) ? 1 : 0);
+                Wi.high = Wih;
+                Wi.low = Wil;
             }
-            const ch = (e & f) ^ (~e & g);
-            const maj = (a & b) ^ (a & c) ^ (b & c);
-            const sigma0 = ((a << 30) | (a >>> 2)) ^ ((a << 19) | (a >>> 13)) ^ ((a << 10) | (a >>> 22));
-            const sigma1 = ((e << 26) | (e >>> 6)) ^ ((e << 21) | (e >>> 11)) ^ ((e << 7) | (e >>> 25));
-            const t1 = h + sigma1 + ch + K[i] + W[i];
-            const t2 = sigma0 + maj;
-            h = g;
-            g = f;
-            f = e;
-            e = (d + t1) | 0;
-            d = c;
-            c = b;
-            b = a;
-            a = (t1 + t2) | 0;
+            const chh = (eh & fh) ^ (~eh & gh);
+            const chl = (el & fl) ^ (~el & gl);
+            const majh = (ah & bh) ^ (ah & ch) ^ (bh & ch);
+            const majl = (al & bl) ^ (al & cl) ^ (bl & cl);
+            const sigma0h = ((ah >>> 28) | (al << 4)) ^ ((ah << 30) | (al >>> 2)) ^ ((ah << 25) | (al >>> 7));
+            const sigma0l = ((al >>> 28) | (ah << 4)) ^ ((al << 30) | (ah >>> 2)) ^ ((al << 25) | (ah >>> 7));
+            const sigma1h = ((eh >>> 14) | (el << 18)) ^ ((eh >>> 18) | (el << 14)) ^ ((eh << 23) | (el >>> 9));
+            const sigma1l = ((el >>> 14) | (eh << 18)) ^ ((el >>> 18) | (eh << 14)) ^ ((el << 23) | (eh >>> 9));
+            // t1 = h + sigma1 + ch + K[i] + W[i]
+            const Ki = K[i];
+            const Kih = Ki.high;
+            const Kil = Ki.low;
+            let t1l = hl + sigma1l;
+            let t1h = hh + sigma1h + ((t1l >>> 0) < (hl >>> 0) ? 1 : 0);
+            t1l = t1l + chl;
+            t1h = t1h + chh + ((t1l >>> 0) < (chl >>> 0) ? 1 : 0);
+            t1l = t1l + Kil;
+            t1h = t1h + Kih + ((t1l >>> 0) < (Kil >>> 0) ? 1 : 0);
+            t1l = t1l + Wil;
+            t1h = t1h + Wih + ((t1l >>> 0) < (Wil >>> 0) ? 1 : 0);
+            // t2 = sigma0 + maj
+            const t2l = sigma0l + majl;
+            const t2h = sigma0h + majh + ((t2l >>> 0) < (sigma0l >>> 0) ? 1 : 0);
+            // Update working variables
+            hh = gh;
+            hl = gl;
+            gh = fh;
+            gl = fl;
+            fh = eh;
+            fl = el;
+            el = (dl + t1l) | 0;
+            eh = (dh + t1h + ((el >>> 0) < (dl >>> 0) ? 1 : 0)) | 0;
+            dh = ch;
+            dl = cl;
+            ch = bh;
+            cl = bl;
+            bh = ah;
+            bl = al;
+            al = (t1l + t2l) | 0;
+            ah = (t1h + t2h + ((al >>> 0) < (t1l >>> 0) ? 1 : 0)) | 0;
         }
         // Intermediate hash value
-        _H[0] = (_H[0] + a) | 0;
-        _H[1] = (_H[1] + b) | 0;
-        _H[2] = (_H[2] + c) | 0;
-        _H[3] = (_H[3] + d) | 0;
-        _H[4] = (_H[4] + e) | 0;
-        _H[5] = (_H[5] + f) | 0;
-        _H[6] = (_H[6] + g) | 0;
-        _H[7] = (_H[7] + h) | 0;
+        H0l = H0.low = (H0l + al);
+        H0.high = (H0h + ah + ((H0l >>> 0) < (al >>> 0) ? 1 : 0));
+        H1l = H1.low = (H1l + bl);
+        H1.high = (H1h + bh + ((H1l >>> 0) < (bl >>> 0) ? 1 : 0));
+        H2l = H2.low = (H2l + cl);
+        H2.high = (H2h + ch + ((H2l >>> 0) < (cl >>> 0) ? 1 : 0));
+        H3l = H3.low = (H3l + dl);
+        H3.high = (H3h + dh + ((H3l >>> 0) < (dl >>> 0) ? 1 : 0));
+        H4l = H4.low = (H4l + el);
+        H4.high = (H4h + eh + ((H4l >>> 0) < (el >>> 0) ? 1 : 0));
+        H5l = H5.low = (H5l + fl);
+        H5.high = (H5h + fh + ((H5l >>> 0) < (fl >>> 0) ? 1 : 0));
+        H6l = H6.low = (H6l + gl);
+        H6.high = (H6h + gh + ((H6l >>> 0) < (gl >>> 0) ? 1 : 0));
+        H7l = H7.low = (H7l + hl);
+        H7.high = (H7h + hh + ((H7l >>> 0) < (hl >>> 0) ? 1 : 0));
     }
     doFinalize() {
-        const words = this._data.raw();
+        // Shortcuts
+        const data = this._data;
+        const dataWords = data.raw();
         const nBitsTotal = this._nBytes * 8;
-        const nBitsLeft = this._data.length() * 8;
+        const nBitsLeft = data.length() * 8;
         // Add padding
-        words[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
-        words[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
-        words[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
-        this._data.setSignificantBytes(words.length * 4);
+        dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+        dataWords[(((nBitsLeft + 128) >>> 10) << 5) + 30] = Math.floor(nBitsTotal / 0x100000000);
+        dataWords[(((nBitsLeft + 128) >>> 10) << 5) + 31] = nBitsTotal;
+        data.setSignificantBytes(dataWords.length * 4);
         // Hash final blocks
         this.process();
-        // Return final computed hash
-        return this._hash;
+        // Convert hash to 32-bit word array before returning
+        return this._hash.to32();
     }
     clone() {
-        return new SHA256(this._hash, this._blockSize, this._data, this._nBytes);
+        const hash = this._hash.clone();
+        return new SHA512(hash, this.blockSize, this._data, this._nBytes);
     }
     static hash(message) {
-        return new SHA256().finalize(message);
+        return new SHA512().finalize(message);
     }
 }
 
@@ -504,6 +528,128 @@ class Word32Array {
             words.push(Object(_random__WEBPACK_IMPORTED_MODULE_1__["random"])());
         }
         return new Word32Array(words, nBytes);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/lib/Word64Array.ts":
+/*!********************************!*\
+  !*** ./src/lib/Word64Array.ts ***!
+  \********************************/
+/*! exports provided: Word64, Word64Array */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Word64", function() { return Word64; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Word64Array", function() { return Word64Array; });
+/* harmony import */ var _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./encoder/Hex */ "./src/lib/encoder/Hex.ts");
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Word32Array */ "./src/lib/Word32Array.ts");
+
+
+class Word64 {
+    constructor(high, low) {
+        this.high = high;
+        this.low = low;
+    }
+    clone() {
+        return new Word64(this.high, this.low);
+    }
+}
+/**
+ * An array of 64bit words
+ */
+class Word64Array {
+    /**
+     * Initializes a newly created word array.
+     *
+     * @param {Array} words (Optional) An array of 32-bit words.
+     * @param {number} nSignificantBytes (Optional) The number of significant bytes in the words.
+     *
+     * @example
+     *   var wordArray = new WordArray();
+     *   var wordArray = new WordArray([0x00010203, 0x04050607]);
+     *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
+     */
+    constructor(words, nSignificantBytes) {
+        this._words = words || [];
+        this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 8;
+    }
+    /**
+     * Converts this 64-bit word array to a 32-bit word array.
+     *
+     * @return {Word32Array} This word array's data as a 32-bit word array.
+     *
+     * @example
+     *
+     *     var x32WordArray = x64WordArray.toX32();
+     */
+    to32() {
+        const words32 = [];
+        for (let i = 0; i < this._words.length; i++) {
+            const word64 = this._words[i];
+            words32.push(word64.high);
+            words32.push(word64.low);
+        }
+        return new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](words32, this._nSignificantBytes);
+    }
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    raw() {
+        return this._words;
+    }
+    /**
+     * Return a copy of an array of 32-bit words.
+     */
+    slice() {
+        return this._words.slice();
+    }
+    /**
+     * Return significantBytes
+     */
+    length() {
+        return this._nSignificantBytes;
+    }
+    /**
+     * Set significant bytes
+     * @param {number} n - significant bytes
+     */
+    setSignificantBytes(n) {
+        this._nSignificantBytes = n;
+    }
+    /**
+     * Converts this word array to a string.
+     *
+     * @param {IEncoder?} encoder The encoding strategy to use. Default: CryptoJS.enc.Hex
+     * @return {string} The stringified word array.
+     * @example
+     *   var string = wordArray + '';
+     *   var string = wordArray.toString();
+     *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+     */
+    toString(encoder) {
+        if (!encoder) {
+            return _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__["Hex"].stringify(this.to32().slice(), this._nSignificantBytes);
+        }
+        return encoder.stringify(this.to32().slice(), this._nSignificantBytes);
+    }
+    /**
+     * Creates a copy of this word array.
+     *
+     * @return {Word64Array} The clone.
+     * @example
+     *   var clone = wordArray.clone();
+     */
+    clone() {
+        const words = this._words.slice();
+        for (let i = 0; i < words.length; i++) {
+            words[i] = words[i].clone();
+        }
+        return new Word64Array(words, this._nSignificantBytes);
     }
 }
 
@@ -870,4 +1016,4 @@ const random = makeRandFunction();
 
 /******/ })["default"];
 });
-//# sourceMappingURL=HmacSHA256.js.map
+//# sourceMappingURL=SHA512.js.map

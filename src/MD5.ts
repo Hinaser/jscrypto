@@ -1,6 +1,6 @@
 import {Word32Array} from "./lib/Word32Array";
 import {Hasher} from "./lib/algorithm/Hasher";
-import {IWord32Array} from "./lib/type";
+import {IWordArray} from "./lib/type";
 
 // Constants table
 const T: number[] = [];
@@ -35,12 +35,12 @@ function II(a: number, b: number, c: number, d: number, x: number, s: number, t:
  * MD5 hash algorithm
  */
 export default class MD5 extends Hasher {
-  private _hash: IWord32Array = new Word32Array([
+  private _hash: IWordArray = new Word32Array([
     0x67452301, 0xefcdab89,
     0x98badcfe, 0x10325476
   ]);
   
-  public constructor(hash?: IWord32Array, blockSize?: number, data?: IWord32Array, nBytes?: number) {
+  public constructor(hash?: IWordArray, blockSize?: number, data?: IWordArray, nBytes?: number) {
     super(blockSize, data, nBytes);
     if(typeof hash !== "undefined"){
       this._hash = hash.clone();
@@ -169,7 +169,7 @@ export default class MD5 extends Hasher {
     H[3] = (H[3] + d) | 0;
   }
   
-  protected doFinalize(): IWord32Array {
+  protected doFinalize(): IWordArray {
     // Shortcuts
     const data = this._data;
     const dataWords = data.raw();
@@ -216,7 +216,7 @@ export default class MD5 extends Hasher {
     return new MD5(this._hash, this._blockSize, this._data, this._nBytes);
   }
   
-  public static hash(message: IWord32Array|string){
+  public static hash(message: IWordArray|string){
     return new MD5().finalize(message);
   }
 }

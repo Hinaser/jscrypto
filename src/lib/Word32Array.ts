@@ -1,11 +1,11 @@
-import {IEncoder, IWord32Array} from "./type";
+import {IEncoder, IWordArray} from "./type";
 import {Hex} from "./encoder/Hex";
 import {random} from "./random";
 
 /**
  * An array of 32bit words
  */
-export class Word32Array implements IWord32Array {
+export class Word32Array implements IWordArray {
   private readonly _words: number[];
   private _nSignificantBytes: number;
   
@@ -75,12 +75,12 @@ export class Word32Array implements IWord32Array {
   /**
    * Concatenates a word array to this word array.
    *
-   * @param {IWord32Array} w The word array to append.
-   * @return {IWord32Array} This word array.
+   * @param {IWordArray} w The word array to append.
+   * @return {IWordArray} This word array.
    * @example
    *   wordArray1.concat(wordArray2);
    */
-  public concat(w: IWord32Array){
+  public concat(w: IWordArray){
     const words = w.slice();
     const N = w.length();
     
@@ -121,7 +121,7 @@ export class Word32Array implements IWord32Array {
   /**
    * Creates a copy of this word array.
    *
-   * @return {IWord32Array} The clone.
+   * @return {IWordArray} The clone.
    * @example
    *   var clone = wordArray.clone();
    */
@@ -133,7 +133,7 @@ export class Word32Array implements IWord32Array {
    * Creates a word array filled with random bytes.
    *
    * @param {number} nBytes The number of random bytes to generate.
-   * @return {IWord32Array} The random word array.
+   * @return {IWordArray} The random word array.
    * @static
    * @example
    *   var wordArray = CryptoJS.lib.WordArray.random(16);

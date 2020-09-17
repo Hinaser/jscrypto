@@ -27,7 +27,7 @@ export const Hex: IEncoder = {
    * Converts a hex string to a word array.
    *
    * @param {string} hexStr The hex string.
-   * @return {IWord32Array} The word array.
+   * @return {IWordArray} The word array.
    * @example
    *   var wordArray = Hex.parse(hexString);
    */

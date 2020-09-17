@@ -1,5 +1,5 @@
 import {Hasher} from "./lib/algorithm/Hasher";
-import {IWord32Array} from "./lib/type";
+import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
 
 // Hash values
@@ -40,9 +40,9 @@ function getFractionalBits(n: number) {
 const W: number[] = [];
 
 export default class SHA256 extends Hasher {
-  protected _hash: IWord32Array = new Word32Array(H.slice(0));
+  protected _hash: IWordArray = new Word32Array(H.slice(0));
   
-  public constructor(hash?: IWord32Array, blockSize?: number, data?: IWord32Array, nBytes?: number) {
+  public constructor(hash?: IWordArray, blockSize?: number, data?: IWordArray, nBytes?: number) {
     super(blockSize, data, nBytes);
     if(typeof hash !== "undefined"){
       this._hash = hash.clone();
@@ -113,7 +113,7 @@ export default class SHA256 extends Hasher {
     _H[7] = (_H[7] + h) | 0;
   }
   
-  protected doFinalize(): IWord32Array {
+  protected doFinalize(): IWordArray {
     const words = this._data.raw();
     const nBitsTotal = this._nBytes * 8;
     const nBitsLeft = this._data.length() * 8;
@@ -135,7 +135,7 @@ export default class SHA256 extends Hasher {
     return new SHA256(this._hash, this._blockSize, this._data, this._nBytes);
   }
   
-  public static hash(message: IWord32Array|string){
+  public static hash(message: IWordArray|string){
     return new SHA256().finalize(message);
   }
 }

@@ -180,7 +180,7 @@ class Hmac {
     /**
      * Updates this Hmac with a message.
      *
-     * @param {IWord32Array|string} messageUpdate The message to append.
+     * @param {IWordArray|string} messageUpdate The message to append.
      * @return {Hmac} This Hmac instance.
      * @example
      *   hmacHasher.update('message');
@@ -194,8 +194,8 @@ class Hmac {
      * Finalizes the Hmac computation.
      * Note that the finalize operation is effectively a destructive, read-once operation.
      *
-     * @param {IWord32Array|string} messageUpdate (Optional) A final message update.
-     * @return {IWord32Array} The Hmac.
+     * @param {IWordArray|string} messageUpdate (Optional) A final message update.
+     * @return {IWordArray} The Hmac.
      * @example
      *   var hmac = hmacHasher.finalize();
      *   var hmac = hmacHasher.finalize('message');
@@ -289,8 +289,8 @@ class Word32Array {
     /**
      * Concatenates a word array to this word array.
      *
-     * @param {IWord32Array} w The word array to append.
-     * @return {IWord32Array} This word array.
+     * @param {IWordArray} w The word array to append.
+     * @return {IWordArray} This word array.
      * @example
      *   wordArray1.concat(wordArray2);
      */
@@ -329,7 +329,7 @@ class Word32Array {
     /**
      * Creates a copy of this word array.
      *
-     * @return {IWord32Array} The clone.
+     * @return {IWordArray} The clone.
      * @example
      *   var clone = wordArray.clone();
      */
@@ -340,7 +340,7 @@ class Word32Array {
      * Creates a word array filled with random bytes.
      *
      * @param {number} nBytes The number of random bytes to generate.
-     * @return {IWord32Array} The random word array.
+     * @return {IWordArray} The random word array.
      * @static
      * @example
      *   var wordArray = CryptoJS.lib.WordArray.random(16);
@@ -392,7 +392,7 @@ const Hex = {
      * Converts a hex string to a word array.
      *
      * @param {string} hexStr The hex string.
-     * @return {IWord32Array} The word array.
+     * @return {IWordArray} The word array.
      * @example
      *   var wordArray = Hex.parse(hexString);
      */
@@ -443,7 +443,7 @@ const Latin1 = {
      * Converts a latin1 string to a word array.
      *
      * @param {string} latin1Str The latin1 string.
-     * @return {IWord32Array} The word array.
+     * @return {IWordArray} The word array.
      * @example
      *   var wordArray = Latin1.parse(latin1Str);
      */
@@ -494,7 +494,7 @@ const Utf8 = {
      * Converts a UTF-8 string to a word array.
      *
      * @param {string} utf8Str The UTF-8 string.
-     * @return {IWord32Array} The word array.
+     * @return {IWordArray} The word array.
      * @example
      *   var wordArray = Utf8.parse(utf8Str);
      */

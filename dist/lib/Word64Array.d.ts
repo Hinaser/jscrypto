@@ -1,8 +1,15 @@
-import { IEncoder, IWordArray } from "./type";
+import { IEncoder } from "./type";
+import { Word32Array } from "./Word32Array";
+export declare class Word64 {
+    high: number;
+    low: number;
+    constructor(high: number, low: number);
+    clone(): Word64;
+}
 /**
- * An array of 32bit words
+ * An array of 64bit words
  */
-export declare class Word32Array implements IWordArray {
+export declare class Word64Array {
     private readonly _words;
     private _nSignificantBytes;
     /**
@@ -16,16 +23,26 @@ export declare class Word32Array implements IWordArray {
      *   var wordArray = new WordArray([0x00010203, 0x04050607]);
      *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
      */
-    constructor(words?: number[], nSignificantBytes?: number);
+    constructor(words?: Word64[], nSignificantBytes?: number);
+    /**
+     * Converts this 64-bit word array to a 32-bit word array.
+     *
+     * @return {Word32Array} This word array's data as a 32-bit word array.
+     *
+     * @example
+     *
+     *     var x32WordArray = x64WordArray.toX32();
+     */
+    to32(): Word32Array;
     /**
      * Get raw reference of internal words.
      * Modification of this raw array will affect internal words.
      */
-    raw(): number[];
+    raw(): Word64[];
     /**
      * Return a copy of an array of 32-bit words.
      */
-    slice(): number[];
+    slice(): Word64[];
     /**
      * Return significantBytes
      */
@@ -47,37 +64,11 @@ export declare class Word32Array implements IWordArray {
      */
     toString(encoder?: IEncoder): string;
     /**
-     * Concatenates a word array to this word array.
-     *
-     * @param {IWordArray} w The word array to append.
-     * @return {IWordArray} This word array.
-     * @example
-     *   wordArray1.concat(wordArray2);
-     */
-    concat(w: IWordArray): this;
-    /**
-     * Removes insignificant bits.
-     *
-     * @example
-     *   wordArray.clamp();
-     */
-    clamp(): void;
-    /**
      * Creates a copy of this word array.
      *
-     * @return {IWordArray} The clone.
+     * @return {Word64Array} The clone.
      * @example
      *   var clone = wordArray.clone();
      */
-    clone(): Word32Array;
-    /**
-     * Creates a word array filled with random bytes.
-     *
-     * @param {number} nBytes The number of random bytes to generate.
-     * @return {IWordArray} The random word array.
-     * @static
-     * @example
-     *   var wordArray = CryptoJS.lib.WordArray.random(16);
-     */
-    static random(nBytes: number): Word32Array;
+    clone(): Word64Array;
 }

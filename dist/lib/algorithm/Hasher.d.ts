@@ -1,8 +1,12 @@
-import { BufferedBlockAlgorithm } from "./BufferedBlockAlgorithm";
+import { BufferedBlockAlgorithm, BufferedBlockAlgorithmProps } from "./BufferedBlockAlgorithm";
 import { IWordArray } from "../type";
+export interface HasherProps extends BufferedBlockAlgorithmProps {
+    blockSize: number;
+}
 export declare abstract class Hasher extends BufferedBlockAlgorithm {
+    protected _props?: Partial<HasherProps>;
     protected _blockSize: number;
-    constructor(blockSize?: number, data?: IWordArray, nBytes?: number);
+    constructor(props?: Partial<HasherProps>);
     get blockSize(): number;
     /**
      * Resets this hasher to its initial state.

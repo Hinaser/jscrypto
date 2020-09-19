@@ -200,21 +200,24 @@ const T = [];
     }
 }());
 class SHA3 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
-    constructor(outputLength, state, blockSize, data, nBytes) {
-        super(blockSize, data, nBytes);
+    constructor(props) {
+        super(props);
         this._blockSize = 1024 / 32;
         this._state = [];
         this._outputLength = 512;
-        if (typeof outputLength !== "undefined") {
-            if (outputLength !== 224 && outputLength !== 256 && outputLength !== 384 && outputLength !== 512) {
-                throw new Error("Unsupported output length.");
+        this._props = props;
+        if (props) {
+            if (typeof props.outputLength !== "undefined") {
+                if (![224, 256, 384, 512].includes(props.outputLength)) {
+                    throw new Error("Unsupported output length.");
+                }
+                this._outputLength = props.outputLength;
             }
-            this._outputLength = outputLength;
+            if (typeof props.state !== "undefined") {
+                this._state = props.state.map(s => s.clone());
+            }
         }
-        if (typeof state !== "undefined") {
-            this._state = state.map(s => s.clone());
-        }
-        else {
+        if (this._state.length === 0) {
             for (let i = 0; i < 25; i++) {
                 this._state[i] = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__["Word64"](0, 0);
             }
@@ -362,10 +365,17 @@ class SHA3 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] 
         return new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_2__["Word32Array"](hashWords, outputLengthBytes);
     }
     clone() {
-        return new SHA3(this._outputLength, this._state, this._blockSize, this._data, this._nBytes);
+        const props = {
+            outputLength: this._outputLength,
+            state: this._state,
+            blockSize: this._blockSize,
+            data: this._data,
+            nBytes: this._nBytes,
+        };
+        return new SHA3(props);
     }
-    static hash(message, outputLength) {
-        return new SHA3(outputLength).finalize(message);
+    static hash(message, props) {
+        return new SHA3(props).finalize(message);
     }
 }
 
@@ -655,11 +665,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class BufferedBlockAlgorithm {
-    constructor(data, nBytes) {
+    constructor(props) {
         this._minBufferSize = 0;
         this._blockSize = 0;
-        this._data = typeof data !== "undefined" ? data.clone() : new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]();
-        this._nBytes = typeof nBytes === "number" ? nBytes : 0;
+        this._props = props;
+        this._data = props && typeof props.data !== "undefined" ? props.data.clone() : new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]();
+        this._nBytes = props && typeof props.nBytes === "number" ? props.nBytes : 0;
     }
     /**
      * Resets this block algorithm's data buffer to its initial state.
@@ -745,13 +756,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BufferedBlockAlgorithm */ "./src/lib/algorithm/BufferedBlockAlgorithm.ts");
 
 class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["BufferedBlockAlgorithm"] {
-    constructor(blockSize, data, nBytes) {
-        super(data, nBytes);
+    constructor(props) {
+        super(props);
         this._blockSize = 512 / 32;
-        if (typeof blockSize === "number") {
-            this._blockSize = blockSize;
+        this._props = props;
+        if (props && typeof props.blockSize === "number") {
+            this._blockSize = props.blockSize;
         }
-        this.reset(data, nBytes);
+        this.reset(props ? props.data : undefined, props ? props.nBytes : undefined);
     }
     get blockSize() {
         return this._blockSize;

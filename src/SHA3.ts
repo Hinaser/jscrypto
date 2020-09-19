@@ -1,8 +1,13 @@
 // Constants tables
 import {Word64} from "./lib/Word64Array";
-import {Hasher} from "./lib/algorithm/Hasher";
+import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
 import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
+
+export interface SHA3Props extends HasherProps {
+  state: Word64[];
+  outputLength: number;
+}
 
 const RHO_OFFSETS: number[] = [];
 const PI_INDEXES: number[]  = [];
@@ -67,27 +72,33 @@ const T: Word64[] = [];
 }());
 
 export default class SHA3 extends Hasher {
+  protected _props?: Partial<SHA3Props>;
   protected _blockSize = 1024/32;
   protected _state: Word64[] = []
   protected _outputLength: number = 512;
   
-  public constructor(outputLength?: number, state?: Word64[], blockSize?: number, data?: IWordArray, nBytes?: number) {
-    super(blockSize, data, nBytes);
+  public constructor(props?: Partial<SHA3Props>) {
+    super(props);
+    this._props = props;
     
-    if(typeof outputLength !== "undefined"){
-      if(outputLength !== 224 && outputLength !== 256 && outputLength !== 384 && outputLength !== 512){
-        throw new Error("Unsupported output length.");
+    if(props){
+      if(typeof props.outputLength !== "undefined"){
+        if(![224,256,384,512].includes(props.outputLength)){
+          throw new Error("Unsupported output length.");
+        }
+        this._outputLength = props.outputLength;
       }
-      this._outputLength = outputLength;
+      if(typeof props.state !== "undefined"){
+        this._state = props.state.map(s => s.clone());
+      }
     }
-    if(typeof state !== "undefined"){
-      this._state = state.map(s => s.clone());
-    }
-    else{
+    
+    if(this._state.length === 0){
       for(let i=0;i<25;i++){
         this._state[i] = new Word64(0, 0);
       }
     }
+    
     this._blockSize = (1600 - 2*this._outputLength) / 32;
   }
   
@@ -263,10 +274,17 @@ export default class SHA3 extends Hasher {
   }
   
   public clone(){
-    return new SHA3(this._outputLength, this._state, this._blockSize, this._data, this._nBytes);
+    const props = {
+      outputLength: this._outputLength,
+      state: this._state,
+      blockSize: this._blockSize,
+      data: this._data,
+      nBytes: this._nBytes,
+    };
+    return new SHA3(props);
   }
   
-  public static hash(message: IWordArray|string, outputLength?: number){
-    return new SHA3(outputLength).finalize(message);
+  public static hash(message: IWordArray|string, props?: SHA3Props){
+    return new SHA3(props).finalize(message);
   }
 }

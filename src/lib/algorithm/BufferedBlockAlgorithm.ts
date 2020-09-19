@@ -2,15 +2,22 @@ import {IWordArray} from "../type";
 import {Word32Array} from "../Word32Array";
 import {Utf8} from "../encoder/Utf8";
 
+export interface BufferedBlockAlgorithmProps {
+  data: IWordArray;
+  nBytes: number;
+}
+
 export abstract class BufferedBlockAlgorithm {
+  protected _props?: Partial<BufferedBlockAlgorithmProps>;
   protected _data: IWordArray;
   protected _nBytes: number;
   protected _minBufferSize: number = 0;
   protected _blockSize: number = 0;
   
-  public constructor(data?: IWordArray, nBytes?: number) {
-    this._data = typeof data !== "undefined" ? data.clone() : new Word32Array();
-    this._nBytes = typeof nBytes === "number" ? nBytes : 0;
+  public constructor(props?: Partial<BufferedBlockAlgorithmProps>) {
+    this._props = props;
+    this._data = props && typeof props.data !== "undefined" ? props.data.clone() : new Word32Array();
+    this._nBytes = props && typeof props.nBytes === "number" ? props.nBytes : 0;
   }
   
   /**

@@ -1,11 +1,16 @@
 import { IWordArray } from "../type";
 import { Word32Array } from "../Word32Array";
+export interface BufferedBlockAlgorithmProps {
+    data: IWordArray;
+    nBytes: number;
+}
 export declare abstract class BufferedBlockAlgorithm {
+    protected _props?: Partial<BufferedBlockAlgorithmProps>;
     protected _data: IWordArray;
     protected _nBytes: number;
     protected _minBufferSize: number;
     protected _blockSize: number;
-    constructor(data?: IWordArray, nBytes?: number);
+    constructor(props?: Partial<BufferedBlockAlgorithmProps>);
     /**
      * Resets this block algorithm's data buffer to its initial state.
      *

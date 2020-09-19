@@ -1,21 +1,27 @@
-import {Hasher} from "./lib/algorithm/Hasher";
+import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
 import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
+
+export interface SHA1Props extends HasherProps {
+  hash: IWordArray;
+}
 
 // Reusable object
 const W: number[] = [];
 
 export default class SHA1 extends Hasher {
+  protected _props?: Partial<SHA1Props>;
   private _hash: IWordArray = new Word32Array([
     0x67452301, 0xefcdab89,
     0x98badcfe, 0x10325476,
     0xc3d2e1f0
   ]);
   
-  public constructor(hash?: IWordArray, blockSize?: number, data?: IWordArray, nBytes?: number) {
-    super(blockSize, data, nBytes);
-    if(typeof hash !== "undefined"){
-      this._hash = hash.clone();
+  public constructor(props?: SHA1Props) {
+    super(props);
+    this._props = props;
+    if(props && typeof props.hash !== "undefined"){
+      this._hash = props.hash.clone();
     }
   }
   
@@ -97,10 +103,11 @@ export default class SHA1 extends Hasher {
   }
   
   public clone(){
-    return new SHA1(this._hash, this._blockSize, this._data, this._nBytes);
+    const props = {hash: this._hash, blockSize: this._blockSize, data: this._data, nBytes: this._nBytes};
+    return new SHA1(props);
   }
   
-  public static hash(message: IWordArray|string){
-    return new SHA1().finalize(message);
+  public static hash(message: IWordArray|string, props?: SHA1Props){
+    return new SHA1(props).finalize(message);
   }
 }

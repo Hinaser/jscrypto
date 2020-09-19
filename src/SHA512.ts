@@ -1,6 +1,10 @@
-import {Hasher} from "./lib/algorithm/Hasher";
+import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
 import {Word64, Word64Array} from "./lib/Word64Array";
 import {IWordArray} from "./lib/type";
+
+export interface SHA512Props extends HasherProps {
+  hash: Word64Array;
+}
 
 const K = [
   new Word64(0x428a2f98, 0xd728ae22), new Word64(0x71374491, 0x23ef65cd),
@@ -54,6 +58,7 @@ const W: Word64[] = [];
 })();
 
 export default class SHA512 extends Hasher {
+  protected _props?: Partial<SHA512Props>;
   protected _blockSize = 1024/32;
   protected _hash: Word64Array = new Word64Array([
     new Word64(0x6a09e667, 0xf3bcc908), new Word64(0xbb67ae85, 0x84caa73b),
@@ -62,10 +67,11 @@ export default class SHA512 extends Hasher {
     new Word64(0x1f83d9ab, 0xfb41bd6b), new Word64(0x5be0cd19, 0x137e2179)
   ]);
   
-  public constructor(hash?: Word64Array, blockSize?: number, data?: IWordArray, nBytes?: number) {
-    super(blockSize, data, nBytes);
-    if(typeof hash !== "undefined"){
-      this._hash = hash.clone();
+  public constructor(props?: Partial<SHA512Props>) {
+    super(props);
+    this._props = props;
+    if(props && typeof props.hash !== "undefined"){
+      this._hash = props.hash.clone();
     }
   }
   
@@ -268,11 +274,11 @@ export default class SHA512 extends Hasher {
   }
   
   public clone(){
-    const hash = this._hash.clone();
-    return new SHA512(hash, this.blockSize, this._data, this._nBytes);
+    const props = {hash: this._hash, blockSize: this._blockSize, data: this._data, nBytes: this._nBytes};
+    return new SHA512(props);
   }
   
-  public static hash(message: IWordArray|string){
-    return new SHA512().finalize(message);
+  public static hash(message: IWordArray|string, props?: SHA512Props){
+    return new SHA512(props).finalize(message);
   }
 }

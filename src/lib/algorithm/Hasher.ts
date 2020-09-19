@@ -1,15 +1,21 @@
-import {BufferedBlockAlgorithm} from "./BufferedBlockAlgorithm";
+import {BufferedBlockAlgorithm, BufferedBlockAlgorithmProps} from "./BufferedBlockAlgorithm";
 import {IWordArray} from "../type";
 
+export interface HasherProps extends BufferedBlockAlgorithmProps {
+  blockSize: number;
+}
+
 export abstract class Hasher extends BufferedBlockAlgorithm {
+  protected _props?: Partial<HasherProps>;
   protected _blockSize: number = 512/32;
   
-  public constructor(blockSize?: number, data?: IWordArray, nBytes?: number){
-    super(data, nBytes);
-    if(typeof blockSize === "number"){
-      this._blockSize = blockSize;
+  public constructor(props?: Partial<HasherProps>){
+    super(props);
+    this._props = props;
+    if(props && typeof props.blockSize === "number"){
+      this._blockSize = props.blockSize;
     }
-    this.reset(data, nBytes);
+    this.reset(props ? props.data : undefined, props ? props.nBytes : undefined);
   }
   
   public get blockSize(){

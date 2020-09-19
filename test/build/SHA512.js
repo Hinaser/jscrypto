@@ -190,8 +190,8 @@ const W = [];
     }
 })();
 class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] {
-    constructor(hash, blockSize, data, nBytes) {
-        super(blockSize, data, nBytes);
+    constructor(props) {
+        super(props);
         this._blockSize = 1024 / 32;
         this._hash = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64Array"]([
             new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x6a09e667, 0xf3bcc908), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0xbb67ae85, 0x84caa73b),
@@ -199,8 +199,9 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
             new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x510e527f, 0xade682d1), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x9b05688c, 0x2b3e6c1f),
             new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x1f83d9ab, 0xfb41bd6b), new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__["Word64"](0x5be0cd19, 0x137e2179)
         ]);
-        if (typeof hash !== "undefined") {
-            this._hash = hash.clone();
+        this._props = props;
+        if (props && typeof props.hash !== "undefined") {
+            this._hash = props.hash.clone();
         }
     }
     doReset() {
@@ -377,11 +378,11 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
         return this._hash.to32();
     }
     clone() {
-        const hash = this._hash.clone();
-        return new SHA512(hash, this.blockSize, this._data, this._nBytes);
+        const props = { hash: this._hash, blockSize: this._blockSize, data: this._data, nBytes: this._nBytes };
+        return new SHA512(props);
     }
-    static hash(message) {
-        return new SHA512().finalize(message);
+    static hash(message, props) {
+        return new SHA512(props).finalize(message);
     }
 }
 
@@ -671,11 +672,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class BufferedBlockAlgorithm {
-    constructor(data, nBytes) {
+    constructor(props) {
         this._minBufferSize = 0;
         this._blockSize = 0;
-        this._data = typeof data !== "undefined" ? data.clone() : new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]();
-        this._nBytes = typeof nBytes === "number" ? nBytes : 0;
+        this._props = props;
+        this._data = props && typeof props.data !== "undefined" ? props.data.clone() : new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]();
+        this._nBytes = props && typeof props.nBytes === "number" ? props.nBytes : 0;
     }
     /**
      * Resets this block algorithm's data buffer to its initial state.
@@ -761,13 +763,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BufferedBlockAlgorithm */ "./src/lib/algorithm/BufferedBlockAlgorithm.ts");
 
 class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["BufferedBlockAlgorithm"] {
-    constructor(blockSize, data, nBytes) {
-        super(data, nBytes);
+    constructor(props) {
+        super(props);
         this._blockSize = 512 / 32;
-        if (typeof blockSize === "number") {
-            this._blockSize = blockSize;
+        this._props = props;
+        if (props && typeof props.blockSize === "number") {
+            this._blockSize = props.blockSize;
         }
-        this.reset(data, nBytes);
+        this.reset(props ? props.data : undefined, props ? props.nBytes : undefined);
     }
     get blockSize() {
         return this._blockSize;

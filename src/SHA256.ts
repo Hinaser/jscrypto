@@ -1,6 +1,10 @@
-import {Hasher} from "./lib/algorithm/Hasher";
+import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
 import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
+
+export interface SHA256Props extends HasherProps {
+  hash: IWordArray;
+}
 
 // Hash values
 const H: number[] = [];
@@ -40,12 +44,14 @@ function getFractionalBits(n: number) {
 const W: number[] = [];
 
 export default class SHA256 extends Hasher {
+  protected _props?: Partial<SHA256Props>;
   protected _hash: IWordArray = new Word32Array(H.slice(0));
   
-  public constructor(hash?: IWordArray, blockSize?: number, data?: IWordArray, nBytes?: number) {
-    super(blockSize, data, nBytes);
-    if(typeof hash !== "undefined"){
-      this._hash = hash.clone();
+  public constructor(props?: SHA256Props) {
+    super(props);
+    this._props = props;
+    if(props && typeof props.hash !== "undefined"){
+      this._hash = props.hash.clone();
     }
   }
   
@@ -132,10 +138,11 @@ export default class SHA256 extends Hasher {
   }
   
   public clone() {
-    return new SHA256(this._hash, this._blockSize, this._data, this._nBytes);
+    const props = {hash: this._hash, blockSize: this._blockSize, data: this._data, nBytes: this._nBytes};
+    return new SHA256(props);
   }
   
-  public static hash(message: IWordArray|string){
-    return new SHA256().finalize(message);
+  public static hash(message: IWordArray|string, props?: SHA256Props){
+    return new SHA256(props).finalize(message);
   }
 }

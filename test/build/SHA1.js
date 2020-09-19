@@ -144,15 +144,16 @@ __webpack_require__.r(__webpack_exports__);
 // Reusable object
 const W = [];
 class SHA1 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] {
-    constructor(hash, blockSize, data, nBytes) {
-        super(blockSize, data, nBytes);
+    constructor(props) {
+        super(props);
         this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([
             0x67452301, 0xefcdab89,
             0x98badcfe, 0x10325476,
             0xc3d2e1f0
         ]);
-        if (typeof hash !== "undefined") {
-            this._hash = hash.clone();
+        this._props = props;
+        if (props && typeof props.hash !== "undefined") {
+            this._hash = props.hash.clone();
         }
     }
     doReset() {
@@ -221,10 +222,11 @@ class SHA1 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] 
         return this._hash;
     }
     clone() {
-        return new SHA1(this._hash, this._blockSize, this._data, this._nBytes);
+        const props = { hash: this._hash, blockSize: this._blockSize, data: this._data, nBytes: this._nBytes };
+        return new SHA1(props);
     }
-    static hash(message) {
-        return new SHA1().finalize(message);
+    static hash(message, props) {
+        return new SHA1(props).finalize(message);
     }
 }
 
@@ -392,11 +394,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class BufferedBlockAlgorithm {
-    constructor(data, nBytes) {
+    constructor(props) {
         this._minBufferSize = 0;
         this._blockSize = 0;
-        this._data = typeof data !== "undefined" ? data.clone() : new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]();
-        this._nBytes = typeof nBytes === "number" ? nBytes : 0;
+        this._props = props;
+        this._data = props && typeof props.data !== "undefined" ? props.data.clone() : new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]();
+        this._nBytes = props && typeof props.nBytes === "number" ? props.nBytes : 0;
     }
     /**
      * Resets this block algorithm's data buffer to its initial state.
@@ -482,13 +485,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BufferedBlockAlgorithm */ "./src/lib/algorithm/BufferedBlockAlgorithm.ts");
 
 class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["BufferedBlockAlgorithm"] {
-    constructor(blockSize, data, nBytes) {
-        super(data, nBytes);
+    constructor(props) {
+        super(props);
         this._blockSize = 512 / 32;
-        if (typeof blockSize === "number") {
-            this._blockSize = blockSize;
+        this._props = props;
+        if (props && typeof props.blockSize === "number") {
+            this._blockSize = props.blockSize;
         }
-        this.reset(data, nBytes);
+        this.reset(props ? props.data : undefined, props ? props.nBytes : undefined);
     }
     get blockSize() {
         return this._blockSize;

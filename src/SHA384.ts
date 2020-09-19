@@ -1,0 +1,43 @@
+import {Word64, Word64Array} from "./lib/Word64Array";
+import {IWordArray} from "./lib/type";
+import SHA512 from "./SHA512";
+
+export default class SHA384 extends SHA512 {
+  protected _hash: Word64Array = new Word64Array([
+    new Word64(0xcbbb9d5d, 0xc1059ed8), new Word64(0x629a292a, 0x367cd507),
+    new Word64(0x9159015a, 0x3070dd17), new Word64(0x152fecd8, 0xf70e5939),
+    new Word64(0x67332667, 0xffc00b31), new Word64(0x8eb44a87, 0x68581511),
+    new Word64(0xdb0c2e0d, 0x64f98fa7), new Word64(0x47b5481d, 0xbefa4fa4)
+  ]);
+  
+  public constructor(hash?: Word64Array, blockSize?: number, data?: IWordArray, nBytes?: number) {
+    super(hash, blockSize, data, nBytes);
+    if(typeof hash !== "undefined"){
+      this._hash = hash.clone();
+    }
+  }
+  
+  protected doReset() {
+    this._hash = new Word64Array([
+      new Word64(0xcbbb9d5d, 0xc1059ed8), new Word64(0x629a292a, 0x367cd507),
+      new Word64(0x9159015a, 0x3070dd17), new Word64(0x152fecd8, 0xf70e5939),
+      new Word64(0x67332667, 0xffc00b31), new Word64(0x8eb44a87, 0x68581511),
+      new Word64(0xdb0c2e0d, 0x64f98fa7), new Word64(0x47b5481d, 0xbefa4fa4)
+    ]);
+  }
+  
+  protected doFinalize(): IWordArray {
+    const hash = super.doFinalize.call(this);
+    hash.setSignificantBytes(hash.length() - 16);
+    return hash;
+  }
+  
+  public clone(){
+    const hash = this._hash.clone();
+    return new SHA384(hash, this.blockSize, this._data, this._nBytes);
+  }
+  
+  public static hash(message: IWordArray|string){
+    return new SHA384().finalize(message);
+  }
+}

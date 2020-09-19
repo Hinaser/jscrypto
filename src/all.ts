@@ -7,3 +7,4 @@ export {default as SHA224} from "./SHA224";
 export {default as SHA256} from "./SHA256";
 export {default as SHA384} from "./SHA384";
 export {default as SHA512} from "./SHA512";
+export {default as SHA3} from "./SHA3";

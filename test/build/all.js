@@ -737,6 +737,251 @@ class SHA256 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
 
 /***/ }),
 
+/***/ "./src/SHA3.ts":
+/*!*********************!*\
+  !*** ./src/SHA3.ts ***!
+  \*********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA3; });
+/* harmony import */ var _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word64Array */ "./src/lib/Word64Array.ts");
+/* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
+/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
+// Constants tables
+
+
+
+const RHO_OFFSETS = [];
+const PI_INDEXES = [];
+const ROUND_CONSTANTS = [];
+// Compute Constants
+(function computeConstants() {
+    // Compute rho offset constants
+    let x = 1;
+    let y = 0;
+    for (let t = 0; t < 24; t++) {
+        RHO_OFFSETS[x + 5 * y] = ((t + 1) * (t + 2) / 2) % 64;
+        const newX = y % 5;
+        const newY = (2 * x + 3 * y) % 5;
+        x = newX;
+        y = newY;
+    }
+    // Compute pi index constants
+    for (let p = 0; p < 5; p++) {
+        for (let q = 0; q < 5; q++) {
+            PI_INDEXES[p + 5 * q] = q + ((2 * p + 3 * q) % 5) * 5;
+        }
+    }
+    // Compute round constants
+    let LFSR = 0x01;
+    for (let i = 0; i < 24; i++) {
+        let roundConstantMsw = 0;
+        let roundConstantLsw = 0;
+        for (let j = 0; j < 7; j++) {
+            if (LFSR & 0x01) {
+                const bitPosition = (1 << j) - 1;
+                if (bitPosition < 32) {
+                    roundConstantLsw ^= 1 << bitPosition;
+                }
+                else /* if (bitPosition >= 32) */ {
+                    roundConstantMsw ^= 1 << (bitPosition - 32);
+                }
+            }
+            // Compute next LFSR
+            if (LFSR & 0x80) {
+                // Primitive polynomial over GF(2): x^8 + x^6 + x^5 + x^4 + 1
+                LFSR = (LFSR << 1) ^ 0x71;
+            }
+            else {
+                LFSR <<= 1;
+            }
+        }
+        ROUND_CONSTANTS[i] = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__["Word64"](roundConstantMsw, roundConstantLsw);
+    }
+}());
+// Reusable objects for temporary values
+const T = [];
+(function () {
+    for (let i = 0; i < 25; i++) {
+        T[i] = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__["Word64"](0, 0);
+    }
+}());
+class SHA3 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
+    constructor(outputLength, state, blockSize, data, nBytes) {
+        super(blockSize, data, nBytes);
+        this._blockSize = 1024 / 32;
+        this._state = [];
+        this._outputLength = 512;
+        if (typeof outputLength !== "undefined") {
+            if (outputLength !== 224 && outputLength !== 256 && outputLength !== 384 && outputLength !== 512) {
+                throw new Error("Unsupported output length.");
+            }
+            this._outputLength = outputLength;
+        }
+        if (typeof state !== "undefined") {
+            this._state = state.map(s => s.clone());
+        }
+        else {
+            for (let i = 0; i < 25; i++) {
+                this._state[i] = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__["Word64"](0, 0);
+            }
+        }
+        this._blockSize = (1600 - 2 * this._outputLength) / 32;
+    }
+    doReset() {
+        this._state = [];
+        for (let i = 0; i < 25; i++) {
+            this._state[i] = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__["Word64"](0, 0);
+        }
+        this._blockSize = (1600 - 2 * this._outputLength) / 32;
+    }
+    doProcessBlock(words, offset) {
+        // Shortcuts
+        const state = this._state;
+        const nBlockSizeLanes = this._blockSize / 2;
+        // Absorb
+        for (let i = 0; i < nBlockSizeLanes; i++) {
+            // Shortcuts
+            let W2i = words[offset + 2 * i];
+            let W2i1 = words[offset + 2 * i + 1];
+            // Swap endian
+            W2i = ((((W2i << 8) | (W2i >>> 24)) & 0x00ff00ff) |
+                (((W2i << 24) | (W2i >>> 8)) & 0xff00ff00));
+            W2i1 = ((((W2i1 << 8) | (W2i1 >>> 24)) & 0x00ff00ff) |
+                (((W2i1 << 24) | (W2i1 >>> 8)) & 0xff00ff00));
+            // Absorb message into state
+            state[i].high ^= W2i1;
+            state[i].low ^= W2i;
+        }
+        // Rounds
+        for (let round = 0; round < 24; round++) {
+            // Theta
+            for (let x = 0; x < 5; x++) {
+                // Mix column lanes
+                let tMsw = 0;
+                let tLsw = 0;
+                for (let y = 0; y < 5; y++) {
+                    const l = state[x + 5 * y];
+                    tMsw ^= l.high;
+                    tLsw ^= l.low;
+                }
+                // Temporary values
+                const Tx = T[x];
+                Tx.high = tMsw;
+                Tx.low = tLsw;
+            }
+            for (let x = 0; x < 5; x++) {
+                // Shortcuts
+                const Tx4 = T[(x + 4) % 5];
+                const Tx1 = T[(x + 1) % 5];
+                const Tx1Msw = Tx1.high;
+                const Tx1Lsw = Tx1.low;
+                // Mix surrounding columns
+                const tMsw = Tx4.high ^ ((Tx1Msw << 1) | (Tx1Lsw >>> 31));
+                const tLsw = Tx4.low ^ ((Tx1Lsw << 1) | (Tx1Msw >>> 31));
+                for (let y = 0; y < 5; y++) {
+                    const l = state[x + 5 * y];
+                    l.high ^= tMsw;
+                    l.low ^= tLsw;
+                }
+            }
+            // Rho Pi
+            for (let laneIndex = 1; laneIndex < 25; laneIndex++) {
+                let tMsw;
+                let tLsw;
+                // Shortcuts
+                const laneMsw = state[laneIndex].high;
+                const laneLsw = state[laneIndex].low;
+                const rhoOffset = RHO_OFFSETS[laneIndex];
+                // Rotate lanes
+                if (rhoOffset < 32) {
+                    tMsw = (laneMsw << rhoOffset) | (laneLsw >>> (32 - rhoOffset));
+                    tLsw = (laneLsw << rhoOffset) | (laneMsw >>> (32 - rhoOffset));
+                }
+                else /* if (rhoOffset >= 32) */ {
+                    tMsw = (laneLsw << (rhoOffset - 32)) | (laneMsw >>> (64 - rhoOffset));
+                    tLsw = (laneMsw << (rhoOffset - 32)) | (laneLsw >>> (64 - rhoOffset));
+                }
+                // Transpose lanes
+                const TPiLane = T[PI_INDEXES[laneIndex]];
+                TPiLane.high = tMsw;
+                TPiLane.low = tLsw;
+            }
+            // Rho pi at x = y = 0
+            const T0 = T[0];
+            const state0 = state[0];
+            T0.high = state0.high;
+            T0.low = state0.low;
+            // Chi
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    // Shortcuts
+                    const laneIndex = x + 5 * y;
+                    const l = state[laneIndex];
+                    const TLane = T[laneIndex];
+                    const Tx1Lane = T[((x + 1) % 5) + 5 * y];
+                    const Tx2Lane = T[((x + 2) % 5) + 5 * y];
+                    // Mix rows
+                    l.high = TLane.high ^ (~Tx1Lane.high & Tx2Lane.high);
+                    l.low = TLane.low ^ (~Tx1Lane.low & Tx2Lane.low);
+                }
+            }
+            // Iota
+            const lane = state[0];
+            const roundConstant = ROUND_CONSTANTS[round];
+            lane.high ^= roundConstant.high;
+            lane.low ^= roundConstant.low;
+        }
+    }
+    doFinalize() {
+        // Shortcuts
+        const data = this._data;
+        const dataWords = data.raw();
+        const nBitsLeft = data.length() * 8;
+        const blockSizeBits = this.blockSize * 32;
+        // Add padding
+        dataWords[nBitsLeft >>> 5] |= 0x1 << (24 - nBitsLeft % 32);
+        dataWords[((Math.ceil((nBitsLeft + 1) / blockSizeBits) * blockSizeBits) >>> 5) - 1] |= 0x80;
+        data.setSignificantBytes(dataWords.length * 4);
+        // Hash final blocks
+        this.process();
+        // Shortcuts
+        const state = this._state;
+        const outputLengthBytes = this._outputLength / 8;
+        const outputLengthLanes = outputLengthBytes / 8;
+        // Squeeze
+        const hashWords = [];
+        for (let i = 0; i < outputLengthLanes; i++) {
+            // Shortcuts
+            const lane = state[i];
+            let laneMsw = lane.high;
+            let laneLsw = lane.low;
+            // Swap endian
+            laneMsw = ((((laneMsw << 8) | (laneMsw >>> 24)) & 0x00ff00ff) |
+                (((laneMsw << 24) | (laneMsw >>> 8)) & 0xff00ff00));
+            laneLsw = ((((laneLsw << 8) | (laneLsw >>> 24)) & 0x00ff00ff) |
+                (((laneLsw << 24) | (laneLsw >>> 8)) & 0xff00ff00));
+            // Squeeze state to retrieve hash
+            hashWords.push(laneLsw);
+            hashWords.push(laneMsw);
+        }
+        // Return final computed hash
+        return new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_2__["Word32Array"](hashWords, outputLengthBytes);
+    }
+    clone() {
+        return new SHA3(this._outputLength, this._state, this._blockSize, this._data, this._nBytes);
+    }
+    static hash(message, outputLength) {
+        return new SHA3(outputLength).finalize(message);
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/SHA384.ts":
 /*!***********************!*\
   !*** ./src/SHA384.ts ***!
@@ -1054,7 +1299,7 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
 /*!********************!*\
   !*** ./src/all.ts ***!
   \********************/
-/*! exports provided: Hmac, HmacMD5, HmacSHA256, MD5, SHA1, SHA224, SHA256, SHA384, SHA512 */
+/*! exports provided: Hmac, HmacMD5, HmacSHA256, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1085,6 +1330,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _SHA512__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./SHA512 */ "./src/SHA512.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA512", function() { return _SHA512__WEBPACK_IMPORTED_MODULE_8__["default"]; });
+
+/* harmony import */ var _SHA3__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./SHA3 */ "./src/SHA3.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA3", function() { return _SHA3__WEBPACK_IMPORTED_MODULE_9__["default"]; });
+
 
 
 

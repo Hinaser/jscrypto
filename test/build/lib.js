@@ -273,6 +273,128 @@ class Word32Array {
 
 /***/ }),
 
+/***/ "./src/lib/Word64Array.ts":
+/*!********************************!*\
+  !*** ./src/lib/Word64Array.ts ***!
+  \********************************/
+/*! exports provided: Word64, Word64Array */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Word64", function() { return Word64; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Word64Array", function() { return Word64Array; });
+/* harmony import */ var _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./encoder/Hex */ "./src/lib/encoder/Hex.ts");
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Word32Array */ "./src/lib/Word32Array.ts");
+
+
+class Word64 {
+    constructor(high, low) {
+        this.high = high;
+        this.low = low;
+    }
+    clone() {
+        return new Word64(this.high, this.low);
+    }
+}
+/**
+ * An array of 64bit words
+ */
+class Word64Array {
+    /**
+     * Initializes a newly created word array.
+     *
+     * @param {Array} words (Optional) An array of 32-bit words.
+     * @param {number} nSignificantBytes (Optional) The number of significant bytes in the words.
+     *
+     * @example
+     *   var wordArray = new WordArray();
+     *   var wordArray = new WordArray([0x00010203, 0x04050607]);
+     *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
+     */
+    constructor(words, nSignificantBytes) {
+        this._words = words || [];
+        this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 8;
+    }
+    /**
+     * Converts this 64-bit word array to a 32-bit word array.
+     *
+     * @return {Word32Array} This word array's data as a 32-bit word array.
+     *
+     * @example
+     *
+     *     var x32WordArray = x64WordArray.toX32();
+     */
+    to32() {
+        const words32 = [];
+        for (let i = 0; i < this._words.length; i++) {
+            const word64 = this._words[i];
+            words32.push(word64.high);
+            words32.push(word64.low);
+        }
+        return new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](words32, this._nSignificantBytes);
+    }
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    raw() {
+        return this._words;
+    }
+    /**
+     * Return a copy of an array of 32-bit words.
+     */
+    slice() {
+        return this._words.slice();
+    }
+    /**
+     * Return significantBytes
+     */
+    length() {
+        return this._nSignificantBytes;
+    }
+    /**
+     * Set significant bytes
+     * @param {number} n - significant bytes
+     */
+    setSignificantBytes(n) {
+        this._nSignificantBytes = n;
+    }
+    /**
+     * Converts this word array to a string.
+     *
+     * @param {IEncoder?} encoder The encoding strategy to use. Default: CryptoJS.enc.Hex
+     * @return {string} The stringified word array.
+     * @example
+     *   var string = wordArray + '';
+     *   var string = wordArray.toString();
+     *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+     */
+    toString(encoder) {
+        if (!encoder) {
+            return _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__["Hex"].stringify(this.to32().slice(), this._nSignificantBytes);
+        }
+        return encoder.stringify(this.to32().slice(), this._nSignificantBytes);
+    }
+    /**
+     * Creates a copy of this word array.
+     *
+     * @return {Word64Array} The clone.
+     * @example
+     *   var clone = wordArray.clone();
+     */
+    clone() {
+        const words = this._words.slice();
+        for (let i = 0; i < words.length; i++) {
+            words[i] = words[i].clone();
+        }
+        return new Word64Array(words, this._nSignificantBytes);
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/lib/browser.ts":
 /*!****************************!*\
   !*** ./src/lib/browser.ts ***!
@@ -476,10 +598,12 @@ const Utf8 = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _random__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./random */ "./src/lib/random.ts");
 /* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Word32Array */ "./src/lib/Word32Array.ts");
-/* harmony import */ var _browser__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./browser */ "./src/lib/browser.ts");
-/* harmony import */ var _encoder_Utf8__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
-/* harmony import */ var _encoder_Latin1__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./encoder/Latin1 */ "./src/lib/encoder/Latin1.ts");
-/* harmony import */ var _encoder_Hex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./encoder/Hex */ "./src/lib/encoder/Hex.ts");
+/* harmony import */ var _Word64Array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Word64Array */ "./src/lib/Word64Array.ts");
+/* harmony import */ var _browser__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./browser */ "./src/lib/browser.ts");
+/* harmony import */ var _encoder_Utf8__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
+/* harmony import */ var _encoder_Latin1__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./encoder/Latin1 */ "./src/lib/encoder/Latin1.ts");
+/* harmony import */ var _encoder_Hex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./encoder/Hex */ "./src/lib/encoder/Hex.ts");
+
 
 
 
@@ -489,10 +613,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
     random: _random__WEBPACK_IMPORTED_MODULE_0__["random"],
     Word32Array: _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"],
-    isIE: _browser__WEBPACK_IMPORTED_MODULE_2__["isIE"],
-    Utf8: _encoder_Utf8__WEBPACK_IMPORTED_MODULE_3__["Utf8"],
-    Latin1: _encoder_Latin1__WEBPACK_IMPORTED_MODULE_4__["Latin1"],
-    Hex: _encoder_Hex__WEBPACK_IMPORTED_MODULE_5__["Hex"],
+    Word64: _Word64Array__WEBPACK_IMPORTED_MODULE_2__["Word64"],
+    Word64Array: _Word64Array__WEBPACK_IMPORTED_MODULE_2__["Word64Array"],
+    isIE: _browser__WEBPACK_IMPORTED_MODULE_3__["isIE"],
+    Utf8: _encoder_Utf8__WEBPACK_IMPORTED_MODULE_4__["Utf8"],
+    Latin1: _encoder_Latin1__WEBPACK_IMPORTED_MODULE_5__["Latin1"],
+    Hex: _encoder_Hex__WEBPACK_IMPORTED_MODULE_6__["Hex"],
 });
 
 

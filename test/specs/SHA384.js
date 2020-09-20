@@ -1,6 +1,6 @@
 const expect = require("expect.js");
 const {Word32Array} = require("../../test/build/lib");
-const SHA384 = require("../../test/build/SHA384");
+const {SHA384} = require("../../test/build/SHA384");
 
 describe("sha384", function(){
   it("digest '' as expected", function(){

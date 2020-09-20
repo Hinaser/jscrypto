@@ -1,7 +1,7 @@
 const expect = require("expect.js");
-const Hmac = require("../../test/build/HMAC");
-const Sha384 = require("../../test/build/SHA384");
-const HmacSHA384 = require("../../test/build/HMACSHA384");
+const {Hmac} = require("../../test/build/Hmac");
+const {SHA384} = require("../../test/build/SHA384");
+const {HmacSHA384} = require("../../test/build/HmacSHA384");
 const {Hex, Word32Array} = require("../../test/build/lib");
 
 describe("hmac-sha384", function(){
@@ -37,7 +37,7 @@ describe("hmac-sha384", function(){
   });
   
   it("update", function(){
-    const hmac = new Hmac(new Sha384(), Hex.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+    const hmac = new Hmac(new SHA384(), Hex.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
     hmac.update(Hex.parse('dddddddddddddddddddddddddddddddddddd'));
     hmac.update(Hex.parse('dddddddddddddddddddddddddddddddd'));
     hmac.update(Hex.parse('dddddddddddddddddddddddddddddddd'));

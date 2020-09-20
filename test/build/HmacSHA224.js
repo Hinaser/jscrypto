@@ -889,28 +889,25 @@ const Utf8 = {
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "random", function() { return random; });
 function makeRandFunction() {
-    const crypto = (() => {
-        // Native crypto from window (Browser)
-        if (typeof window !== "undefined") {
-            const c = window.crypto || window.msCrypto;
-            if (!c) {
-                throw new Error("Crypto module not found");
-            }
-            return c;
+    if (typeof window !== "undefined") {
+        const c = window.crypto || window.msCrypto;
+        if (!c) {
+            throw new Error("Crypto module not found");
         }
-        else if (typeof global !== "undefined" && global.crypto) {
-            return global.crypto;
-        }
-        throw new Error("Unable to find crypto module");
-    })();
-    if (typeof crypto.getRandomValues === "function") {
         return function rand() {
-            return crypto.getRandomValues(new Uint32Array(1))[0];
+            return c.getRandomValues(new Uint32Array(1))[0];
         };
     }
-    if (typeof crypto.randomBytes === "function") {
+    else if (typeof global !== "undefined" && global.crypto) {
         return function rand() {
-            return crypto.randomBytes(4).readInt32LE();
+            return global.crypto.randomBytes(4).readInt32LE();
+        };
+    }
+    else if (true) {
+        return function rand() {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            return require("crypto").randomBytes(4).readInt32LE();
         };
     }
     throw new Error("Unable to find crypto module");

@@ -25,6 +25,6 @@ fs.writeFileSync(path.join(distDir, "package.json"), JSON.stringify(packageJson,
 
 const distSrcDir = path.join(distDir, "src");
 if(fs.existsSync(distSrcDir)){
-  fs.rmdirSync(distSrcDir);
+  fs.rmdirSync(distSrcDir, {recursive: true});
 }
 ncp(path.join(__dirname, "..", "src"), distSrcDir);

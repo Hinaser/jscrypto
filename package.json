@@ -1,8 +1,7 @@
 {
   "name": "jscrypto",
   "version": "0.0.0-beta.0",
-  "main": "./dist/all.js",
-  "types": "./dist/",
+  "main": "./all.js",
   "author": "Izumi Hoshino <rindo.hinase@gmail.com>",
   "license": "MIT",
   "description": "",
@@ -15,7 +14,7 @@
   "scripts": {
     "test": "mocha --enable-source-maps ./test/specs/",
     "build": "webpack --config webpack.dev.js",
-    "build:prod": "webpack --config webpack.prod.es5.js",
+    "build:prod": "webpack --config webpack.prod.es5.js && node ./bin/pre_publish.js",
     "tsc": "tsc --project tsconfig.es5.json --emitDeclarationOnly --declaration --declarationDir ./dist --allowJS false",
     "tsdoc": "typedoc src/XSpy.ts --mode file --excludePrivate --excludeProtected --excludeNotExported --out docs --includeVersion --gaID UA-91245492-8"
   },
@@ -28,6 +27,7 @@
     "expect.js": "^0.3.1",
     "fork-ts-checker-webpack-plugin": "^5.1.0",
     "mocha": "^8.1.3",
+    "ncp": "^2.0.0",
     "nyc": "^15.1.0",
     "parallel-webpack": "^2.6.0",
     "terser-webpack-plugin": "^4.2.0",

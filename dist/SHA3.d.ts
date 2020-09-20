@@ -5,7 +5,7 @@ export interface SHA3Props extends HasherProps {
     state: Word64[];
     outputLength: number;
 }
-export default class SHA3 extends Hasher {
+export declare class SHA3 extends Hasher {
     protected _props?: Partial<SHA3Props>;
     protected _blockSize: number;
     protected _state: Word64[];

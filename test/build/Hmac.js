@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["Hmac"] = factory();
+		exports["JsCrypto"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["Hmac"] = factory();
+		root["JsCrypto"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -131,12 +131,12 @@ module.exports = g;
 /*!*********************!*\
   !*** ./src/Hmac.ts ***!
   \*********************/
-/*! exports provided: default */
+/*! exports provided: Hmac */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Hmac; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Hmac", function() { return Hmac; });
 /* harmony import */ var _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
 
 class Hmac {
@@ -546,6 +546,6 @@ const random = makeRandFunction();
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 });
 //# sourceMappingURL=Hmac.js.map

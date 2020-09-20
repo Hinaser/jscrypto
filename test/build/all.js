@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["all"] = factory();
+		exports["JsCrypto"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["all"] = factory();
+		root["JsCrypto"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -131,12 +131,12 @@ module.exports = g;
 /*!*********************!*\
   !*** ./src/Hmac.ts ***!
   \*********************/
-/*! exports provided: default */
+/*! exports provided: Hmac */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Hmac; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Hmac", function() { return Hmac; });
 /* harmony import */ var _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
 
 class Hmac {
@@ -215,18 +215,18 @@ class Hmac {
 /*!************************!*\
   !*** ./src/HmacMD5.ts ***!
   \************************/
-/*! exports provided: default */
+/*! exports provided: HmacMD5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacMD5; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HmacMD5", function() { return HmacMD5; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MD5 */ "./src/MD5.ts");
 
 
 function HmacMD5(message, key) {
-    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"](new _MD5__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"](new _MD5__WEBPACK_IMPORTED_MODULE_1__["MD5"](), key).finalize(message);
 }
 
 
@@ -236,18 +236,18 @@ function HmacMD5(message, key) {
 /*!***************************!*\
   !*** ./src/HmacSHA224.ts ***!
   \***************************/
-/*! exports provided: default */
+/*! exports provided: HmacSHA224 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacSHA224; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HmacSHA224", function() { return HmacSHA224; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony import */ var _SHA224__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA224 */ "./src/SHA224.ts");
 
 
 function HmacSHA224(message, key) {
-    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"](new _SHA224__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"](new _SHA224__WEBPACK_IMPORTED_MODULE_1__["SHA224"](), key).finalize(message);
 }
 
 
@@ -257,18 +257,18 @@ function HmacSHA224(message, key) {
 /*!***************************!*\
   !*** ./src/HmacSHA256.ts ***!
   \***************************/
-/*! exports provided: default */
+/*! exports provided: HmacSHA256 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacSHA256; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HmacSHA256", function() { return HmacSHA256; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony import */ var _SHA256__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA256 */ "./src/SHA256.ts");
 
 
 function HmacSHA256(message, key) {
-    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"](new _SHA256__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"](new _SHA256__WEBPACK_IMPORTED_MODULE_1__["SHA256"](), key).finalize(message);
 }
 
 
@@ -278,18 +278,18 @@ function HmacSHA256(message, key) {
 /*!***************************!*\
   !*** ./src/HmacSHA384.ts ***!
   \***************************/
-/*! exports provided: default */
+/*! exports provided: HmacSHA384 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacSHA384; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HmacSHA384", function() { return HmacSHA384; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony import */ var _SHA384__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA384 */ "./src/SHA384.ts");
 
 
 function HmacSHA384(message, key) {
-    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"](new _SHA384__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"](new _SHA384__WEBPACK_IMPORTED_MODULE_1__["SHA384"](), key).finalize(message);
 }
 
 
@@ -299,18 +299,18 @@ function HmacSHA384(message, key) {
 /*!***************************!*\
   !*** ./src/HmacSHA512.ts ***!
   \***************************/
-/*! exports provided: default */
+/*! exports provided: HmacSHA512 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacSHA512; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HmacSHA512", function() { return HmacSHA512; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony import */ var _SHA512__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA512 */ "./src/SHA512.ts");
 
 
 function HmacSHA512(message, key) {
-    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"](new _SHA512__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"](new _SHA512__WEBPACK_IMPORTED_MODULE_1__["SHA512"](), key).finalize(message);
 }
 
 
@@ -320,12 +320,12 @@ function HmacSHA512(message, key) {
 /*!********************!*\
   !*** ./src/MD5.ts ***!
   \********************/
-/*! exports provided: default */
+/*! exports provided: MD5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MD5; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MD5", function() { return MD5; });
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 
@@ -522,12 +522,12 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
 /*!*********************!*\
   !*** ./src/SHA1.ts ***!
   \*********************/
-/*! exports provided: default */
+/*! exports provided: SHA1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA1; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA1", function() { return SHA1; });
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
 
@@ -628,17 +628,17 @@ class SHA1 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] 
 /*!***********************!*\
   !*** ./src/SHA224.ts ***!
   \***********************/
-/*! exports provided: default */
+/*! exports provided: SHA224 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA224; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA224", function() { return SHA224; });
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
 /* harmony import */ var _SHA256__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA256 */ "./src/SHA256.ts");
 
 
-class SHA224 extends _SHA256__WEBPACK_IMPORTED_MODULE_1__["default"] {
+class SHA224 extends _SHA256__WEBPACK_IMPORTED_MODULE_1__["SHA256"] {
     constructor(props) {
         super(props);
         this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([
@@ -677,12 +677,12 @@ class SHA224 extends _SHA256__WEBPACK_IMPORTED_MODULE_1__["default"] {
 /*!***********************!*\
   !*** ./src/SHA256.ts ***!
   \***********************/
-/*! exports provided: default */
+/*! exports provided: SHA256 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA256; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA256", function() { return SHA256; });
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
 
@@ -811,12 +811,12 @@ class SHA256 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
 /*!*********************!*\
   !*** ./src/SHA3.ts ***!
   \*********************/
-/*! exports provided: default */
+/*! exports provided: SHA3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA3; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA3", function() { return SHA3; });
 /* harmony import */ var _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word64Array */ "./src/lib/Word64Array.ts");
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
@@ -1066,17 +1066,17 @@ class SHA3 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] 
 /*!***********************!*\
   !*** ./src/SHA384.ts ***!
   \***********************/
-/*! exports provided: default */
+/*! exports provided: SHA384 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA384; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA384", function() { return SHA384; });
 /* harmony import */ var _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word64Array */ "./src/lib/Word64Array.ts");
 /* harmony import */ var _SHA512__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA512 */ "./src/SHA512.ts");
 
 
-class SHA384 extends _SHA512__WEBPACK_IMPORTED_MODULE_1__["default"] {
+class SHA384 extends _SHA512__WEBPACK_IMPORTED_MODULE_1__["SHA512"] {
     constructor(props) {
         super(props);
         this._hash = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__["Word64Array"]([
@@ -1119,12 +1119,12 @@ class SHA384 extends _SHA512__WEBPACK_IMPORTED_MODULE_1__["default"] {
 /*!***********************!*\
   !*** ./src/SHA512.ts ***!
   \***********************/
-/*! exports provided: default */
+/*! exports provided: SHA512 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA512; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA512", function() { return SHA512; });
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 /* harmony import */ var _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word64Array */ "./src/lib/Word64Array.ts");
 
@@ -1387,43 +1387,43 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Hmac", function() { return _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Hmac", function() { return _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"]; });
 
 /* harmony import */ var _HmacMD5__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HmacMD5 */ "./src/HmacMD5.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacMD5", function() { return _HmacMD5__WEBPACK_IMPORTED_MODULE_1__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacMD5", function() { return _HmacMD5__WEBPACK_IMPORTED_MODULE_1__["HmacMD5"]; });
 
 /* harmony import */ var _HmacSHA224__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./HmacSHA224 */ "./src/HmacSHA224.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacSHA224", function() { return _HmacSHA224__WEBPACK_IMPORTED_MODULE_2__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacSHA224", function() { return _HmacSHA224__WEBPACK_IMPORTED_MODULE_2__["HmacSHA224"]; });
 
 /* harmony import */ var _HmacSHA256__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./HmacSHA256 */ "./src/HmacSHA256.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacSHA256", function() { return _HmacSHA256__WEBPACK_IMPORTED_MODULE_3__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacSHA256", function() { return _HmacSHA256__WEBPACK_IMPORTED_MODULE_3__["HmacSHA256"]; });
 
 /* harmony import */ var _HmacSHA384__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./HmacSHA384 */ "./src/HmacSHA384.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacSHA384", function() { return _HmacSHA384__WEBPACK_IMPORTED_MODULE_4__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacSHA384", function() { return _HmacSHA384__WEBPACK_IMPORTED_MODULE_4__["HmacSHA384"]; });
 
 /* harmony import */ var _HmacSHA512__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./HmacSHA512 */ "./src/HmacSHA512.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacSHA512", function() { return _HmacSHA512__WEBPACK_IMPORTED_MODULE_5__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HmacSHA512", function() { return _HmacSHA512__WEBPACK_IMPORTED_MODULE_5__["HmacSHA512"]; });
 
 /* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./MD5 */ "./src/MD5.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MD5", function() { return _MD5__WEBPACK_IMPORTED_MODULE_6__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MD5", function() { return _MD5__WEBPACK_IMPORTED_MODULE_6__["MD5"]; });
 
 /* harmony import */ var _SHA1__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./SHA1 */ "./src/SHA1.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA1", function() { return _SHA1__WEBPACK_IMPORTED_MODULE_7__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA1", function() { return _SHA1__WEBPACK_IMPORTED_MODULE_7__["SHA1"]; });
 
 /* harmony import */ var _SHA224__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./SHA224 */ "./src/SHA224.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA224", function() { return _SHA224__WEBPACK_IMPORTED_MODULE_8__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA224", function() { return _SHA224__WEBPACK_IMPORTED_MODULE_8__["SHA224"]; });
 
 /* harmony import */ var _SHA256__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./SHA256 */ "./src/SHA256.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA256", function() { return _SHA256__WEBPACK_IMPORTED_MODULE_9__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA256", function() { return _SHA256__WEBPACK_IMPORTED_MODULE_9__["SHA256"]; });
 
 /* harmony import */ var _SHA384__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./SHA384 */ "./src/SHA384.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA384", function() { return _SHA384__WEBPACK_IMPORTED_MODULE_10__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA384", function() { return _SHA384__WEBPACK_IMPORTED_MODULE_10__["SHA384"]; });
 
 /* harmony import */ var _SHA512__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./SHA512 */ "./src/SHA512.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA512", function() { return _SHA512__WEBPACK_IMPORTED_MODULE_11__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA512", function() { return _SHA512__WEBPACK_IMPORTED_MODULE_11__["SHA512"]; });
 
 /* harmony import */ var _SHA3__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./SHA3 */ "./src/SHA3.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA3", function() { return _SHA3__WEBPACK_IMPORTED_MODULE_12__["default"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA3", function() { return _SHA3__WEBPACK_IMPORTED_MODULE_12__["SHA3"]; });
 
 
 
@@ -2067,6 +2067,6 @@ const random = makeRandFunction();
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 });
 //# sourceMappingURL=all.js.map

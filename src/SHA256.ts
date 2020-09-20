@@ -43,7 +43,7 @@ function getFractionalBits(n: number) {
 // Reusable object
 const W: number[] = [];
 
-export default class SHA256 extends Hasher {
+export class SHA256 extends Hasher {
   protected _props?: Partial<SHA256Props>;
   protected _hash: IWordArray = new Word32Array(H.slice(0));
   

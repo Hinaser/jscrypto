@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["MD5"] = factory();
+		exports["JsCrypto"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["MD5"] = factory();
+		root["JsCrypto"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -131,12 +131,12 @@ module.exports = g;
 /*!********************!*\
   !*** ./src/MD5.ts ***!
   \********************/
-/*! exports provided: default */
+/*! exports provided: MD5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MD5; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MD5", function() { return MD5; });
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 
@@ -832,6 +832,6 @@ const random = makeRandFunction();
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 });
 //# sourceMappingURL=MD5.js.map

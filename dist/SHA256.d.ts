@@ -3,7 +3,7 @@ import { IWordArray } from "./lib/type";
 export interface SHA256Props extends HasherProps {
     hash: IWordArray;
 }
-export default class SHA256 extends Hasher {
+export declare class SHA256 extends Hasher {
     protected _props?: Partial<SHA256Props>;
     protected _hash: IWordArray;
     constructor(props?: SHA256Props);

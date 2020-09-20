@@ -57,7 +57,7 @@ const W: Word64[] = [];
   }
 })();
 
-export default class SHA512 extends Hasher {
+export class SHA512 extends Hasher {
   protected _props?: Partial<SHA512Props>;
   protected _blockSize = 1024/32;
   protected _hash: Word64Array = new Word64Array([

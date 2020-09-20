@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["SHA224"] = factory();
+		exports["JsCrypto"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["SHA224"] = factory();
+		root["JsCrypto"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -131,17 +131,17 @@ module.exports = g;
 /*!***********************!*\
   !*** ./src/SHA224.ts ***!
   \***********************/
-/*! exports provided: default */
+/*! exports provided: SHA224 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA224; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA224", function() { return SHA224; });
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
 /* harmony import */ var _SHA256__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA256 */ "./src/SHA256.ts");
 
 
-class SHA224 extends _SHA256__WEBPACK_IMPORTED_MODULE_1__["default"] {
+class SHA224 extends _SHA256__WEBPACK_IMPORTED_MODULE_1__["SHA256"] {
     constructor(props) {
         super(props);
         this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([
@@ -180,12 +180,12 @@ class SHA224 extends _SHA256__WEBPACK_IMPORTED_MODULE_1__["default"] {
 /*!***********************!*\
   !*** ./src/SHA256.ts ***!
   \***********************/
-/*! exports provided: default */
+/*! exports provided: SHA256 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA256; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA256", function() { return SHA256; });
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
 
@@ -813,6 +813,6 @@ const random = makeRandFunction();
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 });
 //# sourceMappingURL=SHA224.js.map

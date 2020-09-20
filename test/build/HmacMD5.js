@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["HmacMD5"] = factory();
+		exports["JsCrypto"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["HmacMD5"] = factory();
+		root["JsCrypto"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -131,12 +131,12 @@ module.exports = g;
 /*!*********************!*\
   !*** ./src/Hmac.ts ***!
   \*********************/
-/*! exports provided: default */
+/*! exports provided: Hmac */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Hmac; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Hmac", function() { return Hmac; });
 /* harmony import */ var _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
 
 class Hmac {
@@ -215,18 +215,18 @@ class Hmac {
 /*!************************!*\
   !*** ./src/HmacMD5.ts ***!
   \************************/
-/*! exports provided: default */
+/*! exports provided: HmacMD5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacMD5; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HmacMD5", function() { return HmacMD5; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MD5 */ "./src/MD5.ts");
 
 
 function HmacMD5(message, key) {
-    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"](new _MD5__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"](new _MD5__WEBPACK_IMPORTED_MODULE_1__["MD5"](), key).finalize(message);
 }
 
 
@@ -236,12 +236,12 @@ function HmacMD5(message, key) {
 /*!********************!*\
   !*** ./src/MD5.ts ***!
   \********************/
-/*! exports provided: default */
+/*! exports provided: MD5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MD5; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MD5", function() { return MD5; });
 /* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 
@@ -937,6 +937,6 @@ const random = makeRandFunction();
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 });
 //# sourceMappingURL=HmacMD5.js.map

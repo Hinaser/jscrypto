@@ -39,8 +39,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
-    library: ["JsCrypto", "[name]"],
-    libraryExport: "default",
+    library: ["JsCrypto"],
     libraryTarget: "umd",
     globalObject: "this",
   },

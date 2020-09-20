@@ -2,7 +2,7 @@ import {Utf8} from "./lib/encoder/Utf8";
 import {Hasher} from "./lib/algorithm/Hasher";
 import {IWordArray} from "./lib/type";
 
-export default class Hmac {
+export class Hmac {
   private _hasher: Hasher;
   private _oKey: IWordArray;
   private _iKey: IWordArray;

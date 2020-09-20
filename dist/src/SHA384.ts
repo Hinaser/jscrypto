@@ -1,13 +1,13 @@
 import {Word64, Word64Array} from "./lib/Word64Array";
 import {IWordArray} from "./lib/type";
-import SHA512 from "./SHA512";
+import {SHA512} from "./SHA512";
 import {HasherProps} from "./lib/algorithm/Hasher";
 
 export interface SHA384Props extends HasherProps {
   hash: Word64Array;
 }
 
-export default class SHA384 extends SHA512 {
+export class SHA384 extends SHA512 {
   protected _props?: Partial<SHA384Props>;
   protected _hash: Word64Array = new Word64Array([
     new Word64(0xcbbb9d5d, 0xc1059ed8), new Word64(0x629a292a, 0x367cd507),

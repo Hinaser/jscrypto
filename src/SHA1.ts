@@ -9,7 +9,7 @@ export interface SHA1Props extends HasherProps {
 // Reusable object
 const W: number[] = [];
 
-export default class SHA1 extends Hasher {
+export class SHA1 extends Hasher {
   protected _props?: Partial<SHA1Props>;
   private _hash: IWordArray = new Word32Array([
     0x67452301, 0xefcdab89,

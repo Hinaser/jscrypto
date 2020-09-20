@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["HmacSHA384"] = factory();
+		exports["JsCrypto"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["HmacSHA384"] = factory();
+		root["JsCrypto"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -131,12 +131,12 @@ module.exports = g;
 /*!*********************!*\
   !*** ./src/Hmac.ts ***!
   \*********************/
-/*! exports provided: default */
+/*! exports provided: Hmac */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Hmac; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Hmac", function() { return Hmac; });
 /* harmony import */ var _lib_encoder_Utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
 
 class Hmac {
@@ -215,18 +215,18 @@ class Hmac {
 /*!***************************!*\
   !*** ./src/HmacSHA384.ts ***!
   \***************************/
-/*! exports provided: default */
+/*! exports provided: HmacSHA384 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HmacSHA384; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HmacSHA384", function() { return HmacSHA384; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony import */ var _SHA384__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA384 */ "./src/SHA384.ts");
 
 
 function HmacSHA384(message, key) {
-    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["default"](new _SHA384__WEBPACK_IMPORTED_MODULE_1__["default"](), key).finalize(message);
+    return new _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"](new _SHA384__WEBPACK_IMPORTED_MODULE_1__["SHA384"](), key).finalize(message);
 }
 
 
@@ -236,17 +236,17 @@ function HmacSHA384(message, key) {
 /*!***********************!*\
   !*** ./src/SHA384.ts ***!
   \***********************/
-/*! exports provided: default */
+/*! exports provided: SHA384 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA384; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA384", function() { return SHA384; });
 /* harmony import */ var _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Word64Array */ "./src/lib/Word64Array.ts");
 /* harmony import */ var _SHA512__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SHA512 */ "./src/SHA512.ts");
 
 
-class SHA384 extends _SHA512__WEBPACK_IMPORTED_MODULE_1__["default"] {
+class SHA384 extends _SHA512__WEBPACK_IMPORTED_MODULE_1__["SHA512"] {
     constructor(props) {
         super(props);
         this._hash = new _lib_Word64Array__WEBPACK_IMPORTED_MODULE_0__["Word64Array"]([
@@ -289,12 +289,12 @@ class SHA384 extends _SHA512__WEBPACK_IMPORTED_MODULE_1__["default"] {
 /*!***********************!*\
   !*** ./src/SHA512.ts ***!
   \***********************/
-/*! exports provided: default */
+/*! exports provided: SHA512 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SHA512; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHA512", function() { return SHA512; });
 /* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
 /* harmony import */ var _lib_Word64Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word64Array */ "./src/lib/Word64Array.ts");
 
@@ -1172,6 +1172,6 @@ const random = makeRandFunction();
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 });
 //# sourceMappingURL=HmacSHA384.js.map

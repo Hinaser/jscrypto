@@ -38,7 +38,7 @@ function II(a: number, b: number, c: number, d: number, x: number, s: number, t:
 /**
  * MD5 hash algorithm
  */
-export default class MD5 extends Hasher {
+export class MD5 extends Hasher {
   private _hash: IWordArray = new Word32Array([
     0x67452301, 0xefcdab89,
     0x98badcfe, 0x10325476

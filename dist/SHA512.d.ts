@@ -4,7 +4,7 @@ import { IWordArray } from "./lib/type";
 export interface SHA512Props extends HasherProps {
     hash: Word64Array;
 }
-export default class SHA512 extends Hasher {
+export declare class SHA512 extends Hasher {
     protected _props?: Partial<SHA512Props>;
     protected _blockSize: number;
     protected _hash: Word64Array;

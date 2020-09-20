@@ -1,13 +1,13 @@
 import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
-import SHA256 from "./SHA256";
+import {SHA256} from "./SHA256";
 import {HasherProps} from "./lib/algorithm/Hasher";
 
 export interface SHA224Props extends HasherProps {
   hash: IWordArray;
 }
 
-export default class SHA224 extends SHA256 {
+export class SHA224 extends SHA256 {
   protected _props?: Partial<SHA224Props>;
   protected _hash: IWordArray = new Word32Array([
     0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,

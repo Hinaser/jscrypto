@@ -1,6 +1,6 @@
 import { Hasher } from "./lib/algorithm/Hasher";
 import { IWordArray } from "./lib/type";
-export default class Hmac {
+export declare class Hmac {
     private _hasher;
     private _oKey;
     private _iKey;

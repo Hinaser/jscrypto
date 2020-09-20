@@ -71,7 +71,7 @@ const T: Word64[] = [];
   }
 }());
 
-export default class SHA3 extends Hasher {
+export class SHA3 extends Hasher {
   protected _props?: Partial<SHA3Props>;
   protected _blockSize = 1024/32;
   protected _state: Word64[] = []

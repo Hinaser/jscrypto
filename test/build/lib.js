@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["lib"] = factory();
+		exports["JsCrypto"] = factory();
 	else
-		root["JsCrypto"] = root["JsCrypto"] || {}, root["JsCrypto"]["lib"] = factory();
+		root["JsCrypto"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -591,18 +591,33 @@ const Utf8 = {
 /*!**************************!*\
   !*** ./src/lib/index.ts ***!
   \**************************/
-/*! exports provided: default */
+/*! exports provided: random, Word32Array, Word64, Word64Array, isIE, Utf8, Latin1, Hex */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _random__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./random */ "./src/lib/random.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "random", function() { return _random__WEBPACK_IMPORTED_MODULE_0__["random"]; });
+
 /* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Word32Array", function() { return _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]; });
+
 /* harmony import */ var _Word64Array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Word64Array */ "./src/lib/Word64Array.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Word64", function() { return _Word64Array__WEBPACK_IMPORTED_MODULE_2__["Word64"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Word64Array", function() { return _Word64Array__WEBPACK_IMPORTED_MODULE_2__["Word64Array"]; });
+
 /* harmony import */ var _browser__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./browser */ "./src/lib/browser.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isIE", function() { return _browser__WEBPACK_IMPORTED_MODULE_3__["isIE"]; });
+
 /* harmony import */ var _encoder_Utf8__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./encoder/Utf8 */ "./src/lib/encoder/Utf8.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Utf8", function() { return _encoder_Utf8__WEBPACK_IMPORTED_MODULE_4__["Utf8"]; });
+
 /* harmony import */ var _encoder_Latin1__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./encoder/Latin1 */ "./src/lib/encoder/Latin1.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Latin1", function() { return _encoder_Latin1__WEBPACK_IMPORTED_MODULE_5__["Latin1"]; });
+
 /* harmony import */ var _encoder_Hex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./encoder/Hex */ "./src/lib/encoder/Hex.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Hex", function() { return _encoder_Hex__WEBPACK_IMPORTED_MODULE_6__["Hex"]; });
 
 
 
@@ -610,16 +625,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-/* harmony default export */ __webpack_exports__["default"] = ({
-    random: _random__WEBPACK_IMPORTED_MODULE_0__["random"],
-    Word32Array: _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"],
-    Word64: _Word64Array__WEBPACK_IMPORTED_MODULE_2__["Word64"],
-    Word64Array: _Word64Array__WEBPACK_IMPORTED_MODULE_2__["Word64Array"],
-    isIE: _browser__WEBPACK_IMPORTED_MODULE_3__["isIE"],
-    Utf8: _encoder_Utf8__WEBPACK_IMPORTED_MODULE_4__["Utf8"],
-    Latin1: _encoder_Latin1__WEBPACK_IMPORTED_MODULE_5__["Latin1"],
-    Hex: _encoder_Hex__WEBPACK_IMPORTED_MODULE_6__["Hex"],
-});
+
 
 
 /***/ }),
@@ -664,6 +670,6 @@ const random = makeRandFunction();
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 });
 //# sourceMappingURL=lib.js.map

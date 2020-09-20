@@ -6,7 +6,7 @@ export interface MD5Props extends HasherProps {
 /**
  * MD5 hash algorithm
  */
-export default class MD5 extends Hasher {
+export declare class MD5 extends Hasher {
     private _hash;
     constructor(props?: MD5Props);
     protected doReset(): void;

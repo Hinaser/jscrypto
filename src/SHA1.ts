@@ -1,9 +1,8 @@
 import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
-import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
 
 export interface SHA1Props extends HasherProps {
-  hash: IWordArray;
+  hash: Word32Array;
 }
 
 // Reusable object
@@ -11,7 +10,7 @@ const W: number[] = [];
 
 export class SHA1 extends Hasher {
   protected _props?: Partial<SHA1Props>;
-  private _hash: IWordArray = new Word32Array([
+  private _hash: Word32Array = new Word32Array([
     0x67452301, 0xefcdab89,
     0x98badcfe, 0x10325476,
     0xc3d2e1f0
@@ -25,7 +24,7 @@ export class SHA1 extends Hasher {
     }
   }
   
-  protected doReset() {
+  protected _doReset() {
     this._hash = new Word32Array([
       0x67452301, 0xefcdab89,
       0x98badcfe, 0x10325476,
@@ -33,7 +32,7 @@ export class SHA1 extends Hasher {
     ]);
   }
   
-  protected doProcessBlock(words: number[], offset: number) {
+  protected _doProcessBlock(words: number[], offset: number) {
     const H = this._hash.raw();
   
     // Working variables
@@ -82,7 +81,7 @@ export class SHA1 extends Hasher {
     H[4] = (H[4] + e) | 0;
   }
   
-  protected doFinalize(): IWordArray {
+  protected _doFinalize(): Word32Array {
     // Shortcuts
     const dataWords = this._data.raw();
   
@@ -96,7 +95,7 @@ export class SHA1 extends Hasher {
     this._data.setSignificantBytes(dataWords.length * 4);
   
     // Hash final blocks
-    this.process();
+    this._process();
   
     // Return final computed hash
     return this._hash;
@@ -107,7 +106,7 @@ export class SHA1 extends Hasher {
     return new SHA1(props);
   }
   
-  public static hash(message: IWordArray|string, props?: SHA1Props){
+  public static hash(message: Word32Array|string, props?: SHA1Props){
     return new SHA1(props).finalize(message);
   }
 }

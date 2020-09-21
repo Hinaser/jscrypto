@@ -1,3 +1,5 @@
+import {Word32Array} from "./Word32Array";
+
 export interface IWordArray {
   /**
    * Converts this word array to a string.
@@ -56,5 +58,5 @@ export interface IWordArray {
 
 export interface IEncoder {
   stringify: (words: number[], nSignificantBytes: number) => string;
-  parse: (s: string) => IWordArray;
+  parse: (s: string) => Word32Array;
 }

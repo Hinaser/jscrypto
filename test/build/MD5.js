@@ -178,13 +178,13 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
             this._hash = props.hash.clone();
         }
     }
-    doReset() {
+    _doReset() {
         this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([
             0x67452301, 0xefcdab89,
             0x98badcfe, 0x10325476
         ]);
     }
-    doProcessBlock(words, offset) {
+    _doProcessBlock(words, offset) {
         // Swap endian
         for (let i = 0; i < 16; i++) {
             // Shortcuts
@@ -287,7 +287,7 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
         H[2] = (H[2] + c) | 0;
         H[3] = (H[3] + d) | 0;
     }
-    doFinalize() {
+    _doFinalize() {
         // Shortcuts
         const data = this._data;
         const dataWords = data.raw();
@@ -303,7 +303,7 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
             (((nBitsTotalL << 24) | (nBitsTotalL >>> 8)) & 0xff00ff00));
         data.setSignificantBytes((dataWords.length + 1) * 4);
         // Hash final blocks
-        this.process();
+        this._process();
         // Shortcuts
         const hash = this._hash;
         const H = hash.raw();
@@ -407,8 +407,8 @@ class Word32Array {
     /**
      * Concatenates a word array to this word array.
      *
-     * @param {IWordArray} w The word array to append.
-     * @return {IWordArray} This word array.
+     * @param {Word32Array} w The word array to append.
+     * @return {Word32Array} This word array.
      * @example
      *   wordArray1.concat(wordArray2);
      */
@@ -447,7 +447,7 @@ class Word32Array {
     /**
      * Creates a copy of this word array.
      *
-     * @return {IWordArray} The clone.
+     * @return {Word32Array} The clone.
      * @example
      *   var clone = wordArray.clone();
      */
@@ -458,7 +458,7 @@ class Word32Array {
      * Creates a word array filled with random bytes.
      *
      * @param {number} nBytes The number of random bytes to generate.
-     * @return {IWordArray} The random word array.
+     * @return {Word32Array} The random word array.
      * @static
      * @example
      *   var wordArray = CryptoJS.lib.WordArray.random(16);
@@ -497,6 +497,9 @@ class BufferedBlockAlgorithm {
         this._data = props && typeof props.data !== "undefined" ? props.data.clone() : new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]();
         this._nBytes = props && typeof props.nBytes === "number" ? props.nBytes : 0;
     }
+    get blockSize() {
+        return this._blockSize;
+    }
     /**
      * Resets this block algorithm's data buffer to its initial state.
      *
@@ -510,12 +513,12 @@ class BufferedBlockAlgorithm {
     /**
      * Adds new data to this block algorithm's buffer.
      *
-     * @param {IWordArray|string} data The data to append. Strings are converted to a WordArray using UTF-8.
+     * @param {Word32Array|string} data The data to append. Strings are converted to a WordArray using UTF-8.
      * @example
      *   bufferedBlockAlgorithm.append('data');
      *   bufferedBlockAlgorithm.append(wordArray);
      */
-    append(data) {
+    _append(data) {
         if (typeof data === "string") {
             data = _encoder_Utf8__WEBPACK_IMPORTED_MODULE_1__["Utf8"].parse(data);
         }
@@ -527,12 +530,12 @@ class BufferedBlockAlgorithm {
      * This method invokes doProcessBlock(offset), which must be implemented by a concrete subtype.
      *
      * @param {boolean?} doFlush Whether all blocks and partial blocks should be processed.
-     * @return {IWordArray} The processed data.
+     * @return {Word32Array} The processed data.
      * @example
      *   var processedData = bufferedBlockAlgorithm.process();
      *   var processedData = bufferedBlockAlgorithm.process(!!'flush');
      */
-    process(doFlush) {
+    _process(doFlush) {
         let processedWords;
         const words = this._data.raw();
         const nSigBytes = this._data.length();
@@ -554,7 +557,7 @@ class BufferedBlockAlgorithm {
         if (nWordsReady) {
             for (let offset = 0; offset < nWordsReady; offset += blockSize) {
                 // Perform concrete-algorithm logic
-                this.doProcessBlock(words, offset);
+                this._doProcessBlock(words, offset);
             }
             // Remove processed words
             processedWords = words.splice(0, nWordsReady);
@@ -603,28 +606,28 @@ class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
         // Reset data buffer
         super.reset.call(this, data, nBytes);
         // Perform concrete-hasher logic
-        this.doReset();
+        this._doReset();
     }
     /**
      * Updates this hasher with a message.
      *
-     * @param {IWordArray|string} messageUpdate The message to append.
+     * @param {Word32Array|string} messageUpdate The message to append.
      * @return {Hasher} This hasher.
      * @example
      *   hasher.update('message');
      *   hasher.update(wordArray);
      */
     update(messageUpdate) {
-        this.append(messageUpdate);
-        this.process();
+        this._append(messageUpdate);
+        this._process();
         return this;
     }
     /**
      * Finalizes the hash computation.
      * Note that the finalize operation is effectively a destructive, read-once operation.
      *
-     * @param {IWordArray|string?} messageUpdate (Optional) A final message update.
-     * @return {IWordArray} The hash.
+     * @param {Word32Array|string?} messageUpdate (Optional) A final message update.
+     * @return {Word32Array} The hash.
      * @example
      *   var hash = hasher.finalize();
      *   var hash = hasher.finalize('message');
@@ -633,10 +636,10 @@ class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
     finalize(messageUpdate) {
         // Final message update
         if (messageUpdate) {
-            this.append(messageUpdate);
+            this._append(messageUpdate);
         }
         // Perform concrete-hasher logic
-        return this.doFinalize();
+        return this._doFinalize();
     }
 }
 
@@ -678,7 +681,7 @@ const Hex = {
      * Converts a hex string to a word array.
      *
      * @param {string} hexStr The hex string.
-     * @return {IWordArray} The word array.
+     * @return {Word32Array} The word array.
      * @example
      *   var wordArray = Hex.parse(hexString);
      */
@@ -729,7 +732,7 @@ const Latin1 = {
      * Converts a latin1 string to a word array.
      *
      * @param {string} latin1Str The latin1 string.
-     * @return {IWordArray} The word array.
+     * @return {Word32Array} The word array.
      * @example
      *   var wordArray = Latin1.parse(latin1Str);
      */
@@ -780,7 +783,7 @@ const Utf8 = {
      * Converts a UTF-8 string to a word array.
      *
      * @param {string} utf8Str The UTF-8 string.
-     * @return {IWordArray} The word array.
+     * @return {Word32Array} The word array.
      * @example
      *   var wordArray = Utf8.parse(utf8Str);
      */

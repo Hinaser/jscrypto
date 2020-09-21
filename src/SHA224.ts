@@ -1,15 +1,14 @@
-import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
 import {SHA256} from "./SHA256";
 import {HasherProps} from "./lib/algorithm/Hasher";
 
 export interface SHA224Props extends HasherProps {
-  hash: IWordArray;
+  hash: Word32Array;
 }
 
 export class SHA224 extends SHA256 {
   protected _props?: Partial<SHA224Props>;
-  protected _hash: IWordArray = new Word32Array([
+  protected _hash: Word32Array = new Word32Array([
     0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
     0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4
   ]);
@@ -22,15 +21,15 @@ export class SHA224 extends SHA256 {
     }
   }
   
-  protected doReset() {
+  protected _doReset() {
     this._hash = new Word32Array([
       0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
       0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4
     ]);
   }
   
-  protected doFinalize(): IWordArray {
-    const hash = super.doFinalize.call(this);
+  protected _doFinalize(): Word32Array {
+    const hash = super._doFinalize.call(this);
     hash.setSignificantBytes(hash.length() - 4);
     return hash;
   }
@@ -40,7 +39,7 @@ export class SHA224 extends SHA256 {
     return new SHA224(props);
   }
   
-  public static hash(message: IWordArray|string, props?: SHA224Props){
+  public static hash(message: Word32Array|string, props?: SHA224Props){
     return new SHA224(props).finalize(message);
   }
 }

@@ -1,9 +1,8 @@
 import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
-import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
 
 export interface SHA256Props extends HasherProps {
-  hash: IWordArray;
+  hash: Word32Array;
 }
 
 // Hash values
@@ -45,7 +44,7 @@ const W: number[] = [];
 
 export class SHA256 extends Hasher {
   protected _props?: Partial<SHA256Props>;
-  protected _hash: IWordArray = new Word32Array(H.slice(0));
+  protected _hash: Word32Array = new Word32Array(H.slice(0));
   
   public constructor(props?: SHA256Props) {
     super(props);
@@ -55,11 +54,11 @@ export class SHA256 extends Hasher {
     }
   }
   
-  protected doReset() {
+  protected _doReset() {
     this._hash = new Word32Array(H.slice(0));
   }
   
-  protected doProcessBlock(words: number[], offset: number) {
+  protected _doProcessBlock(words: number[], offset: number) {
     const _H = this._hash.raw();
     
     let a = _H[0];
@@ -119,7 +118,7 @@ export class SHA256 extends Hasher {
     _H[7] = (_H[7] + h) | 0;
   }
   
-  protected doFinalize(): IWordArray {
+  protected _doFinalize(): Word32Array {
     const words = this._data.raw();
     const nBitsTotal = this._nBytes * 8;
     const nBitsLeft = this._data.length() * 8;
@@ -131,7 +130,7 @@ export class SHA256 extends Hasher {
     this._data.setSignificantBytes(words.length * 4);
   
     // Hash final blocks
-    this.process();
+    this._process();
   
     // Return final computed hash
     return this._hash;
@@ -142,7 +141,7 @@ export class SHA256 extends Hasher {
     return new SHA256(props);
   }
   
-  public static hash(message: IWordArray|string, props?: SHA256Props){
+  public static hash(message: Word32Array|string, props?: SHA256Props){
     return new SHA256(props).finalize(message);
   }
 }

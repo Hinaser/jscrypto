@@ -1,7 +1,7 @@
 import {Word64, Word64Array} from "./lib/Word64Array";
-import {IWordArray} from "./lib/type";
 import {SHA512} from "./SHA512";
 import {HasherProps} from "./lib/algorithm/Hasher";
+import {Word32Array} from "./lib/Word32Array";
 
 export interface SHA384Props extends HasherProps {
   hash: Word64Array;
@@ -24,7 +24,7 @@ export class SHA384 extends SHA512 {
     }
   }
   
-  protected doReset() {
+  protected _doReset() {
     this._hash = new Word64Array([
       new Word64(0xcbbb9d5d, 0xc1059ed8), new Word64(0x629a292a, 0x367cd507),
       new Word64(0x9159015a, 0x3070dd17), new Word64(0x152fecd8, 0xf70e5939),
@@ -33,8 +33,8 @@ export class SHA384 extends SHA512 {
     ]);
   }
   
-  protected doFinalize(): IWordArray {
-    const hash = super.doFinalize.call(this);
+  protected _doFinalize(): Word32Array {
+    const hash = super._doFinalize.call(this);
     hash.setSignificantBytes(hash.length() - 16);
     return hash;
   }
@@ -44,7 +44,7 @@ export class SHA384 extends SHA512 {
     return new SHA384(props);
   }
   
-  public static hash(message: IWordArray|string, props?: SHA384Props){
+  public static hash(message: Word32Array|string, props?: SHA384Props){
     return new SHA384(props).finalize(message);
   }
 }

@@ -1,13 +1,13 @@
 import {Utf8} from "./lib/encoder/Utf8";
 import {Hasher} from "./lib/algorithm/Hasher";
-import {IWordArray} from "./lib/type";
+import {Word32Array} from "./lib/Word32Array";
 
 export class Hmac {
   private _hasher: Hasher;
-  private _oKey: IWordArray;
-  private _iKey: IWordArray;
+  private _oKey: Word32Array;
+  private _iKey: Word32Array;
   
-  public constructor(hasher: Hasher, key: IWordArray|string) {
+  public constructor(hasher: Hasher, key: Word32Array|string) {
     this._hasher = hasher;
   
     // Convert string to WordArray, else assume WordArray already
@@ -57,13 +57,13 @@ export class Hmac {
   /**
    * Updates this Hmac with a message.
    *
-   * @param {IWordArray|string} messageUpdate The message to append.
+   * @param {Word32Array|string} messageUpdate The message to append.
    * @return {Hmac} This Hmac instance.
    * @example
    *   hmacHasher.update('message');
    *   hmacHasher.update(wordArray);
    */
-  public update(messageUpdate: IWordArray|string){
+  public update(messageUpdate: Word32Array|string){
     this._hasher.update(messageUpdate);
     return this;
   }
@@ -72,14 +72,14 @@ export class Hmac {
    * Finalizes the Hmac computation.
    * Note that the finalize operation is effectively a destructive, read-once operation.
    *
-   * @param {IWordArray|string} messageUpdate (Optional) A final message update.
-   * @return {IWordArray} The Hmac.
+   * @param {Word32Array|string} messageUpdate (Optional) A final message update.
+   * @return {Word32Array} The Hmac.
    * @example
    *   var hmac = hmacHasher.finalize();
    *   var hmac = hmacHasher.finalize('message');
    *   var hmac = hmacHasher.finalize(wordArray);
    */
-  public finalize(messageUpdate: IWordArray|string){
+  public finalize(messageUpdate: Word32Array|string){
     const innerHash = this._hasher.finalize(messageUpdate);
     this._hasher.reset();
     return this._hasher.finalize(this._oKey.clone().concat(innerHash));

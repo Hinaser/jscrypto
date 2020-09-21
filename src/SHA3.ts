@@ -1,7 +1,6 @@
 // Constants tables
 import {Word64} from "./lib/Word64Array";
 import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
-import {IWordArray} from "./lib/type";
 import {Word32Array} from "./lib/Word32Array";
 
 export interface SHA3Props extends HasherProps {
@@ -102,7 +101,7 @@ export class SHA3 extends Hasher {
     this._blockSize = (1600 - 2*this._outputLength) / 32;
   }
   
-  protected doReset() {
+  protected _doReset() {
     this._state = [];
     for(let i=0;i<25;i++){
       this._state[i] = new Word64(0, 0);
@@ -110,7 +109,7 @@ export class SHA3 extends Hasher {
     this._blockSize = (1600 - 2*this._outputLength) / 32;
   }
   
-  protected doProcessBlock(words: number[], offset: number) {
+  protected _doProcessBlock(words: number[], offset: number) {
     // Shortcuts
     const state = this._state;
     const nBlockSizeLanes = this._blockSize / 2;
@@ -226,7 +225,7 @@ export class SHA3 extends Hasher {
     }
   }
   
-  protected doFinalize(): IWordArray {
+  protected _doFinalize(): Word32Array {
     // Shortcuts
     const data = this._data;
     const dataWords = data.raw();
@@ -239,7 +238,7 @@ export class SHA3 extends Hasher {
     data.setSignificantBytes(dataWords.length * 4);
   
     // Hash final blocks
-    this.process();
+    this._process();
   
     // Shortcuts
     const state = this._state;
@@ -284,7 +283,7 @@ export class SHA3 extends Hasher {
     return new SHA3(props);
   }
   
-  public static hash(message: IWordArray|string, props?: SHA3Props){
+  public static hash(message: Word32Array|string, props?: SHA3Props){
     return new SHA3(props).finalize(message);
   }
 }

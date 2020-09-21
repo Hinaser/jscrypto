@@ -24,7 +24,7 @@ export const Utf8: IEncoder = {
    * Converts a UTF-8 string to a word array.
    *
    * @param {string} utf8Str The UTF-8 string.
-   * @return {IWordArray} The word array.
+   * @return {Word32Array} The word array.
    * @example
    *   var wordArray = Utf8.parse(utf8Str);
    */

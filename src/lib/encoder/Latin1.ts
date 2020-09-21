@@ -5,13 +5,14 @@ export const Latin1: IEncoder = {
   /**
    * Converts a word array to a Latin1 string.
    *
-   * @param {number[]} words An array of 32-bit words.
-   * @param {number} nSig Significant bytes
+   * @param {Word32Array} w An array of 32-bit words.
    * @return {string} The Latin1 string.
    * @example
    *   var latin1String = Latin1.stringify([0x293892], 6);
    */
-  stringify(words: number[], nSig: number){
+  stringify(w: Word32Array){
+    const nSig = w.length();
+    const words = w.raw();
     const latin1Chars: string[] = [];
     
     for(let i=0;i<nSig;i++){

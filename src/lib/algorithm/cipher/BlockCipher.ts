@@ -30,6 +30,18 @@ export class BlockCipher extends Cipher {
     this.reset(props?.data, props?.nBytes);
   }
   
+  public get iv(){
+    return this._iv;
+  }
+  
+  public get mode(){
+    return this._mode;
+  }
+  
+  public get padding(){
+    return this._padding;
+  }
+  
   reset(data?: Word32Array, nBytes?: number) {
     super.reset(data, nBytes);
     
@@ -70,7 +82,7 @@ export class BlockCipher extends Cipher {
       // Process final blocks
       finalProcessedBlocks = this._process(true);
     }
-    else /* if (this._xformMode == this._DEC_XFORM_MODE) */ {
+    else /* if (this._transformMode == Cipher._DEC_TRANSFORM_MODE) */ {
       // Process final blocks
       finalProcessedBlocks = this._process(true);
     
@@ -79,5 +91,38 @@ export class BlockCipher extends Cipher {
     }
   
     return finalProcessedBlocks;
+  }
+  
+  /**
+   * Creates this cipher in encryption mode.
+   *
+   * @param {Word32Array} key The key.
+   * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+   * @return {Cipher} A cipher instance.
+   * @example
+   *     var cipher = CryptoJS.algo.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+   */
+  public static createEncryptor(key: Word32Array, props?: Partial<BlockCipherProps>){
+    if(typeof props === "undefined"){
+      props = {};
+    }
+    props = {...props, key, transformMode: Cipher.ENC_TRANSFORM_MODE};
+    return new BlockCipher(props);
+  }
+  
+  /**
+   * Creates this cipher in decryption mode.
+   * @param {Word32Array} key The key.
+   * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+   * @return {Cipher} A cipher instance.
+   * @example
+   *   var cipher = CryptoJS.algo.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+   */
+  public static createDecryptor(key: Word32Array, props?: Partial<BlockCipherProps>){
+    if(typeof props === "undefined"){
+      props = {};
+    }
+    props = {...props, key, transformMode: Cipher.DEC_TRANSFORM_MODE};
+    return new BlockCipher(props);
   }
 }

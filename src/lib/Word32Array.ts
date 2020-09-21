@@ -67,9 +67,9 @@ export class Word32Array {
    */
   public toString(encoder?: IEncoder){
     if(!encoder){
-      return Hex.stringify(this._words, this._nSignificantBytes);
+      return Hex.stringify(this);
     }
-    return encoder.stringify(this._words, this._nSignificantBytes);
+    return encoder.stringify(this);
   }
   
   /**

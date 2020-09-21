@@ -1,0 +1,51 @@
+import {Cipher} from "../Cipher";
+
+export interface BlockCipherModeProps {
+  cipher: Cipher;
+  iv: number[]|undefined;
+}
+
+/**
+ * Abstract base block cipher mode template.
+ * @abstract
+ */
+export class BlockCipherMode {
+  protected _props: BlockCipherModeProps;
+  protected _cipher: Cipher;
+  protected _iv: number[]|undefined;
+  
+  public constructor(props: BlockCipherModeProps) {
+    this._props = props;
+    this._cipher = props.cipher;
+    this._iv = props.iv;
+  }
+  
+  /**
+   * @abstract
+   */
+  public processBlock(words: number[], offset: number){
+    return;
+  }
+  
+  /**
+   * Creates this mode for encryption.
+   * @param {BlockCipherModeProps} props
+   * @abstract
+   * @example
+   *   var mode = CryptoJS.mode.CBC.createEncryptor(cipher, iv.words);
+   */
+  public static createEncrypter(props: BlockCipherModeProps){
+    return new BlockCipherMode(props);
+  }
+  
+  /**
+   * Creates this mode for decryption.
+   * @param {BlockCipherModeProps} props
+   * @abstract
+   * @example
+   *   var mode = CryptoJS.mode.CBC.createDecryptor(cipher, iv.words);
+   */
+  public static createDecrypter(props: BlockCipherModeProps){
+    return new BlockCipherMode(props);
+  }
+}

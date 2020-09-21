@@ -1,5 +1,5 @@
 import {BufferedBlockAlgorithm, BufferedBlockAlgorithmProps} from "./BufferedBlockAlgorithm";
-import {IWordArray} from "../type";
+import {Word32Array} from "../Word32Array";
 
 export interface HasherProps extends BufferedBlockAlgorithmProps {
   blockSize: number;
@@ -28,25 +28,25 @@ export abstract class Hasher extends BufferedBlockAlgorithm {
    * @example
    *   hasher.reset();
    */
-  public reset(data?: IWordArray, nBytes?: number){
+  public reset(data?: Word32Array, nBytes?: number){
     // Reset data buffer
     super.reset.call(this, data, nBytes);
     // Perform concrete-hasher logic
-    this.doReset();
+    this._doReset();
   }
   
   /**
    * Updates this hasher with a message.
    *
-   * @param {IWordArray|string} messageUpdate The message to append.
+   * @param {Word32Array|string} messageUpdate The message to append.
    * @return {Hasher} This hasher.
    * @example
    *   hasher.update('message');
    *   hasher.update(wordArray);
    */
-  public update(messageUpdate: IWordArray|string){
-    this.append(messageUpdate);
-    this.process();
+  public update(messageUpdate: Word32Array|string){
+    this._append(messageUpdate);
+    this._process();
     return this;
   }
   
@@ -54,23 +54,23 @@ export abstract class Hasher extends BufferedBlockAlgorithm {
    * Finalizes the hash computation.
    * Note that the finalize operation is effectively a destructive, read-once operation.
    *
-   * @param {IWordArray|string?} messageUpdate (Optional) A final message update.
-   * @return {IWordArray} The hash.
+   * @param {Word32Array|string?} messageUpdate (Optional) A final message update.
+   * @return {Word32Array} The hash.
    * @example
    *   var hash = hasher.finalize();
    *   var hash = hasher.finalize('message');
    *   var hash = hasher.finalize(wordArray);
    */
-  public finalize(messageUpdate?: IWordArray|string){
+  public finalize(messageUpdate?: Word32Array|string){
     // Final message update
     if (messageUpdate) {
-      this.append(messageUpdate);
+      this._append(messageUpdate);
     }
   
     // Perform concrete-hasher logic
-    return this.doFinalize();
+    return this._doFinalize();
   }
   
-  protected abstract doReset(): void;
-  protected abstract doFinalize(): IWordArray;
+  protected abstract _doReset(): void;
+  protected abstract _doFinalize(): Word32Array;
 }

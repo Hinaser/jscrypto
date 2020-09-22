@@ -1,5 +1,5 @@
-import { CipherParams } from "../CipherParams";
-import { Word32Array } from "../../../Word32Array";
+import type { CipherParams } from "../CipherParams";
+import type { Word32Array } from "../../../Word32Array";
 export interface KDFParams extends CipherParams {
     key: Word32Array;
     iv: Word32Array;

@@ -1,4 +1,4 @@
-import {IEncoder} from "../type";
+import type {IEncoder} from "../type";
 import {Word32Array} from "../Word32Array";
 
 export const Latin1: IEncoder = {

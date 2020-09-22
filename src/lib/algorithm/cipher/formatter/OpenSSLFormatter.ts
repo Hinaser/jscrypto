@@ -1,4 +1,4 @@
-import {Formatter} from "./type";
+import type {Formatter} from "./type";
 import {CipherParams} from "../CipherParams";
 import {Word32Array} from "../../../Word32Array";
 import {Base64} from "../../../encoder/Base64";

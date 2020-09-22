@@ -8,7 +8,7 @@ export class CBC extends BlockCipherMode {
   /**
    * CBC encryptor.
    */
-  public static Encrypter = class Encrypter extends CBC {
+  public static Encrypter: typeof CBC = class Encrypter extends CBC {
     /**
      * Processes the data block at offset.
      *
@@ -34,7 +34,7 @@ export class CBC extends BlockCipherMode {
   /**
    * CBC decryptor.
    */
-  public static Decrypter = class Decrypter extends CBC {
+  public static Decrypter: typeof CBC = class Decrypter extends CBC {
     /**
      * Processes the data block at offset.
      *

@@ -1,4 +1,4 @@
-import { IEncoder } from "./type";
+import type { IEncoder } from "./type";
 /**
  * An array of 32bit words
  */

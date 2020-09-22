@@ -1,6 +1,6 @@
-import { Formatter } from "./formatter/type";
-import { Word32Array } from "../../Word32Array";
-import { BlockCipher, BlockCipherProps } from "./BlockCipher";
+import type { Formatter } from "./formatter/type";
+import type { Word32Array } from "../../Word32Array";
+import type { BlockCipher, BlockCipherProps } from "./BlockCipher";
 import { CipherParams } from "./CipherParams";
 export interface SerializableCipherProps extends BlockCipherProps {
     formatter: Formatter;

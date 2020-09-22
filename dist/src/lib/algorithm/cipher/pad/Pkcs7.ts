@@ -1,5 +1,5 @@
 import {Word32Array} from "../../../Word32Array";
-import {Pad} from "./pad";
+import type {Pad} from "./pad";
 
 /**
  * Pads data using the algorithm defined in PKCS #5/7.

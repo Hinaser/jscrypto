@@ -1,7 +1,7 @@
 import { CipherProps } from "./lib/algorithm/cipher/Cipher";
 import { Word32Array } from "./lib/Word32Array";
 import { BlockCipher, BlockCipherProps } from "./lib/algorithm/cipher/BlockCipher";
-import { CipherParams } from "./lib/algorithm/cipher/CipherParams";
+import type { CipherParams } from "./lib/algorithm/cipher/CipherParams";
 export interface AESProps extends BlockCipherProps {
 }
 export declare class AES extends BlockCipher {

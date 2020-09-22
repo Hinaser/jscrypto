@@ -1,4 +1,4 @@
-import {IEncoder} from "./type";
+import type {IEncoder} from "./type";
 import {Hex} from "./encoder/Hex";
 import {Word32Array} from "./Word32Array";
 

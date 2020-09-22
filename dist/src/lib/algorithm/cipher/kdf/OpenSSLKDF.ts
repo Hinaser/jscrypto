@@ -1,7 +1,7 @@
 import {Word32Array} from "../../../Word32Array";
 import {CipherParams} from "../CipherParams";
 import {EvpKDF} from "./EvpKDF";
-import {KDF, KDFParams} from "./type";
+import type {KDF, KDFParams} from "./type";
 
 export const OpenSSLKDF: KDF = {
   execute(password: Word32Array|string, keySize: number, ivSize: number, salt?: Word32Array) {

@@ -1,6 +1,6 @@
-import {IEncoder} from "../type";
+import type {IEncoder} from "../type";
 import {Latin1} from "./Latin1";
-import {Word32Array} from "../Word32Array";
+import type {Word32Array} from "../Word32Array";
 
 export const Utf8: IEncoder = {
   /**

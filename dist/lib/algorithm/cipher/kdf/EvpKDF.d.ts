@@ -1,4 +1,4 @@
-import { Hasher } from "../../Hasher";
+import type { Hasher } from "../../Hasher";
 import { Word32Array } from "../../../Word32Array";
 export interface EvpKDFProps {
     keySize: number;

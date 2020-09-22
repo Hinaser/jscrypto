@@ -1,9 +1,9 @@
-import {Word32Array} from "../../Word32Array";
-import {BlockCipherMode} from "./mode/BlockCipherMode";
-import {Pad} from "./pad/pad";
-import {Formatter} from "./formatter/type";
+import type {Word32Array} from "../../Word32Array";
+import type {BlockCipherMode} from "./mode/BlockCipherMode";
+import type {Pad} from "./pad/pad";
+import type {Formatter} from "./formatter/type";
 import {OpenSSLFormatter} from "./formatter/OpenSSLFormatter";
-import {BlockCipher} from "./BlockCipher";
+import type {BlockCipher} from "./BlockCipher";
 
 /**
  * A collection of cipher parameters.

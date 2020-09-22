@@ -1,2 +1,2 @@
-import { KDF } from "./type";
+import type { KDF } from "./type";
 export declare const OpenSSLKDF: KDF;

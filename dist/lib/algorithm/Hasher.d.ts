@@ -1,5 +1,5 @@
 import { BufferedBlockAlgorithm, BufferedBlockAlgorithmProps } from "./BufferedBlockAlgorithm";
-import { Word32Array } from "../Word32Array";
+import type { Word32Array } from "../Word32Array";
 export interface HasherProps extends BufferedBlockAlgorithmProps {
     blockSize: number;
 }

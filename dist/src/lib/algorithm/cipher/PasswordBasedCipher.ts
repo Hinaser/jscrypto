@@ -4,11 +4,11 @@ import {
   SerializableCipher,
   SerializableCipherProps,
 } from "./SerializableCipher";
-import {KDF as KDFType} from "./kdf/type";
+import type {KDF as KDFType} from "./kdf/type";
 import {OpenSSLKDF} from "./kdf/OpenSSLKDF";
-import {BlockCipher} from "./BlockCipher";
-import {Word32Array} from "../../Word32Array";
-import {CipherParams} from "./CipherParams";
+import type {BlockCipher} from "./BlockCipher";
+import type {Word32Array} from "../../Word32Array";
+import type {CipherParams} from "./CipherParams";
 import {OpenSSLFormatter} from "./formatter/OpenSSLFormatter";
 
 export interface PasswordBasedCipherProps extends SerializableCipherProps {

@@ -1,7 +1,7 @@
 import {Word64, Word64Array} from "./lib/Word64Array";
 import {SHA512} from "./SHA512";
-import {HasherProps} from "./lib/algorithm/Hasher";
-import {Word32Array} from "./lib/Word32Array";
+import type {HasherProps} from "./lib/algorithm/Hasher";
+import type {Word32Array} from "./lib/Word32Array";
 
 export interface SHA384Props extends HasherProps {
   hash: Word64Array;

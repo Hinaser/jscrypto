@@ -1,9 +1,9 @@
 import {Cipher, CipherProps} from "./Cipher";
-import {BlockCipherMode, BlockCipherModeProps} from "./mode/BlockCipherMode";
-import {Pad} from "./pad/pad";
+import type {BlockCipherMode, BlockCipherModeProps} from "./mode/BlockCipherMode";
+import type {Pad} from "./pad/pad";
 import {CBC} from "./mode/CBC";
 import {Pkcs7} from "./pad/Pkcs7";
-import {Word32Array} from "../../Word32Array";
+import type {Word32Array} from "../../Word32Array";
 
 export interface BlockCipherProps extends CipherProps {
   mode: typeof BlockCipherMode;

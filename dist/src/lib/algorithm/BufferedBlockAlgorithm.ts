@@ -43,12 +43,9 @@ export class BufferedBlockAlgorithm {
    *   bufferedBlockAlgorithm.append(wordArray);
    */
   protected _append(data: Word32Array|string){
-    if(typeof data === "string"){
-      data = Utf8.parse(data);
-    }
-    
-    this._data.concat(data);
-    this._nBytes += data.length();
+    const d = typeof data === "string" ? Utf8.parse(data) : data;
+    this._data.concat(d);
+    this._nBytes += d.length();
   }
   
   /**

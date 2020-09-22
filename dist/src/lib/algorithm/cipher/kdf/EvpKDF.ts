@@ -1,4 +1,4 @@
-import {Hasher} from "../../Hasher";
+import type {Hasher} from "../../Hasher";
 import {MD5} from "../../../../MD5";
 import {Word32Array} from "../../../Word32Array";
 

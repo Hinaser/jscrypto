@@ -3,7 +3,7 @@ import {Word32Array} from "./lib/Word32Array";
 import {BlockCipher, BlockCipherProps} from "./lib/algorithm/cipher/BlockCipher";
 import {PasswordBasedCipher} from "./lib/algorithm/cipher/PasswordBasedCipher";
 import {SerializableCipher} from "./lib/algorithm/cipher/SerializableCipher";
-import {CipherParams} from "./lib/algorithm/cipher/CipherParams";
+import type {CipherParams} from "./lib/algorithm/cipher/CipherParams";
 
 // Lookup tables
 const SBOX: number[] = [];

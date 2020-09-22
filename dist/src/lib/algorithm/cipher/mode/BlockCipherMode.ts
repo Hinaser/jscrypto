@@ -1,4 +1,4 @@
-import {Cipher} from "../Cipher";
+import type {Cipher} from "../Cipher";
 
 export interface BlockCipherModeProps {
   cipher: Cipher;

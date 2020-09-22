@@ -36,8 +36,8 @@ export class Word32Array {
   /**
    * Return a copy of an array of 32-bit words.
    */
-  public slice(){
-    return this._words.slice();
+  public slice(start?: number, end?: number){
+    return this._words.slice(start, end);
   }
   
   /**

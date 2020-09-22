@@ -1,11 +1,11 @@
-import {IEncoder, IWordArray} from "./type";
+import {IEncoder} from "./type";
 import {Hex} from "./encoder/Hex";
 import {random} from "./random";
 
 /**
  * An array of 32bit words
  */
-export class Word32Array implements IWordArray {
+export class Word32Array {
   private readonly _words: number[];
   private _nSignificantBytes: number;
   
@@ -36,8 +36,8 @@ export class Word32Array implements IWordArray {
   /**
    * Return a copy of an array of 32-bit words.
    */
-  public slice(){
-    return this._words.slice();
+  public slice(start?: number, end?: number){
+    return this._words.slice(start, end);
   }
   
   /**
@@ -67,20 +67,20 @@ export class Word32Array implements IWordArray {
    */
   public toString(encoder?: IEncoder){
     if(!encoder){
-      return Hex.stringify(this._words, this._nSignificantBytes);
+      return Hex.stringify(this);
     }
-    return encoder.stringify(this._words, this._nSignificantBytes);
+    return encoder.stringify(this);
   }
   
   /**
    * Concatenates a word array to this word array.
    *
-   * @param {IWordArray} w The word array to append.
-   * @return {IWordArray} This word array.
+   * @param {Word32Array} w The word array to append.
+   * @return {Word32Array} This word array.
    * @example
    *   wordArray1.concat(wordArray2);
    */
-  public concat(w: IWordArray){
+  public concat(w: Word32Array){
     const words = w.slice();
     const N = w.length();
     
@@ -121,7 +121,7 @@ export class Word32Array implements IWordArray {
   /**
    * Creates a copy of this word array.
    *
-   * @return {IWordArray} The clone.
+   * @return {Word32Array} The clone.
    * @example
    *   var clone = wordArray.clone();
    */
@@ -133,7 +133,7 @@ export class Word32Array implements IWordArray {
    * Creates a word array filled with random bytes.
    *
    * @param {number} nBytes The number of random bytes to generate.
-   * @return {IWordArray} The random word array.
+   * @return {Word32Array} The random word array.
    * @static
    * @example
    *   var wordArray = CryptoJS.lib.WordArray.random(16);

@@ -5,7 +5,7 @@ export interface HasherProps extends BufferedBlockAlgorithmProps {
   blockSize: number;
 }
 
-export abstract class Hasher extends BufferedBlockAlgorithm {
+export class Hasher extends BufferedBlockAlgorithm {
   protected _props?: Partial<HasherProps>;
   protected _blockSize: number = 512/32;
   
@@ -71,6 +71,17 @@ export abstract class Hasher extends BufferedBlockAlgorithm {
     return this._doFinalize();
   }
   
-  protected abstract _doReset(): void;
-  protected abstract _doFinalize(): Word32Array;
+  /**
+   * @abstract
+   */
+  protected _doReset(): void {
+    throw new Error("Not implemented");
+  }
+  
+  /**
+   * @abstract
+   */
+  protected _doFinalize(): Word32Array {
+    throw new Error("Not implemented");
+  }
 }

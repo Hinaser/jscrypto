@@ -4,6 +4,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 module.exports = {
   mode: "production",
   entry: {
+    lib: "./src/lib/index.ts",
     all: "./src/all.ts",
     SHA1: "./src/SHA1.ts",
     SHA224: "./src/SHA224.ts",
@@ -18,7 +19,7 @@ module.exports = {
     HmacSHA384: "./src/HmacSHA384.ts",
     HmacSHA512: "./src/HmacSHA512.ts",
     HmacMD5: "./src/HmacMD5.ts",
-    lib: "./src/lib/index.ts",
+    AES: "./src/AES.ts",
   },
   plugins: [
   ],

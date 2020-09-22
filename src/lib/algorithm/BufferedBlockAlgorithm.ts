@@ -6,7 +6,7 @@ export interface BufferedBlockAlgorithmProps {
   nBytes: number;
 }
 
-export abstract class BufferedBlockAlgorithm {
+export class BufferedBlockAlgorithm {
   protected _props?: Partial<BufferedBlockAlgorithmProps>;
   protected _data: Word32Array;
   protected _nBytes: number;
@@ -99,5 +99,10 @@ export abstract class BufferedBlockAlgorithm {
     return new Word32Array(processedWords, nBytesReady);
   }
   
-  protected abstract _doProcessBlock(words: number[], offset: number): void;
+  /**
+   * @abstract
+   */
+  protected _doProcessBlock(words: number[], offset: number): void {
+    throw new Error("Not implemented")
+  }
 }

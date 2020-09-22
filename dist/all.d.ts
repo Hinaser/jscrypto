@@ -11,3 +11,4 @@ export { SHA256 } from "./SHA256";
 export { SHA384 } from "./SHA384";
 export { SHA512 } from "./SHA512";
 export { SHA3 } from "./SHA3";
+export { AES } from "./AES";

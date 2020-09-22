@@ -1,6 +1,6 @@
 import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
 import {Word64, Word64Array} from "./lib/Word64Array";
-import {IWordArray} from "./lib/type";
+import {Word32Array} from "./lib/Word32Array";
 
 export interface SHA512Props extends HasherProps {
   hash: Word64Array;
@@ -75,7 +75,7 @@ export class SHA512 extends Hasher {
     }
   }
   
-  protected doReset() {
+  protected _doReset() {
     this._hash = new Word64Array([
       new Word64(0x6a09e667, 0xf3bcc908), new Word64(0xbb67ae85, 0x84caa73b),
       new Word64(0x3c6ef372, 0xfe94f82b), new Word64(0xa54ff53a, 0x5f1d36f1),
@@ -84,7 +84,7 @@ export class SHA512 extends Hasher {
     ]);
   }
   
-  protected doProcessBlock(words: number[], offset: number) {
+  protected _doProcessBlock(words: number[], offset: number) {
     // Shortcuts
     const H = this._hash.raw();
   
@@ -252,7 +252,7 @@ export class SHA512 extends Hasher {
     H7.high = (H7h + hh + ((H7l >>> 0) < (hl >>> 0) ? 1 : 0));
   }
   
-  protected doFinalize(): IWordArray {
+  protected _doFinalize(): Word32Array {
     // Shortcuts
     const data = this._data;
     const dataWords = data.raw();
@@ -267,7 +267,7 @@ export class SHA512 extends Hasher {
     data.setSignificantBytes(dataWords.length * 4);
   
     // Hash final blocks
-    this.process();
+    this._process();
   
     // Convert hash to 32-bit word array before returning
     return this._hash.to32();
@@ -278,7 +278,7 @@ export class SHA512 extends Hasher {
     return new SHA512(props);
   }
   
-  public static hash(message: IWordArray|string, props?: SHA512Props){
+  public static hash(message: Word32Array|string, props?: SHA512Props){
     return new SHA512(props).finalize(message);
   }
 }

@@ -100,9 +100,9 @@ export class Word64Array {
    */
   public toString(encoder?: IEncoder){
     if(!encoder){
-      return Hex.stringify(this.to32().slice(), this._nSignificantBytes);
+      return Hex.stringify(this.to32());
     }
-    return encoder.stringify(this.to32().slice(), this._nSignificantBytes);
+    return encoder.stringify(this.to32());
   }
   
   /**

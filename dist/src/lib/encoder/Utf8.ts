@@ -1,19 +1,19 @@
 import {IEncoder} from "../type";
 import {Latin1} from "./Latin1";
+import {Word32Array} from "../Word32Array";
 
 export const Utf8: IEncoder = {
   /**
    * Converts a word array to a UTF-8 string.
    *
-   * @param {number[]} words An array of 32-bit words.
-   * @param {number} nSig Significant bytes
+   * @param {Word32Array} w An array of 32-bit words.
    * @return {string} The UTF-8 string.
    * @example
-   *   var utf8String = Utf8.stringify([0x293892], 6);
+   *   var utf8String = Utf8.stringify(new Word32Array([0x293892]));
    */
-  stringify(words: number[], nSig: number){
+  stringify(w: Word32Array){
     try {
-      return decodeURIComponent(escape(Latin1.stringify(words, nSig)));
+      return decodeURIComponent(escape(Latin1.stringify(w)));
     }
     catch (e) {
       throw new Error("Malformed UTF-8 data");
@@ -24,7 +24,7 @@ export const Utf8: IEncoder = {
    * Converts a UTF-8 string to a word array.
    *
    * @param {string} utf8Str The UTF-8 string.
-   * @return {IWordArray} The word array.
+   * @return {Word32Array} The word array.
    * @example
    *   var wordArray = Utf8.parse(utf8Str);
    */

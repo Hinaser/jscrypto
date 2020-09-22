@@ -127,6 +127,278 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./src/AES.ts":
+/*!********************!*\
+  !*** ./src/AES.ts ***!
+  \********************/
+/*! exports provided: AES */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AES", function() { return AES; });
+/* harmony import */ var _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/cipher/Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
+/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/BlockCipher */ "./src/lib/algorithm/cipher/BlockCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
+
+
+
+
+
+// Lookup tables
+const SBOX = [];
+const INV_SBOX = [];
+const SUB_MIX_0 = [];
+const SUB_MIX_1 = [];
+const SUB_MIX_2 = [];
+const SUB_MIX_3 = [];
+const INV_SUB_MIX_0 = [];
+const INV_SUB_MIX_1 = [];
+const INV_SUB_MIX_2 = [];
+const INV_SUB_MIX_3 = [];
+(function computeLookupTables() {
+    // Compute double table
+    const d = [];
+    for (let i = 0; i < 256; i++) {
+        if (i < 128) {
+            d[i] = i << 1;
+        }
+        else {
+            d[i] = (i << 1) ^ 0x11b;
+        }
+    }
+    // Walk GF(2^8)
+    let x = 0;
+    let xi = 0;
+    for (let i = 0; i < 256; i++) {
+        // Compute sbox
+        let sx = xi ^ (xi << 1) ^ (xi << 2) ^ (xi << 3) ^ (xi << 4);
+        sx = (sx >>> 8) ^ (sx & 0xff) ^ 0x63;
+        SBOX[x] = sx;
+        INV_SBOX[sx] = x;
+        // Compute multiplication
+        const x2 = d[x];
+        const x4 = d[x2];
+        const x8 = d[x4];
+        // Compute sub bytes, mix columns tables
+        let t = (d[sx] * 0x101) ^ (sx * 0x1010100);
+        SUB_MIX_0[x] = (t << 24) | (t >>> 8);
+        SUB_MIX_1[x] = (t << 16) | (t >>> 16);
+        SUB_MIX_2[x] = (t << 8) | (t >>> 24);
+        SUB_MIX_3[x] = t;
+        // Compute inv sub bytes, inv mix columns tables
+        t = (x8 * 0x1010101) ^ (x4 * 0x10001) ^ (x2 * 0x101) ^ (x * 0x1010100);
+        INV_SUB_MIX_0[sx] = (t << 24) | (t >>> 8);
+        INV_SUB_MIX_1[sx] = (t << 16) | (t >>> 16);
+        INV_SUB_MIX_2[sx] = (t << 8) | (t >>> 24);
+        INV_SUB_MIX_3[sx] = t;
+        // Compute next counter
+        if (!x) {
+            x = xi = 1;
+        }
+        else {
+            x = x2 ^ d[d[d[x8 ^ x2]]];
+            xi ^= d[d[xi]];
+        }
+    }
+}());
+// Precomputed Rcon lookup
+const RCON = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
+class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_2__["BlockCipher"] {
+    constructor(props) {
+        super(props);
+        this._nRounds = 6;
+        this._keyPriorReset = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
+        this._key = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
+        this._keySchedule = [];
+        this._invKeySchedule = [];
+        this._keySize = 256 / 32;
+        this._props = props;
+        this._doReset();
+    }
+    _doReset() {
+        let t;
+        // Skip reset of nRounds has been set before and key did not change
+        if (this._nRounds && this._keyPriorReset === this._key) {
+            return;
+        }
+        // Shortcuts
+        const key = this._keyPriorReset = this._key;
+        const keyWords = key.raw();
+        const keySize = key.length() / 4;
+        // Compute number of rounds
+        const nRounds = this._nRounds = keySize + 6;
+        // Compute number of key schedule rows
+        const ksRows = (nRounds + 1) * 4;
+        // Compute key schedule
+        const keySchedule = this._keySchedule = [];
+        for (let ksRow = 0; ksRow < ksRows; ksRow++) {
+            if (ksRow < keySize) {
+                keySchedule[ksRow] = keyWords[ksRow];
+            }
+            else {
+                t = keySchedule[ksRow - 1];
+                if (!(ksRow % keySize)) {
+                    // Rot word
+                    t = (t << 8) | (t >>> 24);
+                    // Sub word
+                    t = (SBOX[t >>> 24] << 24) | (SBOX[(t >>> 16) & 0xff] << 16) | (SBOX[(t >>> 8) & 0xff] << 8) | SBOX[t & 0xff];
+                    // Mix Rcon
+                    t ^= RCON[(ksRow / keySize) | 0] << 24;
+                }
+                else if (keySize > 6 && ksRow % keySize === 4) {
+                    // Sub word
+                    t = (SBOX[t >>> 24] << 24) | (SBOX[(t >>> 16) & 0xff] << 16) | (SBOX[(t >>> 8) & 0xff] << 8) | SBOX[t & 0xff];
+                }
+                keySchedule[ksRow] = keySchedule[ksRow - keySize] ^ t;
+            }
+        }
+        // Compute inv key schedule
+        this._invKeySchedule = [];
+        for (let invKsRow = 0; invKsRow < ksRows; invKsRow++) {
+            const ksRow = ksRows - invKsRow;
+            if (invKsRow % 4) {
+                t = keySchedule[ksRow];
+            }
+            else {
+                t = keySchedule[ksRow - 4];
+            }
+            if (invKsRow < 4 || ksRow <= 4) {
+                this._invKeySchedule[invKsRow] = t;
+            }
+            else {
+                this._invKeySchedule[invKsRow] = INV_SUB_MIX_0[SBOX[t >>> 24]] ^ INV_SUB_MIX_1[SBOX[(t >>> 16) & 0xff]] ^
+                    INV_SUB_MIX_2[SBOX[(t >>> 8) & 0xff]] ^ INV_SUB_MIX_3[SBOX[t & 0xff]];
+            }
+        }
+    }
+    encryptBlock(words, offset) {
+        this._doCryptBlock(words, offset, this._keySchedule, SUB_MIX_0, SUB_MIX_1, SUB_MIX_2, SUB_MIX_3, SBOX);
+    }
+    decryptBlock(words, offset) {
+        // Swap 2nd and 4th rows
+        let t = words[offset + 1];
+        words[offset + 1] = words[offset + 3];
+        words[offset + 3] = t;
+        this._doCryptBlock(words, offset, this._invKeySchedule, INV_SUB_MIX_0, INV_SUB_MIX_1, INV_SUB_MIX_2, INV_SUB_MIX_3, INV_SBOX);
+        // Inv swap 2nd and 4th rows
+        t = words[offset + 1];
+        words[offset + 1] = words[offset + 3];
+        words[offset + 3] = t;
+    }
+    _doCryptBlock(words, offset, keySchedule, subMix0, subMix1, subMix2, subMix3, sBox) {
+        // Shortcut
+        const nRounds = this._nRounds;
+        // Get input, add round key
+        let s0 = words[offset] ^ keySchedule[0];
+        let s1 = words[offset + 1] ^ keySchedule[1];
+        let s2 = words[offset + 2] ^ keySchedule[2];
+        let s3 = words[offset + 3] ^ keySchedule[3];
+        // Key schedule row counter
+        let ksRow = 4;
+        // Rounds
+        for (let round = 1; round < nRounds; round++) {
+            // Shift rows, sub bytes, mix columns, add round key
+            const _s0 = subMix0[s0 >>> 24] ^ subMix1[(s1 >>> 16) & 0xff]
+                ^ subMix2[(s2 >>> 8) & 0xff] ^ subMix3[s3 & 0xff] ^ keySchedule[ksRow++];
+            const _s1 = subMix0[s1 >>> 24] ^ subMix1[(s2 >>> 16) & 0xff]
+                ^ subMix2[(s3 >>> 8) & 0xff] ^ subMix3[s0 & 0xff] ^ keySchedule[ksRow++];
+            const _s2 = subMix0[s2 >>> 24] ^ subMix1[(s3 >>> 16) & 0xff]
+                ^ subMix2[(s0 >>> 8) & 0xff] ^ subMix3[s1 & 0xff] ^ keySchedule[ksRow++];
+            const _s3 = subMix0[s3 >>> 24] ^ subMix1[(s0 >>> 16) & 0xff]
+                ^ subMix2[(s1 >>> 8) & 0xff] ^ subMix3[s2 & 0xff] ^ keySchedule[ksRow++];
+            // Update state
+            s0 = _s0;
+            s1 = _s1;
+            s2 = _s2;
+            s3 = _s3;
+        }
+        // Shift rows, sub bytes, add round key
+        const t0 = ((SBOX[s0 >>> 24] << 24) | (SBOX[(s1 >>> 16) & 0xff] << 16)
+            | (SBOX[(s2 >>> 8) & 0xff] << 8) | SBOX[s3 & 0xff]) ^ keySchedule[ksRow++];
+        const t1 = ((SBOX[s1 >>> 24] << 24) | (SBOX[(s2 >>> 16) & 0xff] << 16)
+            | (SBOX[(s3 >>> 8) & 0xff] << 8) | SBOX[s0 & 0xff]) ^ keySchedule[ksRow++];
+        const t2 = ((SBOX[s2 >>> 24] << 24) | (SBOX[(s3 >>> 16) & 0xff] << 16)
+            | (SBOX[(s0 >>> 8) & 0xff] << 8) | SBOX[s1 & 0xff]) ^ keySchedule[ksRow++];
+        const t3 = ((SBOX[s3 >>> 24] << 24) | (SBOX[(s0 >>> 16) & 0xff] << 16)
+            | (SBOX[(s1 >>> 8) & 0xff] << 8) | SBOX[s2 & 0xff]) ^ keySchedule[ksRow++];
+        // Set output
+        words[offset] = t0;
+        words[offset + 1] = t1;
+        words[offset + 2] = t2;
+        words[offset + 3] = t3;
+    }
+    /**
+     * Creates this cipher in encryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createEncryptor(key, props) {
+        if (typeof props === "undefined") {
+            props = {};
+        }
+        props = Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE });
+        return new AES(props);
+    }
+    /**
+     * Creates this cipher in decryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createDecrypter(key, props) {
+        if (typeof props === "undefined") {
+            props = {};
+        }
+        props = Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE });
+        return new AES(props);
+    }
+    /**
+     * Encrypt a message with key
+     *
+     * @param {Word32Array|string} message
+     * @param {Word32Array|string} key
+     * @param {Partial<AESProps>?} props
+     * @example
+     *   var encryptedMessage = JsCrypt.AES.encrypt("test", "pass");
+     */
+    static encrypt(message, key, props) {
+        const aes = new AES(props);
+        if (typeof key === "string") {
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__["PasswordBasedCipher"].encrypt(aes, message, key, props);
+        }
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__["SerializableCipher"].encrypt(aes, message, key, props);
+    }
+    /**
+     * Encrypt a encrypted message with key
+     *
+     * @param {CipherParams} cipherText
+     * @param {Word32Array|string} key
+     * @param {Partial<AESProps>?} props
+     * @example
+     *   var encryptedMessage = JsCrypt.AES.decrypt(cipherProps, "pass");
+     */
+    static decrypt(cipherText, key, props) {
+        const aes = new AES(props);
+        if (typeof key === "string") {
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__["PasswordBasedCipher"].decrypt(aes, cipherText, key, props);
+        }
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__["SerializableCipher"].decrypt(aes, cipherText, key, props);
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/Hmac.ts":
 /*!*********************!*\
   !*** ./src/Hmac.ts ***!
@@ -1381,7 +1653,7 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
 /*!********************!*\
   !*** ./src/all.ts ***!
   \********************/
-/*! exports provided: Hmac, HmacMD5, HmacSHA224, HmacSHA256, HmacSHA384, HmacSHA512, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3 */
+/*! exports provided: Hmac, HmacMD5, HmacSHA224, HmacSHA256, HmacSHA384, HmacSHA512, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3, AES */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1424,6 +1696,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _SHA3__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./SHA3 */ "./src/SHA3.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SHA3", function() { return _SHA3__WEBPACK_IMPORTED_MODULE_12__["SHA3"]; });
+
+/* harmony import */ var _AES__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./AES */ "./src/AES.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AES", function() { return _AES__WEBPACK_IMPORTED_MODULE_13__["AES"]; });
+
 
 
 
@@ -1485,8 +1761,8 @@ class Word32Array {
     /**
      * Return a copy of an array of 32-bit words.
      */
-    slice() {
-        return this._words.slice();
+    slice(start, end) {
+        return this._words.slice(start, end);
     }
     /**
      * Return significantBytes
@@ -1513,9 +1789,9 @@ class Word32Array {
      */
     toString(encoder) {
         if (!encoder) {
-            return _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__["Hex"].stringify(this._words, this._nSignificantBytes);
+            return _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__["Hex"].stringify(this);
         }
-        return encoder.stringify(this._words, this._nSignificantBytes);
+        return encoder.stringify(this);
     }
     /**
      * Concatenates a word array to this word array.
@@ -1687,9 +1963,9 @@ class Word64Array {
      */
     toString(encoder) {
         if (!encoder) {
-            return _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__["Hex"].stringify(this.to32().slice(), this._nSignificantBytes);
+            return _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__["Hex"].stringify(this.to32());
         }
-        return encoder.stringify(this.to32().slice(), this._nSignificantBytes);
+        return encoder.stringify(this.to32());
     }
     /**
      * Creates a copy of this word array.
@@ -1801,6 +2077,12 @@ class BufferedBlockAlgorithm {
         // Return processed words
         return new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](processedWords, nBytesReady);
     }
+    /**
+     * @abstract
+     */
+    _doProcessBlock(words, offset) {
+        throw new Error("Not implemented");
+    }
 }
 
 
@@ -1876,7 +2158,994 @@ class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
         // Perform concrete-hasher logic
         return this._doFinalize();
     }
+    /**
+     * @abstract
+     */
+    _doReset() {
+        throw new Error("Not implemented");
+    }
+    /**
+     * @abstract
+     */
+    _doFinalize() {
+        throw new Error("Not implemented");
+    }
 }
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/BlockCipher.ts":
+/*!*************************************************!*\
+  !*** ./src/lib/algorithm/cipher/BlockCipher.ts ***!
+  \*************************************************/
+/*! exports provided: BlockCipher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BlockCipher", function() { return BlockCipher; });
+/* harmony import */ var _Cipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
+/* harmony import */ var _mode_CBC__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mode/CBC */ "./src/lib/algorithm/cipher/mode/CBC.ts");
+/* harmony import */ var _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pad/Pkcs7 */ "./src/lib/algorithm/cipher/pad/Pkcs7.ts");
+
+
+
+class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
+    constructor(props) {
+        super(props);
+        this._blockSize = 128 / 32;
+        this._Mode = _mode_CBC__WEBPACK_IMPORTED_MODULE_1__["CBC"];
+        this._padding = _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_2__["Pkcs7"];
+        this._props = props;
+        if (props) {
+            this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
+            this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
+        }
+        this.reset(props === null || props === void 0 ? void 0 : props.data, props === null || props === void 0 ? void 0 : props.nBytes);
+    }
+    get iv() {
+        return this._iv;
+    }
+    get mode() {
+        return this._mode;
+    }
+    get padding() {
+        return this._padding;
+    }
+    reset(data, nBytes) {
+        super.reset(data, nBytes);
+        let modeCreator;
+        if (this._transformMode === _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE) {
+            modeCreator = this._Mode.createEncrypter;
+        }
+        else {
+            modeCreator = this._Mode.createDecrypter;
+            // Keep at least one block in the buffer for unpadding
+            this._minBufferSize = 1;
+        }
+        if (this._Mode && this._modeCreator === modeCreator) {
+            this._mode = new this._Mode({ cipher: this, iv: this._iv && this._iv.raw() });
+        }
+        else {
+            this._mode = modeCreator.call(this._Mode, { cipher: this, iv: this._iv && this._iv.raw() });
+            this._modeCreator = modeCreator;
+        }
+    }
+    _doProcessBlock(words, offset) {
+        var _a;
+        (_a = this._mode) === null || _a === void 0 ? void 0 : _a.processBlock(words, offset);
+    }
+    _doFinalize() {
+        let finalProcessedBlocks;
+        // Shortcut
+        const padding = this._padding;
+        // Finalize
+        if (this._transformMode === _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE) {
+            // Pad data
+            padding.pad(this._data, this.blockSize);
+            // Process final blocks
+            finalProcessedBlocks = this._process(true);
+        }
+        else /* if (this._transformMode == Cipher._DEC_TRANSFORM_MODE) */ {
+            // Process final blocks
+            finalProcessedBlocks = this._process(true);
+            // Unpad data
+            padding.unpad(finalProcessedBlocks);
+        }
+        return finalProcessedBlocks;
+    }
+    /**
+     * Creates this cipher in encryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *     var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createEncryptor(key, props) {
+        if (typeof props === "undefined") {
+            props = {};
+        }
+        props = Object.assign(Object.assign({}, props), { key, transformMode: _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE });
+        return new BlockCipher(props);
+    }
+    /**
+     * Creates this cipher in decryption mode.
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createDecryptor(key, props) {
+        if (typeof props === "undefined") {
+            props = {};
+        }
+        props = Object.assign(Object.assign({}, props), { key, transformMode: _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE });
+        return new BlockCipher(props);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/Cipher.ts":
+/*!********************************************!*\
+  !*** ./src/lib/algorithm/cipher/Cipher.ts ***!
+  \********************************************/
+/*! exports provided: Cipher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cipher", function() { return Cipher; });
+/* harmony import */ var _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../BufferedBlockAlgorithm */ "./src/lib/algorithm/BufferedBlockAlgorithm.ts");
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Word32Array */ "./src/lib/Word32Array.ts");
+
+
+class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["BufferedBlockAlgorithm"] {
+    constructor(props) {
+        super(props);
+        this._transformMode = 1;
+        this._key = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
+        this._iv = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
+        this._keySize = 128 / 32;
+        this._ivSize = 128 / 32;
+        this._props = props;
+        if (props) {
+            this._key = typeof props.key !== "undefined" ? props.key : this._key;
+            this._iv = typeof props.iv !== "undefined" ? props.iv : this._iv;
+            this._keySize = typeof props.keySize !== "undefined" ? props.keySize : this._keySize;
+            this._ivSize = typeof props.ivSize !== "undefined" ? props.ivSize : this._ivSize;
+            this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
+        }
+    }
+    get keySize() {
+        return this._keySize;
+    }
+    get ivSize() {
+        return this._ivSize;
+    }
+    /**
+     * Resets this cipher to its initial state.
+     * @example
+     *   cipher.reset();
+     */
+    reset(data, nBytes) {
+        super.reset(data, nBytes);
+        this._doReset();
+    }
+    /**
+     * Adds data to be encrypted or decrypted.
+     * @param {Word32Array|string} dataUpdate The data to encrypt or decrypt.
+     * @return {Word32Array} The data after processing.
+     * @example
+     *   var encrypted = cipher.process('data');
+     *   var encrypted = cipher.process(wordArray);
+     */
+    process(dataUpdate) {
+        this._append(dataUpdate);
+        return this._process();
+    }
+    /**
+     * Finalizes the encryption or decryption process.
+     * Note that the finalize operation is effectively a destructive, read-once operation.
+     * @param {Word32Array|string} dataUpdate The final data to encrypt or decrypt.
+     * @return {Word32Array} The data after final processing.
+     * @example
+     *   var encrypted = cipher.finalize();
+     *   var encrypted = cipher.finalize('data');
+     *   var encrypted = cipher.finalize(wordArray);
+     */
+    finalize(dataUpdate) {
+        // Final data update
+        if (dataUpdate) {
+            this._append(dataUpdate);
+        }
+        // Perform concrete-cipher logic
+        return this._doFinalize();
+    }
+    /**
+     * @abstract
+     */
+    _doReset() {
+        throw new Error("Not implemented");
+    }
+    /**
+     * @abstract
+     */
+    _doProcess() {
+        throw new Error("Not implemented");
+    }
+    /**
+     * @abstract
+     */
+    _doProcessBlock(words, offset) {
+        throw new Error("Not implemented");
+    }
+    /**
+     * @abstract
+     */
+    _doFinalize() {
+        throw new Error("Not implemented");
+    }
+    /**
+     * @abstract
+     */
+    encryptBlock(words, offset) {
+        throw new Error("Not implemented");
+    }
+    /**
+     * @abstract
+     */
+    decryptBlock(words, offset) {
+        throw new Error("Not implemented");
+    }
+    /**
+     * Creates this cipher in encryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *     var cipher = CryptoJS.algo.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createEncryptor(key, props) {
+        if (typeof props === "undefined") {
+            props = {};
+        }
+        props = Object.assign(Object.assign({}, props), { key, transformMode: Cipher.ENC_TRANSFORM_MODE });
+        return new Cipher(props);
+    }
+    /**
+     * Creates this cipher in decryption mode.
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = CryptoJS.algo.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createDecryptor(key, props) {
+        if (typeof props === "undefined") {
+            props = {};
+        }
+        props = Object.assign(Object.assign({}, props), { key, transformMode: Cipher.DEC_TRANSFORM_MODE });
+        return new Cipher(props);
+    }
+}
+Cipher.ENC_TRANSFORM_MODE = 1;
+Cipher.DEC_TRANSFORM_MODE = 2;
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/CipherParams.ts":
+/*!**************************************************!*\
+  !*** ./src/lib/algorithm/cipher/CipherParams.ts ***!
+  \**************************************************/
+/*! exports provided: CipherParams */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CipherParams", function() { return CipherParams; });
+/* harmony import */ var _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./formatter/OpenSSLFormatter */ "./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts");
+
+/**
+ * A collection of cipher parameters.
+ *
+ * @property {Word32Array} ciphertext The raw ciphertext.
+ * @property {Word32Array} key The key to this ciphertext.
+ * @property {Word32Array} iv The IV used in the ciphering operation.
+ * @property {Word32Array} salt The salt used with a key derivation function.
+ * @property {typeof BufferedBlockAlgorithm} algorithm The cipher algorithm.
+ * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
+ * @property {Pad} padding The padding scheme used in the ciphering operation.
+ * @property {number} blockSize The block size of the cipher.
+ * @property {Formatter} formatter The default formatting strategy to convert this cipher params object to a string.
+ */
+class CipherParams {
+    /**
+     * Initializes a newly created cipher params object.
+     *
+     * @param {Partial<CipherParams>} cp An object with any of the possible cipher parameters.
+     * @example
+     *   var cipherParams = CryptoJS.lib.CipherParams.create({
+     *       ciphertext: ciphertextWordArray,
+     *       key: keyWordArray,
+     *       iv: ivWordArray,
+     *       salt: saltWordArray,
+     *       algorithm: CryptoJS.algo.AES,
+     *       mode: CryptoJS.mode.CBC,
+     *       padding: CryptoJS.pad.PKCS7,
+     *       blockSize: 4,
+     *       formatter: CryptoJS.format.OpenSSL
+     *     });
+     */
+    constructor(cp) {
+        this.formatter = _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"];
+        if (cp) {
+            this.cipherText = cp.cipherText;
+            this.key = cp.key;
+            this.iv = cp.iv;
+            this.salt = cp.salt;
+            this.algorithm = cp.algorithm;
+            this.mode = cp.mode;
+            this.padding = cp.padding;
+            this.blockSize = cp.blockSize;
+            this.formatter = cp.formatter || _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"];
+        }
+    }
+    /**
+     * Converts this cipher params object to a string.
+     *
+     * @param {Formatter?} formatter (Optional) The formatting strategy to use.
+     * @return {string} The stringified cipher params.
+     * @throws Error If neither the formatter nor the default formatter is set.
+     * @example
+     *   var string = cipherParams + '';
+     *   var string = cipherParams.toString();
+     *   var string = cipherParams.toString(CryptoJS.format.OpenSSL);
+     */
+    toString(formatter) {
+        return (formatter || this.formatter).stringify(this);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts":
+/*!*********************************************************!*\
+  !*** ./src/lib/algorithm/cipher/PasswordBasedCipher.ts ***!
+  \*********************************************************/
+/*! exports provided: PasswordBasedCipher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PasswordBasedCipher", function() { return PasswordBasedCipher; });
+/* harmony import */ var _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
+/* harmony import */ var _kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./kdf/OpenSSLKDF */ "./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts");
+/* harmony import */ var _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./formatter/OpenSSLFormatter */ "./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts");
+
+
+
+const PasswordBasedCipher = {
+    /**
+     * Encrypts a message using a password.
+     *
+     * @param {Cipher} cipher The cipher algorithm to use.
+     * @param {Word32Array|string} message The message to encrypt.
+     * @param {string} password The password.
+     * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {CipherParams} A cipher params object.
+     * @example
+     *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password');
+     *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password', { format: JsCrypto.OpenSSLFormatter });
+     */
+    encrypt(cipher, message, password, props) {
+        const p = props ? Object.assign({}, props) : {};
+        const KDF = props && props.KDF ? props.KDF : _kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_1__["OpenSSLKDF"];
+        const derivedParams = KDF.execute(password, cipher.keySize, cipher.ivSize);
+        p.iv = derivedParams.iv;
+        const cipherParams = _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].encrypt(cipher, message, derivedParams.key, p);
+        return Object.assign(Object.assign({}, cipherParams), derivedParams);
+    },
+    /**
+     * Decrypts serialized ciphertext using a password.
+     *
+     * @param {BlockCipher} cipher The cipher algorithm to use.
+     * @param {CipherParams|string} cipherText The ciphertext to decrypt.
+     * @param {string} password The password.
+     * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Word32Array} The plaintext.
+     * @example
+     *   var plaintext = JsCrypto.PasswordBasedCipher.decrypt(
+     *     JsCrypto.AES,
+     *     formattedCiphertext,
+     *     'password',
+     *     { format: JsCrypto.OpenSSLFormatter }
+     *   );
+     *   var plaintext = JsCrypto.PasswordBasedCipher.decrypt(
+     *     JsCrypto.AES,
+     *     ciphertextParams,
+     *     'password',
+     *     { format: JsCrypto.OpenSSLFormatter }
+     *   );
+     */
+    decrypt(cipher, cipherText, password, props) {
+        const p = props ? Object.assign({}, props) : {};
+        const KDF = p.KDF ? p.KDF : _kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_1__["OpenSSLKDF"];
+        const formatter = p.formatter ? p.formatter : _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_2__["OpenSSLFormatter"];
+        const cipherTextParams = Object(_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["parseCipherText"])(cipherText, formatter);
+        const derivedParams = KDF.execute(password, cipher.keySize, cipher.ivSize);
+        p.iv = derivedParams.iv;
+        return _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].decrypt(cipher, cipherTextParams, derivedParams.key, props);
+    }
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/SerializableCipher.ts":
+/*!********************************************************!*\
+  !*** ./src/lib/algorithm/cipher/SerializableCipher.ts ***!
+  \********************************************************/
+/*! exports provided: parseCipherText, SerializableCipher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseCipherText", function() { return parseCipherText; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SerializableCipher", function() { return SerializableCipher; });
+/* harmony import */ var _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./formatter/OpenSSLFormatter */ "./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts");
+/* harmony import */ var _CipherParams__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CipherParams */ "./src/lib/algorithm/cipher/CipherParams.ts");
+
+
+/**
+ * Converts serialized ciphertext to CipherParams,
+ * else assumed CipherParams already and returns ciphertext unchanged.
+ * @param {CipherParams|string} cipherTextParams The ciphertext.
+ * @param {Formatter} formatter The formatting strategy to use to parse serialized ciphertext.
+ * @return {CipherParams} The un-serialized ciphertext.
+ * @example
+ *   var ciphertextParams = JsCrypto.SerializableCipher.parse(ciphertextStringOrParams, format);
+ */
+function parseCipherText(cipherTextParams, formatter) {
+    if (typeof cipherTextParams === "string") {
+        return formatter.parse(cipherTextParams);
+    }
+    return cipherTextParams;
+}
+const SerializableCipher = {
+    /**
+     * Encrypts a message.
+     *
+     * @param {BlockCipher} cipher The cipher algorithm to use.
+     * @param {Word32Array|string} message The message to encrypt.
+     * @param {Word32Array} key The key.
+     * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {CipherParams} A cipher params object.
+     * @example
+     *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key);
+     *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key, { iv: iv });
+     */
+    encrypt(cipher, message, key, props) {
+        const encrypter = cipher.constructor.createEncryptor(key, props);
+        const cipherText = encrypter.finalize(message);
+        return new _CipherParams__WEBPACK_IMPORTED_MODULE_1__["CipherParams"]({
+            cipherText,
+            key,
+            iv: encrypter.iv,
+            algorithm: cipher,
+            mode: encrypter.mode,
+            padding: encrypter.padding,
+            blockSize: encrypter.blockSize,
+            formatter: (props === null || props === void 0 ? void 0 : props.formatter) || _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"],
+        });
+    },
+    /**
+     * Decrypts serialized ciphertext.
+     *
+     * @param {BlockCipher} cipher The cipher algorithm to use.
+     * @param {CipherParams|string} cipherText The ciphertext to decrypt.
+     * @param {Word32Array} key The key.
+     * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
+     * @return {Word32Array} The plaintext.
+     * @example
+     *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, formattedCiphertext, key, { iv: iv, format: JsCrypto.OpenSSL });
+     *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, ciphertextParams, key, { iv: iv, format: JsCrypto.OpenSSL });
+     */
+    decrypt(cipher, cipherText, key, props) {
+        const decrypter = cipher.constructor.createDecryptor(key, props);
+        const cipherParams = parseCipherText(cipherText, (props === null || props === void 0 ? void 0 : props.formatter) || _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"]);
+        return decrypter.finalize(cipherParams.cipherText || "");
+    }
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts":
+/*!****************************************************************!*\
+  !*** ./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts ***!
+  \****************************************************************/
+/*! exports provided: OpenSSLFormatter */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OpenSSLFormatter", function() { return OpenSSLFormatter; });
+/* harmony import */ var _CipherParams__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../CipherParams */ "./src/lib/algorithm/cipher/CipherParams.ts");
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _encoder_Base64__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../encoder/Base64 */ "./src/lib/encoder/Base64.ts");
+
+
+
+const OpenSSLFormatter = {
+    /**
+     * Converts a cipher params object to an OpenSSL-compatible string.
+     *
+     * @param {CipherParams} cipherParams The cipher params object.
+     * @return {string} The OpenSSL-compatible string.
+     * @example
+     *   var openSSLString = CryptoJS.format.OpenSSL.stringify(cipherParams);
+     */
+    stringify(cipherParams) {
+        // Shortcuts
+        const cipherText = cipherParams.cipherText;
+        const salt = cipherParams.salt;
+        if (!cipherText) {
+            return "";
+        }
+        // Format
+        if (salt) {
+            const wordArray = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([0x53616c74, 0x65645f5f]).concat(salt).concat(cipherText);
+            return wordArray.toString(_encoder_Base64__WEBPACK_IMPORTED_MODULE_2__["Base64"]);
+        }
+        return cipherText.toString(_encoder_Base64__WEBPACK_IMPORTED_MODULE_2__["Base64"]);
+    },
+    /**
+     * Converts an OpenSSL-compatible string to a cipher params object.
+     *
+     * @param {string} openSSLStr The OpenSSL-compatible string.
+     * @return {CipherParams} The cipher params object.
+     * @example
+     *   var cipherParams = CryptoJS.format.OpenSSL.parse(openSSLString);
+     */
+    parse(openSSLStr) {
+        let salt;
+        // Parse base64
+        const cipherText = _encoder_Base64__WEBPACK_IMPORTED_MODULE_2__["Base64"].parse(openSSLStr);
+        // Shortcut
+        const ciphertextWords = cipherText.raw();
+        // Test for salt
+        if (ciphertextWords[0] === 0x53616c74 && ciphertextWords[1] === 0x65645f5f) {
+            // Extract salt
+            salt = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](ciphertextWords.slice(2, 4));
+            // Remove salt from ciphertext
+            ciphertextWords.splice(0, 4);
+            cipherText.setSignificantBytes(cipherText.length() - 16);
+        }
+        return new _CipherParams__WEBPACK_IMPORTED_MODULE_0__["CipherParams"]({ cipherText, salt });
+    }
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/kdf/EvpKDF.ts":
+/*!************************************************!*\
+  !*** ./src/lib/algorithm/cipher/kdf/EvpKDF.ts ***!
+  \************************************************/
+/*! exports provided: EvpKDF */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EvpKDF", function() { return EvpKDF; });
+/* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../MD5 */ "./src/MD5.ts");
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
+
+
+/**
+ * This key derivation function is meant to conform with EVP_BytesToKey.
+ * https://www.openssl.org/docs/man1.1.1/man3/EVP_BytesToKey.html
+ *
+ * @property {number} keySize The key size in words to generate. Default: 4 (128 bits)
+ * @property {Hasher} hasher The hash algorithm to use. Default: MD5
+ * @property {number} iterations The number of iterations to perform. Default: 1
+ */
+class EvpKDF {
+    constructor(props) {
+        this._keySize = 128 / 32;
+        this._Hasher = _MD5__WEBPACK_IMPORTED_MODULE_0__["MD5"];
+        this._iterations = 1;
+        this._props = props;
+        if (props) {
+            this._keySize = typeof props.keySize !== "undefined" ? props.keySize : this._keySize;
+            this._Hasher = typeof props.Hasher !== "undefined" ? props.Hasher : this._Hasher;
+            this._iterations = typeof props.iterations !== "undefined" ? props.iterations : this._iterations;
+        }
+    }
+    /**
+     * Derives a key from a password.
+     *
+     * @param {Word32Array|string} password The password.
+     * @param {Word32Array|string} salt A salt.
+     * @return {Word32Array} The derived key.
+     * @example
+     *   var key = kdf.compute(password, salt);
+     */
+    compute(password, salt) {
+        let block;
+        // Init hasher
+        const hasher = new this._Hasher();
+        // Initial values
+        const derivedKey = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
+        // Shortcuts
+        const derivedKeyWords = derivedKey.raw();
+        const keySize = this._keySize;
+        const iterations = this._iterations;
+        // Generate key
+        while (derivedKeyWords.length < keySize) {
+            if (block) {
+                hasher.update(block);
+            }
+            block = hasher.update(password).finalize(salt);
+            hasher.reset();
+            // Iterations
+            for (let i = 1; i < iterations; i++) {
+                block = hasher.finalize(block);
+                hasher.reset();
+            }
+            derivedKey.concat(block);
+        }
+        derivedKey.setSignificantBytes(keySize * 4);
+        return derivedKey;
+    }
+    /**
+     * Derives a key from a password.
+     *
+     * @param {Word32Array|string} password The password.
+     * @param {Word32Array|string} salt A salt.
+     * @param {Partial<EvpKDFProps>?} props (Optional) The configuration options to use for this computation.
+     *
+     * @return {Word32Array} The derived key.
+     *
+     * @static
+     *
+     * @example
+     *
+     *     var key = CryptoJS.EvpKDF(password, salt);
+     *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8 });
+     *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8, iterations: 1000 });
+     */
+    static getKey(password, salt, props) {
+        return new EvpKDF(props).compute(password, salt);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts":
+/*!****************************************************!*\
+  !*** ./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts ***!
+  \****************************************************/
+/*! exports provided: OpenSSLKDF */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OpenSSLKDF", function() { return OpenSSLKDF; });
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _CipherParams__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../CipherParams */ "./src/lib/algorithm/cipher/CipherParams.ts");
+/* harmony import */ var _EvpKDF__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EvpKDF */ "./src/lib/algorithm/cipher/kdf/EvpKDF.ts");
+
+
+
+const OpenSSLKDF = {
+    execute(password, keySize, ivSize, salt) {
+        // Generate random salt
+        if (!salt) {
+            salt = _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"].random(64 / 8);
+        }
+        // Derive key and IV
+        const key = _EvpKDF__WEBPACK_IMPORTED_MODULE_2__["EvpKDF"].getKey(password, salt, { keySize: keySize + ivSize });
+        // Separate key and IV
+        const iv = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](key.slice(keySize), ivSize * 4);
+        key.setSignificantBytes(keySize * 4);
+        // Return params
+        return new _CipherParams__WEBPACK_IMPORTED_MODULE_1__["CipherParams"]({ key, iv, salt });
+    }
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts":
+/*!**********************************************************!*\
+  !*** ./src/lib/algorithm/cipher/mode/BlockCipherMode.ts ***!
+  \**********************************************************/
+/*! exports provided: BlockCipherMode */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BlockCipherMode", function() { return BlockCipherMode; });
+/**
+ * Abstract base block cipher mode template.
+ * @abstract
+ */
+class BlockCipherMode {
+    constructor(props) {
+        this._props = props;
+        this._cipher = props.cipher;
+        this._iv = props.iv;
+    }
+    /**
+     * @abstract
+     */
+    processBlock(words, offset) {
+        return;
+    }
+    /**
+     * Creates this mode for encryption.
+     * @param {BlockCipherModeProps} props
+     * @abstract
+     * @example
+     *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
+     */
+    static createEncrypter(props) {
+        throw new Error("Not implemented yet");
+    }
+    /**
+     * Creates this mode for decryption.
+     * @param {BlockCipherModeProps} props
+     * @abstract
+     * @example
+     *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
+     */
+    static createDecrypter(props) {
+        throw new Error("Not implemented yet");
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/mode/CBC.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/mode/CBC.ts ***!
+  \**********************************************/
+/*! exports provided: CBC */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CBC", function() { return CBC; });
+/* harmony import */ var _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BlockCipherMode */ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts");
+
+class CBC extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode"] {
+    constructor(props) {
+        super(props);
+        this._prevBlock = [];
+    }
+    xorBlock(words, offset, blockSize) {
+        let block;
+        // Shortcut
+        const iv = this._iv;
+        // Choose mixing block
+        if (iv) {
+            block = iv;
+            // Remove IV for subsequent blocks
+            this._iv = undefined;
+        }
+        else {
+            block = this._prevBlock;
+        }
+        // XOR blocks
+        for (let i = 0; i < blockSize; i++) {
+            words[offset + i] ^= block[i];
+        }
+    }
+    /**
+     * Creates this mode for encryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
+     */
+    static createEncrypter(props) {
+        return new CBC.Encrypter(props);
+    }
+    /**
+     * Creates this mode for decryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
+     */
+    static createDecrypter(props) {
+        return new CBC.Decrypter(props);
+    }
+}
+/**
+ * CBC encryptor.
+ */
+CBC.Encrypter = class Encrypter extends CBC {
+    /**
+     * Processes the data block at offset.
+     *
+     * @param {number[]} words The data words to operate on.
+     * @param {number} offset The offset where the block starts.
+     * @example
+     *   mode.processBlock(data.words, offset);
+     */
+    processBlock(words, offset) {
+        // Shortcuts
+        const cipher = this._cipher;
+        const blockSize = cipher.blockSize;
+        // XOR and encrypt
+        this.xorBlock(words, offset, blockSize);
+        cipher.encryptBlock(words, offset);
+        // Remember this block to use with next block
+        this._prevBlock = words.slice(offset, offset + blockSize);
+    }
+};
+/**
+ * CBC decryptor.
+ */
+CBC.Decrypter = class Decrypter extends CBC {
+    /**
+     * Processes the data block at offset.
+     *
+     * @param {number[]} words The data words to operate on.
+     * @param {number} offset The offset where the block starts.
+     * @example
+     *   mode.processBlock(data.words, offset);
+     */
+    processBlock(words, offset) {
+        // Shortcuts
+        const cipher = this._cipher;
+        const blockSize = cipher.blockSize;
+        // Remember this block to use with next block
+        const thisBlock = words.slice(offset, offset + blockSize);
+        // Decrypt and XOR
+        cipher.decryptBlock(words, offset);
+        this.xorBlock(words, offset, blockSize);
+        // This block becomes the previous block
+        this._prevBlock = thisBlock;
+    }
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/pad/Pkcs7.ts":
+/*!***********************************************!*\
+  !*** ./src/lib/algorithm/cipher/pad/Pkcs7.ts ***!
+  \***********************************************/
+/*! exports provided: Pkcs7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Pkcs7", function() { return Pkcs7; });
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
+
+/**
+ * Pads data using the algorithm defined in PKCS #5/7.
+ *
+ * @param {Word32Array} data The data to pad.
+ * @param {number} blockSize The multiple that the data should be padded to.
+ * @example
+ *   JsCrypto.Pkcs7.pad(wordArray, 4);
+ */
+function pad(data, blockSize) {
+    // Shortcut
+    const blockSizeBytes = blockSize * 4;
+    // Count padding bytes
+    const nPaddingBytes = blockSizeBytes - data.length() % blockSizeBytes;
+    // Create padding word
+    const paddingWord = (nPaddingBytes << 24) | (nPaddingBytes << 16) | (nPaddingBytes << 8) | nPaddingBytes;
+    // Create padding
+    const paddingWords = [];
+    for (let i = 0; i < nPaddingBytes; i += 4) {
+        paddingWords.push(paddingWord);
+    }
+    const padding = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](paddingWords, nPaddingBytes);
+    // Add padding
+    data.concat(padding);
+}
+/**
+ * Unpads data that had been padded using the algorithm defined in PKCS #5/7.
+ *
+ * @param {Word32Array} data The data to unpad.
+ * @example
+ *   JsCrypto.pad.Pkcs7.unpad(wordArray);
+ */
+function unpad(data) {
+    // Get number of padding bytes from last byte
+    const nPaddingBytes = data.raw()[(data.length() - 1) >>> 2] & 0xff;
+    // Remove padding
+    data.setSignificantBytes(data.length() - nPaddingBytes);
+}
+const Pkcs7 = {
+    pad,
+    unpad,
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/encoder/Base64.ts":
+/*!***********************************!*\
+  !*** ./src/lib/encoder/Base64.ts ***!
+  \***********************************/
+/*! exports provided: Base64 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Base64", function() { return Base64; });
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Word32Array */ "./src/lib/Word32Array.ts");
+
+const map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+const Base64 = {
+    /**
+     * Converts a word array to a hex string.
+     *
+     * @param {Word32Array} w An array of 32-bit words.
+     * @return {string} The hex string.
+     * @example
+     *   var hexString = Hex.stringify([0x293892], 6);
+     */
+    stringify(w) {
+        // Shortcuts
+        const words = w.raw();
+        const sigBytes = w.length();
+        // Clamp excess bits
+        w.clamp();
+        // Convert
+        const base64Chars = [];
+        for (let i = 0; i < sigBytes; i += 3) {
+            const byte1 = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+            const byte2 = (words[(i + 1) >>> 2] >>> (24 - ((i + 1) % 4) * 8)) & 0xff;
+            const byte3 = (words[(i + 2) >>> 2] >>> (24 - ((i + 2) % 4) * 8)) & 0xff;
+            const triplet = (byte1 << 16) | (byte2 << 8) | byte3;
+            for (let j = 0; (j < 4) && (i + j * 0.75 < sigBytes); j++) {
+                base64Chars.push(map.charAt((triplet >>> (6 * (3 - j))) & 0x3f));
+            }
+        }
+        // Add padding
+        const paddingChar = map.charAt(64);
+        if (paddingChar) {
+            while (base64Chars.length % 4) {
+                base64Chars.push(paddingChar);
+            }
+        }
+        return base64Chars.join("");
+    },
+    /**
+     * Converts a hex string to a word array.
+     *
+     * @param {string} base64Str The hex string.
+     * @return {Word32Array} The word array.
+     * @example
+     *   var wordArray = Hex.parse(hexString);
+     */
+    parse(base64Str) {
+        const Len = base64Str.length;
+        const words = [];
+        for (let i = 0; i < Len; i += 2) {
+            words[i >>> 3] |= parseInt(base64Str.substr(i, 2), 16) << (24 - (i % 8) * 4);
+        }
+        return new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](words, Len / 2);
+    }
+};
 
 
 /***/ }),
@@ -1897,13 +3166,14 @@ const Hex = {
     /**
      * Converts a word array to a hex string.
      *
-     * @param {number[]} words An array of 32-bit words.
-     * @param {number} nSig Significant bytes
+     * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The hex string.
      * @example
      *   var hexString = Hex.stringify([0x293892], 6);
      */
-    stringify(words, nSig) {
+    stringify(w) {
+        const nSig = w.length();
+        const words = w.raw();
         const hexChars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
@@ -1949,13 +3219,14 @@ const Latin1 = {
     /**
      * Converts a word array to a Latin1 string.
      *
-     * @param {number[]} words An array of 32-bit words.
-     * @param {number} nSig Significant bytes
+     * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The Latin1 string.
      * @example
      *   var latin1String = Latin1.stringify([0x293892], 6);
      */
-    stringify(words, nSig) {
+    stringify(w) {
+        const nSig = w.length();
+        const words = w.raw();
         const latin1Chars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
@@ -2000,15 +3271,14 @@ const Utf8 = {
     /**
      * Converts a word array to a UTF-8 string.
      *
-     * @param {number[]} words An array of 32-bit words.
-     * @param {number} nSig Significant bytes
+     * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The UTF-8 string.
      * @example
-     *   var utf8String = Utf8.stringify([0x293892], 6);
+     *   var utf8String = Utf8.stringify(new Word32Array([0x293892]));
      */
-    stringify(words, nSig) {
+    stringify(w) {
         try {
-            return decodeURIComponent(escape(_Latin1__WEBPACK_IMPORTED_MODULE_0__["Latin1"].stringify(words, nSig)));
+            return decodeURIComponent(escape(_Latin1__WEBPACK_IMPORTED_MODULE_0__["Latin1"].stringify(w)));
         }
         catch (e) {
             throw new Error("Malformed UTF-8 data");

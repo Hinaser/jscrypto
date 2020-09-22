@@ -1,2 +1,2 @@
-import { IWordArray } from "./lib/type";
-export declare function HmacMD5(message: IWordArray | string, key: IWordArray | string): IWordArray;
+import { Word32Array } from "./lib/Word32Array";
+export declare function HmacMD5(message: Word32Array | string, key: Word32Array | string): Word32Array;

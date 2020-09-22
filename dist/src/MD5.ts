@@ -1,9 +1,8 @@
 import {Word32Array} from "./lib/Word32Array";
 import {Hasher, HasherProps} from "./lib/algorithm/Hasher";
-import {IWordArray} from "./lib/type";
 
 export interface MD5Props extends HasherProps {
-  hash: IWordArray;
+  hash: Word32Array;
 }
 
 // Constants table
@@ -39,7 +38,7 @@ function II(a: number, b: number, c: number, d: number, x: number, s: number, t:
  * MD5 hash algorithm
  */
 export class MD5 extends Hasher {
-  private _hash: IWordArray = new Word32Array([
+  private _hash: Word32Array = new Word32Array([
     0x67452301, 0xefcdab89,
     0x98badcfe, 0x10325476
   ]);
@@ -51,14 +50,14 @@ export class MD5 extends Hasher {
     }
   }
   
-  protected doReset() {
+  protected _doReset() {
     this._hash = new Word32Array([
       0x67452301, 0xefcdab89,
       0x98badcfe, 0x10325476
     ]);
   }
   
-  protected doProcessBlock(words: number[], offset: number) {
+  protected _doProcessBlock(words: number[], offset: number) {
     // Swap endian
     for (let i=0;i<16;i++) {
       // Shortcuts
@@ -173,7 +172,7 @@ export class MD5 extends Hasher {
     H[3] = (H[3] + d) | 0;
   }
   
-  protected doFinalize(): IWordArray {
+  protected _doFinalize(): Word32Array {
     // Shortcuts
     const data = this._data;
     const dataWords = data.raw();
@@ -198,7 +197,7 @@ export class MD5 extends Hasher {
     data.setSignificantBytes((dataWords.length + 1) * 4);
   
     // Hash final blocks
-    this.process();
+    this._process();
   
     // Shortcuts
     const hash = this._hash;
@@ -221,7 +220,7 @@ export class MD5 extends Hasher {
     return new MD5(props);
   }
   
-  public static hash(message: IWordArray|string){
+  public static hash(message: Word32Array|string){
     return new MD5().finalize(message);
   }
 }

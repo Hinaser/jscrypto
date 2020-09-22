@@ -458,8 +458,8 @@ class Word32Array {
     /**
      * Return a copy of an array of 32-bit words.
      */
-    slice() {
-        return this._words.slice();
+    slice(start, end) {
+        return this._words.slice(start, end);
     }
     /**
      * Return significantBytes
@@ -486,9 +486,9 @@ class Word32Array {
      */
     toString(encoder) {
         if (!encoder) {
-            return _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__["Hex"].stringify(this._words, this._nSignificantBytes);
+            return _encoder_Hex__WEBPACK_IMPORTED_MODULE_0__["Hex"].stringify(this);
         }
-        return encoder.stringify(this._words, this._nSignificantBytes);
+        return encoder.stringify(this);
     }
     /**
      * Concatenates a word array to this word array.
@@ -652,6 +652,12 @@ class BufferedBlockAlgorithm {
         // Return processed words
         return new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](processedWords, nBytesReady);
     }
+    /**
+     * @abstract
+     */
+    _doProcessBlock(words, offset) {
+        throw new Error("Not implemented");
+    }
 }
 
 
@@ -727,6 +733,18 @@ class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
         // Perform concrete-hasher logic
         return this._doFinalize();
     }
+    /**
+     * @abstract
+     */
+    _doReset() {
+        throw new Error("Not implemented");
+    }
+    /**
+     * @abstract
+     */
+    _doFinalize() {
+        throw new Error("Not implemented");
+    }
 }
 
 
@@ -748,13 +766,14 @@ const Hex = {
     /**
      * Converts a word array to a hex string.
      *
-     * @param {number[]} words An array of 32-bit words.
-     * @param {number} nSig Significant bytes
+     * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The hex string.
      * @example
      *   var hexString = Hex.stringify([0x293892], 6);
      */
-    stringify(words, nSig) {
+    stringify(w) {
+        const nSig = w.length();
+        const words = w.raw();
         const hexChars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
@@ -800,13 +819,14 @@ const Latin1 = {
     /**
      * Converts a word array to a Latin1 string.
      *
-     * @param {number[]} words An array of 32-bit words.
-     * @param {number} nSig Significant bytes
+     * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The Latin1 string.
      * @example
      *   var latin1String = Latin1.stringify([0x293892], 6);
      */
-    stringify(words, nSig) {
+    stringify(w) {
+        const nSig = w.length();
+        const words = w.raw();
         const latin1Chars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
@@ -851,15 +871,14 @@ const Utf8 = {
     /**
      * Converts a word array to a UTF-8 string.
      *
-     * @param {number[]} words An array of 32-bit words.
-     * @param {number} nSig Significant bytes
+     * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The UTF-8 string.
      * @example
-     *   var utf8String = Utf8.stringify([0x293892], 6);
+     *   var utf8String = Utf8.stringify(new Word32Array([0x293892]));
      */
-    stringify(words, nSig) {
+    stringify(w) {
         try {
-            return decodeURIComponent(escape(_Latin1__WEBPACK_IMPORTED_MODULE_0__["Latin1"].stringify(words, nSig)));
+            return decodeURIComponent(escape(_Latin1__WEBPACK_IMPORTED_MODULE_0__["Latin1"].stringify(w)));
         }
         catch (e) {
             throw new Error("Malformed UTF-8 data");

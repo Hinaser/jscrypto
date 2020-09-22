@@ -1,15 +1,15 @@
-import { IWordArray } from "./lib/type";
+import { Word32Array } from "./lib/Word32Array";
 import { SHA256 } from "./SHA256";
 import { HasherProps } from "./lib/algorithm/Hasher";
 export interface SHA224Props extends HasherProps {
-    hash: IWordArray;
+    hash: Word32Array;
 }
 export declare class SHA224 extends SHA256 {
     protected _props?: Partial<SHA224Props>;
-    protected _hash: IWordArray;
+    protected _hash: Word32Array;
     constructor(props?: SHA224Props);
-    protected doReset(): void;
-    protected doFinalize(): IWordArray;
+    protected _doReset(): void;
+    protected _doFinalize(): Word32Array;
     clone(): SHA224;
-    static hash(message: IWordArray | string, props?: SHA224Props): IWordArray;
+    static hash(message: Word32Array | string, props?: SHA224Props): Word32Array;
 }

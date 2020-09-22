@@ -1,7 +1,7 @@
+import { Word32Array } from "./lib/Word32Array";
 import { Hasher, HasherProps } from "./lib/algorithm/Hasher";
-import { IWordArray } from "./lib/type";
 export interface MD5Props extends HasherProps {
-    hash: IWordArray;
+    hash: Word32Array;
 }
 /**
  * MD5 hash algorithm
@@ -9,9 +9,9 @@ export interface MD5Props extends HasherProps {
 export declare class MD5 extends Hasher {
     private _hash;
     constructor(props?: MD5Props);
-    protected doReset(): void;
-    protected doProcessBlock(words: number[], offset: number): void;
-    protected doFinalize(): IWordArray;
+    protected _doReset(): void;
+    protected _doProcessBlock(words: number[], offset: number): void;
+    protected _doFinalize(): Word32Array;
     clone(): MD5;
-    static hash(message: IWordArray | string): IWordArray;
+    static hash(message: Word32Array | string): Word32Array;
 }

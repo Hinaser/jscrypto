@@ -10,7 +10,7 @@ import type { BlockCipher } from "./BlockCipher";
  * @property {Word32Array} key The key to this ciphertext.
  * @property {Word32Array} iv The IV used in the ciphering operation.
  * @property {Word32Array} salt The salt used with a key derivation function.
- * @property {typeof BufferedBlockAlgorithm} algorithm The cipher algorithm.
+ * @property {typeof BlockCipher} algorithm The cipher algorithm.
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
@@ -21,7 +21,7 @@ export declare class CipherParams {
     key?: Word32Array;
     iv?: Word32Array;
     salt?: Word32Array;
-    algorithm?: BlockCipher;
+    Algorithm?: typeof BlockCipher;
     mode?: BlockCipherMode;
     padding?: Pad;
     blockSize?: number;
@@ -36,11 +36,11 @@ export declare class CipherParams {
      *       key: keyWordArray,
      *       iv: ivWordArray,
      *       salt: saltWordArray,
-     *       algorithm: CryptoJS.algo.AES,
-     *       mode: CryptoJS.mode.CBC,
-     *       padding: CryptoJS.pad.PKCS7,
+     *       algorithm: JsCrypto.AES,
+     *       mode: JsCrypto.CBC,
+     *       padding: JsCrypto.PKCS7,
      *       blockSize: 4,
-     *       formatter: CryptoJS.format.OpenSSL
+     *       formatter: JsCrypto.OpenSSLFormatter
      *     });
      */
     constructor(cp?: Partial<CipherParams>);

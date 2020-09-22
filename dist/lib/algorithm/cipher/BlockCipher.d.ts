@@ -1,4 +1,4 @@
-import { Cipher, CipherProps } from "./Cipher";
+import { Cipher, CipherProps, PropsWithKey } from "./Cipher";
 import type { BlockCipherMode, BlockCipherModeProps } from "./mode/BlockCipherMode";
 import type { Pad } from "./pad/pad";
 import type { Word32Array } from "../../Word32Array";
@@ -7,7 +7,7 @@ export interface BlockCipherProps extends CipherProps {
     padding: Pad;
 }
 export declare class BlockCipher extends Cipher {
-    protected _props?: Partial<BlockCipherProps>;
+    protected _props: PropsWithKey<BlockCipherProps>;
     protected _blockSize: number;
     protected _Mode: typeof BlockCipherMode;
     protected _mode?: BlockCipherMode;
@@ -17,8 +17,8 @@ export declare class BlockCipher extends Cipher {
      * @see https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
      */
     ["constructor"]: typeof BlockCipher;
-    constructor(props?: Partial<BlockCipherProps>);
-    get iv(): Word32Array;
+    constructor(props: PropsWithKey<BlockCipherProps>);
+    get iv(): Word32Array | undefined;
     get mode(): BlockCipherMode | undefined;
     get padding(): Pad;
     reset(data?: Word32Array, nBytes?: number): void;

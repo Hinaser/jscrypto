@@ -1,24 +1,21 @@
 import { BufferedBlockAlgorithm, BufferedBlockAlgorithmProps } from "../BufferedBlockAlgorithm";
-import { Word32Array } from "../../Word32Array";
+import type { Word32Array } from "../../Word32Array";
 export interface CipherProps extends BufferedBlockAlgorithmProps {
     key: Word32Array;
     iv: Word32Array;
-    keySize: number;
-    ivSize: number;
     transformMode: number;
 }
+export declare type PropsWithKey<T extends CipherProps> = Partial<T> & Pick<T, "key">;
 export declare class Cipher extends BufferedBlockAlgorithm {
-    protected static ENC_TRANSFORM_MODE: number;
-    protected static DEC_TRANSFORM_MODE: number;
-    protected _props?: Partial<CipherProps>;
+    static readonly ENC_TRANSFORM_MODE = 1;
+    static readonly DEC_TRANSFORM_MODE = 2;
+    static readonly keySize: number;
+    static readonly ivSize: number;
+    protected _props: PropsWithKey<CipherProps>;
     protected _transformMode: number;
     protected _key: Word32Array;
-    protected _iv: Word32Array;
-    protected _keySize: number;
-    protected _ivSize: number;
-    constructor(props?: Partial<CipherProps>);
-    get keySize(): number;
-    get ivSize(): number;
+    protected _iv?: Word32Array;
+    constructor(props: PropsWithKey<CipherProps>);
     /**
      * Resets this cipher to its initial state.
      * @example

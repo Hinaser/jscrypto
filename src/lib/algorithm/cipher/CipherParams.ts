@@ -12,7 +12,7 @@ import type {BlockCipher} from "./BlockCipher";
  * @property {Word32Array} key The key to this ciphertext.
  * @property {Word32Array} iv The IV used in the ciphering operation.
  * @property {Word32Array} salt The salt used with a key derivation function.
- * @property {typeof BufferedBlockAlgorithm} algorithm The cipher algorithm.
+ * @property {typeof BlockCipher} algorithm The cipher algorithm.
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
@@ -23,7 +23,7 @@ export class CipherParams {
   public key?: Word32Array;
   public iv?: Word32Array;
   public salt?: Word32Array;
-  public algorithm?: BlockCipher;
+  public Algorithm?: typeof BlockCipher;
   public mode?: BlockCipherMode;
   public padding?: Pad;
   public blockSize?: number;
@@ -39,11 +39,11 @@ export class CipherParams {
    *       key: keyWordArray,
    *       iv: ivWordArray,
    *       salt: saltWordArray,
-   *       algorithm: CryptoJS.algo.AES,
-   *       mode: CryptoJS.mode.CBC,
-   *       padding: CryptoJS.pad.PKCS7,
+   *       algorithm: JsCrypto.AES,
+   *       mode: JsCrypto.CBC,
+   *       padding: JsCrypto.PKCS7,
    *       blockSize: 4,
-   *       formatter: CryptoJS.format.OpenSSL
+   *       formatter: JsCrypto.OpenSSLFormatter
    *     });
    */
   public constructor(cp?: Partial<CipherParams>) {
@@ -52,7 +52,7 @@ export class CipherParams {
       this.key = cp.key;
       this.iv = cp.iv;
       this.salt = cp.salt;
-      this.algorithm = cp.algorithm;
+      this.Algorithm = cp.Algorithm;
       this.mode = cp.mode;
       this.padding = cp.padding;
       this.blockSize = cp.blockSize;

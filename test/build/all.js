@@ -138,11 +138,9 @@ module.exports = g;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AES", function() { return AES; });
 /* harmony import */ var _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/cipher/Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
-/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
-/* harmony import */ var _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/BlockCipher */ "./src/lib/algorithm/cipher/BlockCipher.ts");
-/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
-/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
-
+/* harmony import */ var _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/cipher/BlockCipher */ "./src/lib/algorithm/cipher/BlockCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
 
 
 
@@ -206,15 +204,12 @@ const INV_SUB_MIX_3 = [];
 }());
 // Precomputed Rcon lookup
 const RCON = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
-class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_2__["BlockCipher"] {
+class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__["BlockCipher"] {
     constructor(props) {
         super(props);
-        this._nRounds = 6;
-        this._keyPriorReset = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
-        this._key = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
+        this._nRounds = 0;
         this._keySchedule = [];
         this._invKeySchedule = [];
-        this._keySize = 256 / 32;
         this._props = props;
         this._doReset();
     }
@@ -340,11 +335,8 @@ class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_2__
      *   var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key, props) {
-        if (typeof props === "undefined") {
-            props = {};
-        }
-        props = Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE });
-        return new AES(props);
+        props = typeof props === "undefined" ? {} : props;
+        return new AES(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE }));
     }
     /**
      * Creates this cipher in decryption mode.
@@ -356,11 +348,8 @@ class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_2__
      *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecrypter(key, props) {
-        if (typeof props === "undefined") {
-            props = {};
-        }
-        props = Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE });
-        return new AES(props);
+        props = typeof props === "undefined" ? {} : props;
+        return new AES(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE }));
     }
     /**
      * Encrypt a message with key
@@ -372,11 +361,10 @@ class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_2__
      *   var encryptedMessage = JsCrypt.AES.encrypt("test", "pass");
      */
     static encrypt(message, key, props) {
-        const aes = new AES(props);
         if (typeof key === "string") {
-            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__["PasswordBasedCipher"].encrypt(aes, message, key, props);
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__["PasswordBasedCipher"].encrypt(AES, message, key, props);
         }
-        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__["SerializableCipher"].encrypt(aes, message, key, props);
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__["SerializableCipher"].encrypt(AES, message, key, props);
     }
     /**
      * Encrypt a encrypted message with key
@@ -388,13 +376,13 @@ class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_2__
      *   var encryptedMessage = JsCrypt.AES.decrypt(cipherProps, "pass");
      */
     static decrypt(cipherText, key, props) {
-        const aes = new AES(props);
         if (typeof key === "string") {
-            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__["PasswordBasedCipher"].decrypt(aes, cipherText, key, props);
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__["PasswordBasedCipher"].decrypt(AES, cipherText, key, props);
         }
-        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__["SerializableCipher"].decrypt(aes, cipherText, key, props);
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__["SerializableCipher"].decrypt(AES, cipherText, key, props);
     }
 }
+AES.keySize = 256 / 32;
 
 
 /***/ }),
@@ -2196,10 +2184,8 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
         this._Mode = _mode_CBC__WEBPACK_IMPORTED_MODULE_1__["CBC"];
         this._padding = _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_2__["Pkcs7"];
         this._props = props;
-        if (props) {
-            this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
-            this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
-        }
+        this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
+        this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
         this.reset(props === null || props === void 0 ? void 0 : props.data, props === null || props === void 0 ? void 0 : props.nBytes);
     }
     get iv() {
@@ -2263,11 +2249,8 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
      *     var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key, props) {
-        if (typeof props === "undefined") {
-            props = {};
-        }
-        props = Object.assign(Object.assign({}, props), { key, transformMode: _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE });
-        return new BlockCipher(props);
+        props = typeof props === "undefined" ? {} : props;
+        return new BlockCipher(Object.assign(Object.assign({}, props), { key, transformMode: _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE }));
     }
     /**
      * Creates this cipher in decryption mode.
@@ -2278,11 +2261,8 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
      *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key, props) {
-        if (typeof props === "undefined") {
-            props = {};
-        }
-        props = Object.assign(Object.assign({}, props), { key, transformMode: _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE });
-        return new BlockCipher(props);
+        props = typeof props === "undefined" ? {} : props;
+        return new BlockCipher(Object.assign(Object.assign({}, props), { key, transformMode: _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE }));
     }
 }
 
@@ -2300,31 +2280,15 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cipher", function() { return Cipher; });
 /* harmony import */ var _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../BufferedBlockAlgorithm */ "./src/lib/algorithm/BufferedBlockAlgorithm.ts");
-/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Word32Array */ "./src/lib/Word32Array.ts");
-
 
 class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["BufferedBlockAlgorithm"] {
     constructor(props) {
         super(props);
         this._transformMode = 1;
-        this._key = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
-        this._iv = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
-        this._keySize = 128 / 32;
-        this._ivSize = 128 / 32;
         this._props = props;
-        if (props) {
-            this._key = typeof props.key !== "undefined" ? props.key : this._key;
-            this._iv = typeof props.iv !== "undefined" ? props.iv : this._iv;
-            this._keySize = typeof props.keySize !== "undefined" ? props.keySize : this._keySize;
-            this._ivSize = typeof props.ivSize !== "undefined" ? props.ivSize : this._ivSize;
-            this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
-        }
-    }
-    get keySize() {
-        return this._keySize;
-    }
-    get ivSize() {
-        return this._ivSize;
+        this._key = props.key;
+        this._iv = typeof props.iv !== "undefined" ? props.iv : this._iv;
+        this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
     }
     /**
      * Resets this cipher to its initial state.
@@ -2411,11 +2375,8 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
      *     var cipher = CryptoJS.algo.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key, props) {
-        if (typeof props === "undefined") {
-            props = {};
-        }
-        props = Object.assign(Object.assign({}, props), { key, transformMode: Cipher.ENC_TRANSFORM_MODE });
-        return new Cipher(props);
+        props = typeof props === "undefined" ? {} : props;
+        return new Cipher(Object.assign(Object.assign({}, props), { key, transformMode: Cipher.ENC_TRANSFORM_MODE }));
     }
     /**
      * Creates this cipher in decryption mode.
@@ -2426,15 +2387,14 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
      *   var cipher = CryptoJS.algo.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key, props) {
-        if (typeof props === "undefined") {
-            props = {};
-        }
-        props = Object.assign(Object.assign({}, props), { key, transformMode: Cipher.DEC_TRANSFORM_MODE });
-        return new Cipher(props);
+        props = typeof props === "undefined" ? {} : props;
+        return new Cipher(Object.assign(Object.assign({}, props), { key, transformMode: Cipher.DEC_TRANSFORM_MODE }));
     }
 }
 Cipher.ENC_TRANSFORM_MODE = 1;
 Cipher.DEC_TRANSFORM_MODE = 2;
+Cipher.keySize = 128 / 32;
+Cipher.ivSize = 128 / 32;
 
 
 /***/ }),
@@ -2458,7 +2418,7 @@ __webpack_require__.r(__webpack_exports__);
  * @property {Word32Array} key The key to this ciphertext.
  * @property {Word32Array} iv The IV used in the ciphering operation.
  * @property {Word32Array} salt The salt used with a key derivation function.
- * @property {typeof BufferedBlockAlgorithm} algorithm The cipher algorithm.
+ * @property {typeof BlockCipher} algorithm The cipher algorithm.
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
@@ -2475,11 +2435,11 @@ class CipherParams {
      *       key: keyWordArray,
      *       iv: ivWordArray,
      *       salt: saltWordArray,
-     *       algorithm: CryptoJS.algo.AES,
-     *       mode: CryptoJS.mode.CBC,
-     *       padding: CryptoJS.pad.PKCS7,
+     *       algorithm: JsCrypto.AES,
+     *       mode: JsCrypto.CBC,
+     *       padding: JsCrypto.PKCS7,
      *       blockSize: 4,
-     *       formatter: CryptoJS.format.OpenSSL
+     *       formatter: JsCrypto.OpenSSLFormatter
      *     });
      */
     constructor(cp) {
@@ -2489,7 +2449,7 @@ class CipherParams {
             this.key = cp.key;
             this.iv = cp.iv;
             this.salt = cp.salt;
-            this.algorithm = cp.algorithm;
+            this.Algorithm = cp.Algorithm;
             this.mode = cp.mode;
             this.padding = cp.padding;
             this.blockSize = cp.blockSize;
@@ -2535,7 +2495,7 @@ const PasswordBasedCipher = {
     /**
      * Encrypts a message using a password.
      *
-     * @param {Cipher} cipher The cipher algorithm to use.
+     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
      * @param {Word32Array|string} message The message to encrypt.
      * @param {string} password The password.
      * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -2544,18 +2504,18 @@ const PasswordBasedCipher = {
      *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password');
      *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password', { format: JsCrypto.OpenSSLFormatter });
      */
-    encrypt(cipher, message, password, props) {
+    encrypt(Cipher, message, password, props) {
         const p = props ? Object.assign({}, props) : {};
         const KDF = props && props.KDF ? props.KDF : _kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_1__["OpenSSLKDF"];
-        const derivedParams = KDF.execute(password, cipher.keySize, cipher.ivSize);
+        const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
         p.iv = derivedParams.iv;
-        const cipherParams = _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].encrypt(cipher, message, derivedParams.key, p);
+        const cipherParams = _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].encrypt(Cipher, message, derivedParams.key, p);
         return Object.assign(Object.assign({}, cipherParams), derivedParams);
     },
     /**
      * Decrypts serialized ciphertext using a password.
      *
-     * @param {BlockCipher} cipher The cipher algorithm to use.
+     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
      * @param {CipherParams|string} cipherText The ciphertext to decrypt.
      * @param {string} password The password.
      * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -2574,14 +2534,14 @@ const PasswordBasedCipher = {
      *     { format: JsCrypto.OpenSSLFormatter }
      *   );
      */
-    decrypt(cipher, cipherText, password, props) {
+    decrypt(Cipher, cipherText, password, props) {
         const p = props ? Object.assign({}, props) : {};
         const KDF = p.KDF ? p.KDF : _kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_1__["OpenSSLKDF"];
         const formatter = p.formatter ? p.formatter : _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_2__["OpenSSLFormatter"];
         const cipherTextParams = Object(_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["parseCipherText"])(cipherText, formatter);
-        const derivedParams = KDF.execute(password, cipher.keySize, cipher.ivSize);
+        const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
         p.iv = derivedParams.iv;
-        return _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].decrypt(cipher, cipherTextParams, derivedParams.key, props);
+        return _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].decrypt(Cipher, cipherTextParams, derivedParams.key, props);
     }
 };
 
@@ -2622,7 +2582,7 @@ const SerializableCipher = {
     /**
      * Encrypts a message.
      *
-     * @param {BlockCipher} cipher The cipher algorithm to use.
+     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
      * @param {Word32Array|string} message The message to encrypt.
      * @param {Word32Array} key The key.
      * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -2631,14 +2591,14 @@ const SerializableCipher = {
      *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key);
      *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key, { iv: iv });
      */
-    encrypt(cipher, message, key, props) {
-        const encrypter = cipher.constructor.createEncryptor(key, props);
+    encrypt(Cipher, message, key, props) {
+        const encrypter = Cipher.createEncryptor(key, props);
         const cipherText = encrypter.finalize(message);
         return new _CipherParams__WEBPACK_IMPORTED_MODULE_1__["CipherParams"]({
             cipherText,
             key,
             iv: encrypter.iv,
-            algorithm: cipher,
+            Algorithm: Cipher,
             mode: encrypter.mode,
             padding: encrypter.padding,
             blockSize: encrypter.blockSize,
@@ -2648,7 +2608,7 @@ const SerializableCipher = {
     /**
      * Decrypts serialized ciphertext.
      *
-     * @param {BlockCipher} cipher The cipher algorithm to use.
+     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
      * @param {CipherParams|string} cipherText The ciphertext to decrypt.
      * @param {Word32Array} key The key.
      * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
@@ -2657,8 +2617,8 @@ const SerializableCipher = {
      *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, formattedCiphertext, key, { iv: iv, format: JsCrypto.OpenSSL });
      *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, ciphertextParams, key, { iv: iv, format: JsCrypto.OpenSSL });
      */
-    decrypt(cipher, cipherText, key, props) {
-        const decrypter = cipher.constructor.createDecryptor(key, props);
+    decrypt(Cipher, cipherText, key, props) {
+        const decrypter = Cipher.createDecryptor(key, props);
         const cipherParams = parseCipherText(cipherText, (props === null || props === void 0 ? void 0 : props.formatter) || _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"]);
         return decrypter.finalize(cipherParams.cipherText || "");
     }

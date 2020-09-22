@@ -10,7 +10,7 @@ export interface BlockCipherModeProps {
 export declare class BlockCipherMode {
     protected _props: BlockCipherModeProps;
     protected _cipher: Cipher;
-    protected _iv: number[] | undefined;
+    protected _iv?: number[];
     constructor(props: BlockCipherModeProps);
     /**
      * @abstract

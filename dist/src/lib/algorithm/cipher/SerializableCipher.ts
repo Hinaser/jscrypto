@@ -10,13 +10,13 @@ export interface SerializableCipherProps extends BlockCipherProps {
 
 export interface ISerializableCipher<K extends Word32Array|string> {
   encrypt: (
-    cipher: BlockCipher,
+    cipher: typeof BlockCipher,
     message: Word32Array|string,
     key: K,
     props?: Partial<SerializableCipherProps>,
   ) => CipherParams;
   decrypt: (
-    cipher: BlockCipher,
+    cipher: typeof BlockCipher,
     cipherText: CipherParams|string,
     key: K,
     props?: Partial<SerializableCipherProps>,
@@ -43,7 +43,7 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
   /**
    * Encrypts a message.
    *
-   * @param {BlockCipher} cipher The cipher algorithm to use.
+   * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
    * @param {Word32Array|string} message The message to encrypt.
    * @param {Word32Array} key The key.
    * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -53,19 +53,19 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
    *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key, { iv: iv });
    */
   encrypt(
-    cipher: BlockCipher,
+    Cipher: typeof BlockCipher,
     message: Word32Array|string,
     key: Word32Array,
     props?: Partial<SerializableCipherProps>,
   ){
-    const encrypter = cipher.constructor.createEncryptor(key, props);
+    const encrypter = Cipher.createEncryptor(key, props);
     const cipherText = encrypter.finalize(message);
     
     return new CipherParams({
       cipherText,
       key,
       iv: encrypter.iv,
-      algorithm: cipher,
+      Algorithm: Cipher,
       mode: encrypter.mode,
       padding: encrypter.padding,
       blockSize: encrypter.blockSize,
@@ -76,7 +76,7 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
   /**
    * Decrypts serialized ciphertext.
    *
-   * @param {BlockCipher} cipher The cipher algorithm to use.
+   * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
    * @param {CipherParams|string} cipherText The ciphertext to decrypt.
    * @param {Word32Array} key The key.
    * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
@@ -86,12 +86,12 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
    *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, ciphertextParams, key, { iv: iv, format: JsCrypto.OpenSSL });
    */
   decrypt(
-    cipher: BlockCipher,
+    Cipher: typeof BlockCipher,
     cipherText: CipherParams|string,
     key: Word32Array,
     props?: Partial<SerializableCipherProps>,
   ){
-    const decrypter = cipher.constructor.createDecryptor(key, props);
+    const decrypter = Cipher.createDecryptor(key, props);
     const cipherParams = parseCipherText(cipherText, props?.formatter || OpenSSLFormatter);
     return decrypter.finalize(cipherParams.cipherText || "");
   }

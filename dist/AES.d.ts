@@ -1,18 +1,17 @@
-import { CipherProps } from "./lib/algorithm/cipher/Cipher";
-import { Word32Array } from "./lib/Word32Array";
+import { CipherProps, PropsWithKey } from "./lib/algorithm/cipher/Cipher";
+import type { Word32Array } from "./lib/Word32Array";
 import { BlockCipher, BlockCipherProps } from "./lib/algorithm/cipher/BlockCipher";
 import type { CipherParams } from "./lib/algorithm/cipher/CipherParams";
 export interface AESProps extends BlockCipherProps {
 }
 export declare class AES extends BlockCipher {
-    protected _props?: Partial<AESProps>;
+    static readonly keySize: number;
+    protected _props: PropsWithKey<AESProps>;
     protected _nRounds: number;
-    protected _keyPriorReset: Word32Array;
-    protected _key: Word32Array;
+    protected _keyPriorReset: Word32Array | undefined;
     protected _keySchedule: number[];
     protected _invKeySchedule: number[];
-    protected _keySize: number;
-    constructor(props?: Partial<AESProps>);
+    constructor(props: PropsWithKey<AESProps>);
     protected _doReset(): void;
     encryptBlock(words: number[], offset: number): void;
     decryptBlock(words: number[], offset: number): void;

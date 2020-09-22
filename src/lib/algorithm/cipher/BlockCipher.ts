@@ -1,4 +1,4 @@
-import {Cipher, CipherProps} from "./Cipher";
+import {Cipher, CipherProps, PropsWithKey} from "./Cipher";
 import type {BlockCipherMode, BlockCipherModeProps} from "./mode/BlockCipherMode";
 import type {Pad} from "./pad/pad";
 import {CBC} from "./mode/CBC";
@@ -11,7 +11,7 @@ export interface BlockCipherProps extends CipherProps {
 }
 
 export class BlockCipher extends Cipher {
-  protected _props?: Partial<BlockCipherProps>;
+  protected _props: PropsWithKey<BlockCipherProps>;
   protected _blockSize = 128/32;
   protected _Mode: typeof BlockCipherMode = CBC;
   protected _mode?: BlockCipherMode;
@@ -23,14 +23,12 @@ export class BlockCipher extends Cipher {
    */
   ["constructor"]!: typeof BlockCipher;
   
-  public constructor(props?: Partial<BlockCipherProps>) {
+  public constructor(props: PropsWithKey<BlockCipherProps>) {
     super(props);
     this._props = props;
-    
-    if(props){
-      this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
-      this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
-    }
+  
+    this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
+    this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
   
     this.reset(props?.data, props?.nBytes);
   }
@@ -108,11 +106,8 @@ export class BlockCipher extends Cipher {
    *     var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createEncryptor(key: Word32Array, props?: Partial<BlockCipherProps>){
-    if(typeof props === "undefined"){
-      props = {};
-    }
-    props = {...props, key, transformMode: Cipher.ENC_TRANSFORM_MODE};
-    return new BlockCipher(props);
+    props = typeof props === "undefined" ? {} : props;
+    return new BlockCipher({...props, key, transformMode: Cipher.ENC_TRANSFORM_MODE});
   }
   
   /**
@@ -124,10 +119,7 @@ export class BlockCipher extends Cipher {
    *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createDecryptor(key: Word32Array, props?: Partial<BlockCipherProps>){
-    if(typeof props === "undefined"){
-      props = {};
-    }
-    props = {...props, key, transformMode: Cipher.DEC_TRANSFORM_MODE};
-    return new BlockCipher(props);
+    props = typeof props === "undefined" ? {} : props;
+    return new BlockCipher({...props, key, transformMode: Cipher.DEC_TRANSFORM_MODE});
   }
 }

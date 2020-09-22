@@ -1,5 +1,5 @@
-import {Cipher, CipherProps} from "./lib/algorithm/cipher/Cipher";
-import {Word32Array} from "./lib/Word32Array";
+import {Cipher, CipherProps, PropsWithKey} from "./lib/algorithm/cipher/Cipher";
+import type {Word32Array} from "./lib/Word32Array";
 import {BlockCipher, BlockCipherProps} from "./lib/algorithm/cipher/BlockCipher";
 import {PasswordBasedCipher} from "./lib/algorithm/cipher/PasswordBasedCipher";
 import {SerializableCipher} from "./lib/algorithm/cipher/SerializableCipher";
@@ -74,15 +74,14 @@ export interface AESProps extends BlockCipherProps {
 }
 
 export class AES extends BlockCipher {
-  protected _props?: Partial<AESProps>;
-  protected _nRounds: number = 6;
-  protected _keyPriorReset: Word32Array = new Word32Array();
-  protected _key: Word32Array = new Word32Array();
+  public static readonly keySize = 256/32;
+  protected _props: PropsWithKey<AESProps>;
+  protected _nRounds: number = 0;
+  protected _keyPriorReset: Word32Array|undefined;
   protected _keySchedule: number[] = [];
   protected _invKeySchedule: number[] = [];
-  protected _keySize = 256/32;
   
-  public constructor(props?: Partial<AESProps>) {
+  public constructor(props: PropsWithKey<AESProps>) {
     super(props);
     this._props = props;
     
@@ -244,11 +243,8 @@ export class AES extends BlockCipher {
    *   var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createEncryptor(key: Word32Array, props?: Partial<CipherProps>){
-    if(typeof props === "undefined"){
-      props = {};
-    }
-    props = {...props, key, transformMode: Cipher.ENC_TRANSFORM_MODE}
-    return new AES(props)
+    props = typeof props === "undefined" ? {} : props;
+    return new AES({...props, key, transformMode: Cipher.ENC_TRANSFORM_MODE});
   }
   
   /**
@@ -261,11 +257,8 @@ export class AES extends BlockCipher {
    *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createDecrypter(key: Word32Array, props?: Partial<CipherProps>){
-    if(typeof props === "undefined"){
-      props = {};
-    }
-    props = {...props, key, transformMode: Cipher.DEC_TRANSFORM_MODE}
-    return new AES(props)
+    props = typeof props === "undefined" ? {} : props;
+    return new AES({...props, key, transformMode: Cipher.DEC_TRANSFORM_MODE});
   }
   
   /**
@@ -278,11 +271,10 @@ export class AES extends BlockCipher {
    *   var encryptedMessage = JsCrypt.AES.encrypt("test", "pass");
    */
   public static encrypt(message: Word32Array|string, key: Word32Array|string, props?: Partial<AESProps>){
-    const aes = new AES(props);
     if(typeof key === "string"){
-      return PasswordBasedCipher.encrypt(aes, message, key, props);
+      return PasswordBasedCipher.encrypt(AES, message, key, props);
     }
-    return SerializableCipher.encrypt(aes, message, key, props);
+    return SerializableCipher.encrypt(AES, message, key, props);
   }
   
   /**
@@ -295,10 +287,9 @@ export class AES extends BlockCipher {
    *   var encryptedMessage = JsCrypt.AES.decrypt(cipherProps, "pass");
    */
   public static decrypt(cipherText: CipherParams, key: Word32Array|string, props?: Partial<AESProps>){
-    const aes = new AES(props);
     if(typeof key === "string"){
-      return PasswordBasedCipher.decrypt(aes, cipherText, key, props);
+      return PasswordBasedCipher.decrypt(AES, cipherText, key, props);
     }
-    return SerializableCipher.decrypt(aes, cipherText, key, props);
+    return SerializableCipher.decrypt(AES, cipherText, key, props);
   }
 }

@@ -6,8 +6,8 @@ export interface SerializableCipherProps extends BlockCipherProps {
     formatter: Formatter;
 }
 export interface ISerializableCipher<K extends Word32Array | string> {
-    encrypt: (cipher: BlockCipher, message: Word32Array | string, key: K, props?: Partial<SerializableCipherProps>) => CipherParams;
-    decrypt: (cipher: BlockCipher, cipherText: CipherParams | string, key: K, props?: Partial<SerializableCipherProps>) => Word32Array;
+    encrypt: (cipher: typeof BlockCipher, message: Word32Array | string, key: K, props?: Partial<SerializableCipherProps>) => CipherParams;
+    decrypt: (cipher: typeof BlockCipher, cipherText: CipherParams | string, key: K, props?: Partial<SerializableCipherProps>) => Word32Array;
 }
 /**
  * Converts serialized ciphertext to CipherParams,

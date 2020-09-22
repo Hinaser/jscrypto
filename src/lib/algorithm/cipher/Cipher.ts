@@ -1,44 +1,32 @@
 import {BufferedBlockAlgorithm, BufferedBlockAlgorithmProps} from "../BufferedBlockAlgorithm";
-import {Word32Array} from "../../Word32Array";
+import type {Word32Array} from "../../Word32Array";
 
 export interface CipherProps extends BufferedBlockAlgorithmProps {
   key: Word32Array;
   iv: Word32Array;
-  keySize: number;
-  ivSize: number;
   transformMode: number;
 }
 
+export type PropsWithKey<T extends CipherProps> = Partial<T> & Pick<T, "key">;
+
 export class Cipher extends BufferedBlockAlgorithm {
-  protected static ENC_TRANSFORM_MODE = 1;
-  protected static DEC_TRANSFORM_MODE = 2;
+  public static readonly ENC_TRANSFORM_MODE = 1;
+  public static readonly DEC_TRANSFORM_MODE = 2;
+  public static readonly keySize = 128/32;
+  public static readonly ivSize = 128/32;
   
-  protected _props?: Partial<CipherProps>;
+  protected _props: PropsWithKey<CipherProps>;
   protected _transformMode: number = 1;
-  protected _key: Word32Array = new Word32Array();
-  protected _iv: Word32Array = new Word32Array();
-  protected _keySize = 128/32;
-  protected _ivSize = 128/32;
+  protected _key: Word32Array;
+  protected _iv?: Word32Array;
   
-  public constructor(props?: Partial<CipherProps>) {
+  public constructor(props: PropsWithKey<CipherProps>) {
     super(props);
     this._props = props;
-    
-    if(props){
-      this._key = typeof props.key !== "undefined" ? props.key : this._key;
-      this._iv = typeof props.iv !== "undefined" ? props.iv : this._iv;
-      this._keySize = typeof props.keySize !== "undefined" ? props.keySize : this._keySize;
-      this._ivSize = typeof props.ivSize !== "undefined" ? props.ivSize : this._ivSize;
-      this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
-    }
-  }
   
-  public get keySize(){
-    return this._keySize;
-  }
-  
-  public get ivSize(){
-    return this._ivSize;
+    this._key = props.key;
+    this._iv = typeof props.iv !== "undefined" ? props.iv : this._iv;
+    this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
   }
   
   /**
@@ -136,11 +124,8 @@ export class Cipher extends BufferedBlockAlgorithm {
    *     var cipher = CryptoJS.algo.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createEncryptor(key: Word32Array, props?: Partial<CipherProps>){
-    if(typeof props === "undefined"){
-      props = {};
-    }
-    props = {...props, key, transformMode: Cipher.ENC_TRANSFORM_MODE};
-    return new Cipher(props);
+    props = typeof props === "undefined" ? {} : props;
+    return new Cipher({...props, key, transformMode: Cipher.ENC_TRANSFORM_MODE});
   }
   
   /**
@@ -152,10 +137,7 @@ export class Cipher extends BufferedBlockAlgorithm {
    *   var cipher = CryptoJS.algo.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createDecryptor(key: Word32Array, props?: Partial<CipherProps>){
-    if(typeof props === "undefined"){
-      props = {};
-    }
-    props = {...props, key, transformMode: Cipher.DEC_TRANSFORM_MODE};
-    return new Cipher(props);
+    props = typeof props === "undefined" ? {} : props;
+    return new Cipher({...props, key, transformMode: Cipher.DEC_TRANSFORM_MODE});
   }
 }

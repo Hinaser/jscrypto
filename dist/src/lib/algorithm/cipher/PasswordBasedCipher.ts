@@ -19,7 +19,7 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
   /**
    * Encrypts a message using a password.
    *
-   * @param {Cipher} cipher The cipher algorithm to use.
+   * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
    * @param {Word32Array|string} message The message to encrypt.
    * @param {string} password The password.
    * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -29,17 +29,17 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
    *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password', { format: JsCrypto.OpenSSLFormatter });
    */
   encrypt(
-    cipher: BlockCipher,
+    Cipher: typeof BlockCipher,
     message: Word32Array|string,
     password: string,
     props?: Partial<PasswordBasedCipherProps>,
   ){
     const p = props ? {...props} : {};
     const KDF = props && props.KDF ? props.KDF : OpenSSLKDF;
-    const derivedParams = KDF.execute(password, cipher.keySize, cipher.ivSize);
+    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
     
     p.iv = derivedParams.iv;
-    const cipherParams = SerializableCipher.encrypt(cipher, message, derivedParams.key, p);
+    const cipherParams = SerializableCipher.encrypt(Cipher, message, derivedParams.key, p);
     
     return {
       ...cipherParams,
@@ -50,7 +50,7 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
   /**
    * Decrypts serialized ciphertext using a password.
    *
-   * @param {BlockCipher} cipher The cipher algorithm to use.
+   * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
    * @param {CipherParams|string} cipherText The ciphertext to decrypt.
    * @param {string} password The password.
    * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -70,7 +70,7 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
    *   );
    */
   decrypt(
-    cipher: BlockCipher,
+    Cipher: typeof BlockCipher,
     cipherText: CipherParams|string,
     password: string,
     props?: Partial<PasswordBasedCipherProps>,
@@ -79,9 +79,9 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
     const KDF = p.KDF ? p.KDF : OpenSSLKDF;
     const formatter = p.formatter ? p.formatter : OpenSSLFormatter;
     const cipherTextParams = parseCipherText(cipherText, formatter);
-    const derivedParams = KDF.execute(password, cipher.keySize, cipher.ivSize);
+    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
     
     p.iv = derivedParams.iv;
-    return SerializableCipher.decrypt(cipher, cipherTextParams, derivedParams.key, props);
+    return SerializableCipher.decrypt(Cipher, cipherTextParams, derivedParams.key, props);
   }
 }

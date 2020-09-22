@@ -12,7 +12,7 @@ export interface BlockCipherModeProps {
 export class BlockCipherMode {
   protected _props: BlockCipherModeProps;
   protected _cipher: Cipher;
-  protected _iv: number[]|undefined;
+  protected _iv?: number[];
   
   public constructor(props: BlockCipherModeProps) {
     this._props = props;

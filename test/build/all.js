@@ -1641,11 +1641,12 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
 /*!********************!*\
   !*** ./src/all.ts ***!
   \********************/
-/*! exports provided: Hmac, HmacMD5, HmacSHA224, HmacSHA256, HmacSHA384, HmacSHA512, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3, AES */
+/*! exports provided: Hmac, HmacMD5, HmacSHA224, HmacSHA256, HmacSHA384, HmacSHA512, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3, AES, mode */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mode", function() { return mode; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Hmac", function() { return _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"]; });
 
@@ -1688,6 +1689,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AES__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./AES */ "./src/AES.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AES", function() { return _AES__WEBPACK_IMPORTED_MODULE_13__["AES"]; });
 
+/* harmony import */ var _mode_CBC__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./mode/CBC */ "./src/mode/CBC.ts");
+/* harmony import */ var _mode_CFB__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./mode/CFB */ "./src/mode/CFB.ts");
+/* harmony import */ var _mode_CTR__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./mode/CTR */ "./src/mode/CTR.ts");
+/* harmony import */ var _mode_ECB__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./mode/ECB */ "./src/mode/ECB.ts");
+/* harmony import */ var _mode_OFB__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./mode/OFB */ "./src/mode/OFB.ts");
 
 
 
@@ -1702,6 +1708,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+
+
+
+const mode = {
+    get CBC() { return _mode_CBC__WEBPACK_IMPORTED_MODULE_14__["CBC"]; },
+    get CFB() { return _mode_CFB__WEBPACK_IMPORTED_MODULE_15__["CFB"]; },
+    get CTR() { return _mode_CTR__WEBPACK_IMPORTED_MODULE_16__["CTR"]; },
+    get ECB() { return _mode_ECB__WEBPACK_IMPORTED_MODULE_17__["ECB"]; },
+    get OFB() { return _mode_OFB__WEBPACK_IMPORTED_MODULE_18__["OFB"]; },
+};
 
 
 /***/ }),
@@ -2982,6 +3000,339 @@ CBC.Decrypter = class Decrypter extends CBC {
 
 /***/ }),
 
+/***/ "./src/lib/algorithm/cipher/mode/CFB.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/mode/CFB.ts ***!
+  \**********************************************/
+/*! exports provided: CFB */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CFB", function() { return CFB; });
+/* harmony import */ var _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BlockCipherMode */ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts");
+
+/**
+ * Cipher Feedback Block mode
+ */
+class CFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode"] {
+    constructor(props) {
+        super(props);
+        this._prevBlock = [];
+    }
+    generateKeyStreamAndEncrypt(words, offset, blockSize, cipher) {
+        let keyStream;
+        // Shortcut
+        const iv = this._iv;
+        // Generate keyStream
+        if (iv) {
+            keyStream = iv.slice(0);
+            // Remove IV for subsequent blocks
+            this._iv = undefined;
+        }
+        else {
+            keyStream = this._prevBlock;
+        }
+        cipher.encryptBlock(keyStream, 0);
+        // Encrypt
+        for (let i = 0; i < blockSize; i++) {
+            words[offset + i] ^= keyStream[i];
+        }
+    }
+    /**
+     * Creates this mode for encryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.CFB.createEncryptor(cipher, iv.words);
+     */
+    static createEncrypter(props) {
+        return new CFB.Encrypter(props);
+    }
+    /**
+     * Creates this mode for decryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.CFB.createDecryptor(cipher, iv.words);
+     */
+    static createDecrypter(props) {
+        return new CFB.Decrypter(props);
+    }
+}
+/**
+ * CFB encryptor.
+ */
+CFB.Encrypter = class Encrypter extends CFB {
+    /**
+     * Processes the data block at offset.
+     *
+     * @param {number[]} words The data words to operate on.
+     * @param {number} offset The offset where the block starts.
+     * @example
+     *   mode.processBlock(data.words, offset);
+     */
+    processBlock(words, offset) {
+        this.generateKeyStreamAndEncrypt(words, offset, this._cipher.blockSize, this._cipher);
+        // Remember this block to use with next block
+        this._prevBlock = words.slice(offset, offset + this._cipher.blockSize);
+    }
+};
+/**
+ * CFB decryptor.
+ */
+CFB.Decrypter = class Encrypter extends CFB {
+    /**
+     * Processes the data block at offset.
+     *
+     * @param {number[]} words The data words to operate on.
+     * @param {number} offset The offset where the block starts.
+     * @example
+     *   mode.processBlock(data.words, offset);
+     */
+    processBlock(words, offset) {
+        // Remember this block to use with next block
+        const thisBlock = words.slice(offset, offset + this._cipher.blockSize);
+        this.generateKeyStreamAndEncrypt(words, offset, this._cipher.blockSize, this._cipher);
+        // This block becomes the previous block
+        this._prevBlock = thisBlock;
+    }
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/mode/CTR.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/mode/CTR.ts ***!
+  \**********************************************/
+/*! exports provided: CTR */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CTR", function() { return CTR; });
+/* harmony import */ var _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BlockCipherMode */ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts");
+
+/**
+ * Output Feedback Block mode
+ */
+class CTR extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode"] {
+    constructor(props) {
+        super(props);
+        this._counter = [];
+    }
+    /**
+     * Creates this mode for encryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.CTR.createEncryptor(cipher, iv.words);
+     */
+    static createEncrypter(props) {
+        return new CTR.Encrypter(props);
+    }
+    /**
+     * Creates this mode for decryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.CTR.createDecryptor(cipher, iv.words);
+     */
+    static createDecrypter(props) {
+        return new CTR.Decrypter(props);
+    }
+}
+/**
+ * CTR encryptor.
+ */
+CTR.Encrypter = class Encrypter extends CTR {
+    /**
+     * Processes the data block at offset.
+     *
+     * @param {number[]} words The data words to operate on.
+     * @param {number} offset The offset where the block starts.
+     * @example
+     *   mode.processBlock(data.words, offset);
+     */
+    processBlock(words, offset) {
+        // Shortcuts
+        const cipher = this._cipher;
+        const blockSize = cipher.blockSize;
+        const iv = this._iv;
+        let counter = this._counter;
+        // Generate keyStream
+        if (iv) {
+            counter = this._counter = iv.slice(0);
+            // Remove IV for subsequent blocks
+            this._iv = undefined;
+        }
+        const keyStream = counter.slice(0);
+        cipher.encryptBlock(keyStream, 0);
+        // Increment counter
+        counter[blockSize - 1] = (counter[blockSize - 1] + 1) | 0;
+        // Encrypt
+        for (let i = 0; i < blockSize; i++) {
+            words[offset + i] ^= keyStream[i];
+        }
+    }
+};
+/**
+ * CTR decryptor.
+ */
+CTR.Decrypter = CTR.Encrypter;
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/mode/ECB.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/mode/ECB.ts ***!
+  \**********************************************/
+/*! exports provided: ECB */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ECB", function() { return ECB; });
+/* harmony import */ var _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BlockCipherMode */ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts");
+
+/**
+ * Electronic Codebook block mode.
+ */
+class ECB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode"] {
+    constructor(props) {
+        super(props);
+    }
+    /**
+     * Creates this mode for encryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.ECB.createEncryptor(cipher, iv.words);
+     */
+    static createEncrypter(props) {
+        return new ECB.Encrypter(props);
+    }
+    /**
+     * Creates this mode for decryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.ECB.createDecryptor(cipher, iv.words);
+     */
+    static createDecrypter(props) {
+        return new ECB.Decrypter(props);
+    }
+}
+/**
+ * ECB encryptor.
+ */
+ECB.Encrypter = class Encrypter extends ECB {
+    /**
+     * Processes the data block at offset.
+     *
+     * @param {number[]} words The data words to operate on.
+     * @param {number} offset The offset where the block starts.
+     * @example
+     *   mode.processBlock(data.words, offset);
+     */
+    processBlock(words, offset) {
+        this._cipher.encryptBlock(words, offset);
+    }
+};
+/**
+ * ECB decryptor.
+ */
+ECB.Decrypter = class Decrypter extends ECB {
+    /**
+     * Processes the data block at offset.
+     *
+     * @param {number[]} words The data words to operate on.
+     * @param {number} offset The offset where the block starts.
+     * @example
+     *   mode.processBlock(data.words, offset);
+     */
+    processBlock(words, offset) {
+        this._cipher.decryptBlock(words, offset);
+    }
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/mode/OFB.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/mode/OFB.ts ***!
+  \**********************************************/
+/*! exports provided: OFB */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OFB", function() { return OFB; });
+/* harmony import */ var _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BlockCipherMode */ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts");
+
+/**
+ * Output Feedback Block mode
+ */
+class OFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode"] {
+    constructor(props) {
+        super(props);
+        this._keyStream = [];
+    }
+    /**
+     * Creates this mode for encryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.OFB.createEncryptor(cipher, iv.words);
+     */
+    static createEncrypter(props) {
+        return new OFB.Encrypter(props);
+    }
+    /**
+     * Creates this mode for decryption.
+     * @param {BlockCipherModeProps} props
+     * @example
+     *   var mode = JsCrypto.OFB.createDecryptor(cipher, iv.words);
+     */
+    static createDecrypter(props) {
+        return new OFB.Decrypter(props);
+    }
+}
+/**
+ * OFB encryptor.
+ */
+OFB.Encrypter = class Encrypter extends OFB {
+    /**
+     * Processes the data block at offset.
+     *
+     * @param {number[]} words The data words to operate on.
+     * @param {number} offset The offset where the block starts.
+     * @example
+     *   mode.processBlock(data.words, offset);
+     */
+    processBlock(words, offset) {
+        // Shortcuts
+        const cipher = this._cipher;
+        const blockSize = cipher.blockSize;
+        const iv = this._iv;
+        let keyStream = this._keyStream;
+        // Generate key stream
+        if (iv) {
+            keyStream = this._keyStream = iv.slice(0);
+            // Remove IV for subsequent blocks
+            this._iv = undefined;
+        }
+        cipher.encryptBlock(keyStream, 0);
+        // Encrypt
+        for (let i = 0; i < blockSize; i++) {
+            words[offset + i] ^= keyStream[i];
+        }
+    }
+};
+/**
+ * OFB decryptor.
+ */
+OFB.Decrypter = OFB.Encrypter;
+
+
+/***/ }),
+
 /***/ "./src/lib/algorithm/cipher/pad/Pkcs7.ts":
 /*!***********************************************!*\
   !*** ./src/lib/algorithm/cipher/pad/Pkcs7.ts ***!
@@ -3295,6 +3646,91 @@ function makeRandFunction() {
 const random = makeRandFunction();
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node_modules/webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./src/mode/CBC.ts":
+/*!*************************!*\
+  !*** ./src/mode/CBC.ts ***!
+  \*************************/
+/*! exports provided: CBC */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_mode_CBC__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/mode/CBC */ "./src/lib/algorithm/cipher/mode/CBC.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CBC", function() { return _lib_algorithm_cipher_mode_CBC__WEBPACK_IMPORTED_MODULE_0__["CBC"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/mode/CFB.ts":
+/*!*************************!*\
+  !*** ./src/mode/CFB.ts ***!
+  \*************************/
+/*! exports provided: CFB */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_mode_CFB__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/mode/CFB */ "./src/lib/algorithm/cipher/mode/CFB.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CFB", function() { return _lib_algorithm_cipher_mode_CFB__WEBPACK_IMPORTED_MODULE_0__["CFB"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/mode/CTR.ts":
+/*!*************************!*\
+  !*** ./src/mode/CTR.ts ***!
+  \*************************/
+/*! exports provided: CTR */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_mode_CTR__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/mode/CTR */ "./src/lib/algorithm/cipher/mode/CTR.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CTR", function() { return _lib_algorithm_cipher_mode_CTR__WEBPACK_IMPORTED_MODULE_0__["CTR"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/mode/ECB.ts":
+/*!*************************!*\
+  !*** ./src/mode/ECB.ts ***!
+  \*************************/
+/*! exports provided: ECB */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_mode_ECB__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/mode/ECB */ "./src/lib/algorithm/cipher/mode/ECB.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ECB", function() { return _lib_algorithm_cipher_mode_ECB__WEBPACK_IMPORTED_MODULE_0__["ECB"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/mode/OFB.ts":
+/*!*************************!*\
+  !*** ./src/mode/OFB.ts ***!
+  \*************************/
+/*! exports provided: OFB */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_mode_OFB__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/mode/OFB */ "./src/lib/algorithm/cipher/mode/OFB.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "OFB", function() { return _lib_algorithm_cipher_mode_OFB__WEBPACK_IMPORTED_MODULE_0__["OFB"]; });
+
+
+
 
 /***/ })
 

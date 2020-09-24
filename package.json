@@ -14,13 +14,14 @@
   "scripts": {
     "test": "mocha --enable-source-maps ./test/specs/",
     "build": "webpack --config webpack.dev.js",
-    "build:prod": "webpack --config webpack.prod.es5.js && node ./bin/pre_publish.js",
+    "build:prod": "webpack --config webpack.prod.es5.js && node ./bin/pre_publish.js && yarn tsc",
     "tsc": "tsc --project tsconfig.es5.json --emitDeclarationOnly --declaration --declarationDir ./dist --allowJS false",
     "tsdoc": "typedoc src/XSpy.ts --mode file --excludePrivate --excludeProtected --excludeNotExported --out docs --includeVersion --gaID UA-91245492-8"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",
+    "clean-webpack-plugin": "^3.0.0",
     "eslint": "^7.8.1",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsdoc": "^30.4.1",

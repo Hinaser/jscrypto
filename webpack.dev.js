@@ -1,54 +1,20 @@
-const path = require("path");
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const {
+  baseConfig,
+  mainEntry,
+  mainOutput,
+  modeModuleEntry,
+  modeModuleOutput,
+} = require("./webpack.common");
 
-module.exports = {
-  mode: "development",
-  context: __dirname, // to automatically find tsconfig.json
-  entry: {
-    lib: "./src/lib/index.ts",
-    all: "./src/all.ts",
-    SHA1: "./src/SHA1.ts",
-    SHA224: "./src/SHA224.ts",
-    SHA256: "./src/SHA256.ts",
-    SHA384: "./src/SHA384.ts",
-    SHA512: "./src/SHA512.ts",
-    SHA3: "./src/SHA3.ts",
-    MD5: "./src/MD5.ts",
-    Hmac: "./src/Hmac.ts",
-    HmacSHA224: "./src/HmacSHA224.ts",
-    HmacSHA256: "./src/HmacSHA256.ts",
-    HmacSHA384: "./src/HmacSHA384.ts",
-    HmacSHA512: "./src/HmacSHA512.ts",
-    HmacMD5: "./src/HmacMD5.ts",
-    AES: "./src/AES.ts",
+module.exports = [
+  {
+    ...baseConfig(),
+    entry: {...mainEntry()},
+    output: {...mainOutput()},
   },
-  plugins: [
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        files: './src/**/*.{ts,tsx,js,jsx}' // required - same as command `eslint ./src/**/*.{ts,tsx,js,jsx} --ext .ts,.tsx,.js,.jsx`
-      }
-    }),
-  ],
-  devtool: "source-map",
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: [
-          {loader: "ts-loader", options: {transpileOnly: true}}
-        ],
-        exclude: /node_modules/,
-      },
-    ],
-  },
-  resolve: {
-    extensions: [".tsx", ".ts", "js"],
-  },
-  output: {
-    path: path.resolve(__dirname, "test", "build"),
-    filename: "[name].js",
-    library: ["JsCrypto"],
-    libraryTarget: "umd",
-    globalObject: "this",
+  {
+    ...baseConfig(),
+    entry: {...modeModuleEntry()},
+    output: {...modeModuleOutput()},
   }
-};
+];

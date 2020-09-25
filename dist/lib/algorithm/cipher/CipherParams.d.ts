@@ -1,6 +1,6 @@
 import type { Word32Array } from "../../Word32Array";
 import type { BlockCipherMode } from "./mode/BlockCipherMode";
-import type { Pad } from "./pad/pad";
+import type { Pad } from "./pad/type";
 import type { Formatter } from "./formatter/type";
 import type { BlockCipher } from "./BlockCipher";
 /**

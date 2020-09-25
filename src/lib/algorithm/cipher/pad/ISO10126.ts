@@ -2,12 +2,12 @@ import {Word32Array} from "../../../Word32Array";
 import type {Pad} from "./type";
 
 /**
- * Pads data using the algorithm defined in PKCS #5/7.
+ * ISO10126 padding strategy
  *
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.pad.Pkcs7.pad(wordArray, 4);
+ *   JsCrypto.pad.ISO10126.pad(wordArray, 4);
  */
 function pad(data: Word32Array, blockSize: number){
   // Shortcut
@@ -16,26 +16,18 @@ function pad(data: Word32Array, blockSize: number){
   // Count padding bytes
   const nPaddingBytes = blockSizeBytes - data.length() % blockSizeBytes;
   
-  // Create padding word
-  const paddingWord = (nPaddingBytes << 24) | (nPaddingBytes << 16) | (nPaddingBytes << 8) | nPaddingBytes;
-  
-  // Create padding
-  const paddingWords = [];
-  for (let i = 0; i < nPaddingBytes; i += 4) {
-    paddingWords.push(paddingWord);
-  }
-  const padding = new Word32Array(paddingWords, nPaddingBytes);
-  
-  // Add padding
-  data.concat(padding);
+  // Pad
+  data
+    .concat(Word32Array.random(nPaddingBytes - 1))
+    .concat(new Word32Array([nPaddingBytes << 24], 1));
 }
 
 /**
- * Unpads data that had been padded using the algorithm defined in PKCS #5/7.
+ * Unpads data that had been padded with ISO10126 padding strategy.
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   JsCrypto.pad.Pkcs7.unpad(wordArray);
+ *   JsCrypto.pad.ISO10126.unpad(wordArray);
  */
 function unpad(data: Word32Array){
   // Get number of padding bytes from last byte
@@ -45,7 +37,7 @@ function unpad(data: Word32Array){
   data.setSignificantBytes(data.length() - nPaddingBytes);
 }
 
-export const Pkcs7: Pad = {
+export const ISO10126: Pad = {
   pad,
   unpad,
 };

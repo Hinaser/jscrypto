@@ -54,7 +54,25 @@ exports.modeModuleOutput = (isProd) => {
   };
 };
 
+exports.padModuleEntry = () => {
+  return {
+    AnsiX923: "./src/pad/AnsiX923.ts",
+    ISO10126: "./src/pad/ISO10126.ts",
+    ISO97971: "./src/pad/ISO97971.ts",
+    Noop: "./src/pad/Noop.ts",
+    Zero: "./src/pad/Zero.ts",
+  };
+};
 
+exports.padModuleOutput = (isProd) => {
+  return {
+    path: isProd ? path.resolve(__dirname, "dist", "pad") : path.resolve(__dirname, "test", "build", "pad"),
+    filename: "[name].js",
+    library: ["JsCrypto", "pad"],
+    libraryTarget: "umd",
+    globalObject: "this",
+  };
+};
 
 
 

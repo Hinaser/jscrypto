@@ -1,6 +1,6 @@
 import {Cipher, CipherProps, PropsWithKey} from "./Cipher";
 import type {BlockCipherMode, BlockCipherModeProps} from "./mode/BlockCipherMode";
-import type {Pad} from "./pad/pad";
+import type {Pad} from "./pad/type";
 import {CBC} from "./mode/CBC";
 import {Pkcs7} from "./pad/Pkcs7";
 import type {Word32Array} from "../../Word32Array";

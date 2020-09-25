@@ -1,5 +1,5 @@
 import {Word32Array} from "../../../Word32Array";
-import type {Pad} from "./pad";
+import type {Pad} from "./type";
 
 /**
  * Pads data using the algorithm defined in PKCS #5/7.
@@ -7,7 +7,7 @@ import type {Pad} from "./pad";
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.Pkcs7.pad(wordArray, 4);
+ *   JsCrypto.pad.Pkcs7.pad(wordArray, 4);
  */
 function pad(data: Word32Array, blockSize: number){
   // Shortcut

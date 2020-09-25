@@ -18,9 +18,16 @@ import { CTR } from "./mode/CTR";
 import { ECB } from "./mode/ECB";
 import { OFB } from "./mode/OFB";
 export declare const mode: {
-    readonly CBC: typeof CBC;
-    readonly CFB: typeof CFB;
-    readonly CTR: typeof CTR;
-    readonly ECB: typeof ECB;
-    readonly OFB: typeof OFB;
+    CBC: typeof CBC;
+    CFB: typeof CFB;
+    CTR: typeof CTR;
+    ECB: typeof ECB;
+    OFB: typeof OFB;
+};
+export declare const pad: {
+    AnsiX923: import("./lib/algorithm/cipher/pad/type").Pad;
+    ISO10126: import("./lib/algorithm/cipher/pad/type").Pad;
+    ISO97971: import("./lib/algorithm/cipher/pad/type").Pad;
+    Noop: import("./lib/algorithm/cipher/pad/type").Pad;
+    Zero: import("./lib/algorithm/cipher/pad/type").Pad;
 };

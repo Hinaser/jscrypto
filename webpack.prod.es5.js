@@ -4,6 +4,8 @@ const {
   mainOutput,
   modeModuleEntry,
   modeModuleOutput,
+  padModuleEntry,
+  padModuleOutput,
 } = require("./webpack.common");
 
 module.exports = [
@@ -16,5 +18,10 @@ module.exports = [
     ...baseConfig("production"),
     entry: {...modeModuleEntry()},
     output: {...modeModuleOutput("production")},
-  }
+  },
+  {
+    ...baseConfig("production"),
+    entry: {...padModuleEntry()},
+    output: {...padModuleOutput("production")},
+  },
 ];

@@ -1641,12 +1641,13 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
 /*!********************!*\
   !*** ./src/all.ts ***!
   \********************/
-/*! exports provided: Hmac, HmacMD5, HmacSHA224, HmacSHA256, HmacSHA384, HmacSHA512, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3, AES, mode */
+/*! exports provided: Hmac, HmacMD5, HmacSHA224, HmacSHA256, HmacSHA384, HmacSHA512, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3, AES, mode, pad */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mode", function() { return mode; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pad", function() { return pad; });
 /* harmony import */ var _Hmac__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Hmac */ "./src/Hmac.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Hmac", function() { return _Hmac__WEBPACK_IMPORTED_MODULE_0__["Hmac"]; });
 
@@ -1694,6 +1695,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _mode_CTR__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./mode/CTR */ "./src/mode/CTR.ts");
 /* harmony import */ var _mode_ECB__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./mode/ECB */ "./src/mode/ECB.ts");
 /* harmony import */ var _mode_OFB__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./mode/OFB */ "./src/mode/OFB.ts");
+/* harmony import */ var _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./pad/AnsiX923 */ "./src/pad/AnsiX923.ts");
+/* harmony import */ var _pad_ISO10126__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./pad/ISO10126 */ "./src/pad/ISO10126.ts");
+/* harmony import */ var _pad_ISO97971__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./pad/ISO97971 */ "./src/pad/ISO97971.ts");
+/* harmony import */ var _pad_Noop__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./pad/Noop */ "./src/pad/Noop.ts");
+/* harmony import */ var _pad_Zero__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./pad/Zero */ "./src/pad/Zero.ts");
 
 
 
@@ -1714,11 +1720,23 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const mode = {
-    get CBC() { return _mode_CBC__WEBPACK_IMPORTED_MODULE_14__["CBC"]; },
-    get CFB() { return _mode_CFB__WEBPACK_IMPORTED_MODULE_15__["CFB"]; },
-    get CTR() { return _mode_CTR__WEBPACK_IMPORTED_MODULE_16__["CTR"]; },
-    get ECB() { return _mode_ECB__WEBPACK_IMPORTED_MODULE_17__["ECB"]; },
-    get OFB() { return _mode_OFB__WEBPACK_IMPORTED_MODULE_18__["OFB"]; },
+    CBC: _mode_CBC__WEBPACK_IMPORTED_MODULE_14__["CBC"],
+    CFB: _mode_CFB__WEBPACK_IMPORTED_MODULE_15__["CFB"],
+    CTR: _mode_CTR__WEBPACK_IMPORTED_MODULE_16__["CTR"],
+    ECB: _mode_ECB__WEBPACK_IMPORTED_MODULE_17__["ECB"],
+    OFB: _mode_OFB__WEBPACK_IMPORTED_MODULE_18__["OFB"],
+};
+
+
+
+
+
+const pad = {
+    AnsiX923: _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_19__["AnsiX923"],
+    ISO10126: _pad_ISO10126__WEBPACK_IMPORTED_MODULE_20__["ISO10126"],
+    ISO97971: _pad_ISO97971__WEBPACK_IMPORTED_MODULE_21__["ISO97971"],
+    Noop: _pad_Noop__WEBPACK_IMPORTED_MODULE_22__["Noop"],
+    Zero: _pad_Zero__WEBPACK_IMPORTED_MODULE_23__["Zero"],
 };
 
 
@@ -3333,6 +3351,197 @@ OFB.Decrypter = OFB.Encrypter;
 
 /***/ }),
 
+/***/ "./src/lib/algorithm/cipher/pad/AnsiX923.ts":
+/*!**************************************************!*\
+  !*** ./src/lib/algorithm/cipher/pad/AnsiX923.ts ***!
+  \**************************************************/
+/*! exports provided: AnsiX923 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AnsiX923", function() { return AnsiX923; });
+/**
+ * ANSI X.923 padding strategy
+ *
+ * @param {Word32Array} data The data to pad.
+ * @param {number} blockSize The multiple that the data should be padded to.
+ * @example
+ *   JsCrypto.pad.AnsiX923.pad(wordArray, 4);
+ */
+function pad(data, blockSize) {
+    // Shortcuts
+    const dataSigBytes = data.length();
+    const blockSizeBytes = blockSize * 4;
+    // Count padding bytes
+    const nPaddingBytes = blockSizeBytes - dataSigBytes % blockSizeBytes;
+    // Compute last byte position
+    const lastBytePos = dataSigBytes + nPaddingBytes - 1;
+    // Pad
+    data.clamp();
+    data.raw()[lastBytePos >>> 2] |= nPaddingBytes << (24 - (lastBytePos % 4) * 8);
+    data.setSignificantBytes(data.length() + nPaddingBytes);
+}
+/**
+ * Unpads data that had been padded with ANSI X.923 padding strategy
+ *
+ * @param {Word32Array} data The data to unpad.
+ * @example
+ *   JsCrypto.pad.AnsiX923.unpad(wordArray);
+ */
+function unpad(data) {
+    // Get number of padding bytes from last byte
+    const nPaddingBytes = data.raw()[(data.length() - 1) >>> 2] & 0xff;
+    // Remove padding
+    data.setSignificantBytes(data.length() - nPaddingBytes);
+}
+const AnsiX923 = {
+    pad,
+    unpad,
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/pad/ISO10126.ts":
+/*!**************************************************!*\
+  !*** ./src/lib/algorithm/cipher/pad/ISO10126.ts ***!
+  \**************************************************/
+/*! exports provided: ISO10126 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ISO10126", function() { return ISO10126; });
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
+
+/**
+ * ISO10126 padding strategy
+ *
+ * @param {Word32Array} data The data to pad.
+ * @param {number} blockSize The multiple that the data should be padded to.
+ * @example
+ *   JsCrypto.pad.ISO10126.pad(wordArray, 4);
+ */
+function pad(data, blockSize) {
+    // Shortcut
+    const blockSizeBytes = blockSize * 4;
+    // Count padding bytes
+    const nPaddingBytes = blockSizeBytes - data.length() % blockSizeBytes;
+    // Pad
+    data
+        .concat(_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"].random(nPaddingBytes - 1))
+        .concat(new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([nPaddingBytes << 24], 1));
+}
+/**
+ * Unpads data that had been padded with ISO10126 padding strategy.
+ *
+ * @param {Word32Array} data The data to unpad.
+ * @example
+ *   JsCrypto.pad.ISO10126.unpad(wordArray);
+ */
+function unpad(data) {
+    // Get number of padding bytes from last byte
+    const nPaddingBytes = data.raw()[(data.length() - 1) >>> 2] & 0xff;
+    // Remove padding
+    data.setSignificantBytes(data.length() - nPaddingBytes);
+}
+const ISO10126 = {
+    pad,
+    unpad,
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/pad/ISO97971.ts":
+/*!**************************************************!*\
+  !*** ./src/lib/algorithm/cipher/pad/ISO97971.ts ***!
+  \**************************************************/
+/*! exports provided: ISO97971 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ISO97971", function() { return ISO97971; });
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _Zero__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Zero */ "./src/lib/algorithm/cipher/pad/Zero.ts");
+
+
+/**
+ * ISO/IEC 9797-1 Padding Method 2. padding strategy
+ *
+ * @param {Word32Array} data The data to pad.
+ * @param {number} blockSize The multiple that the data should be padded to.
+ * @example
+ *   JsCrypto.pad.ISO97971.pad(wordArray, 4);
+ */
+function pad(data, blockSize) {
+    // Add 0x80 byte
+    data.concat(new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([0x80000000], 1));
+    // Zero pad the rest
+    _Zero__WEBPACK_IMPORTED_MODULE_1__["Zero"].pad(data, blockSize);
+}
+/**
+ * Unpads data that had been padded with ISO/IEC 9797-1 Padding Method 2 strategy.
+ *
+ * @param {Word32Array} data The data to unpad.
+ * @example
+ *   JsCrypto.pad.ISO97971.unpad(wordArray);
+ */
+function unpad(data) {
+    // Remove zero padding
+    _Zero__WEBPACK_IMPORTED_MODULE_1__["Zero"].unpad(data);
+    // Remove one more byte -- the 0x80 byte
+    data.setSignificantBytes(data.length() - 1);
+}
+const ISO97971 = {
+    pad,
+    unpad,
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/pad/Noop.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/pad/Noop.ts ***!
+  \**********************************************/
+/*! exports provided: Noop */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Noop", function() { return Noop; });
+/**
+ * A noop padding strategy
+ *
+ * @param {Word32Array} data The data to pad.
+ * @param {number} blockSize The multiple that the data should be padded to.
+ * @example
+ *   JsCrypto.pad.Noop.pad(wordArray, 4);
+ */
+function pad(data, blockSize) {
+    // Noop
+}
+/**
+ * Unpads data that had been padded with Noop strategy.
+ *
+ * @param {Word32Array} data The data to unpad.
+ * @example
+ *   JsCrypto.pad.Noop.unpad(wordArray);
+ */
+function unpad(data) {
+    // Noop
+}
+const Noop = {
+    pad,
+    unpad,
+};
+
+
+/***/ }),
+
 /***/ "./src/lib/algorithm/cipher/pad/Pkcs7.ts":
 /*!***********************************************!*\
   !*** ./src/lib/algorithm/cipher/pad/Pkcs7.ts ***!
@@ -3351,7 +3560,7 @@ __webpack_require__.r(__webpack_exports__);
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.Pkcs7.pad(wordArray, 4);
+ *   JsCrypto.pad.Pkcs7.pad(wordArray, 4);
  */
 function pad(data, blockSize) {
     // Shortcut
@@ -3383,6 +3592,57 @@ function unpad(data) {
     data.setSignificantBytes(data.length() - nPaddingBytes);
 }
 const Pkcs7 = {
+    pad,
+    unpad,
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/pad/Zero.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/pad/Zero.ts ***!
+  \**********************************************/
+/*! exports provided: Zero */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Zero", function() { return Zero; });
+/**
+ * Pads data with zero padding strategy.
+ *
+ * @param {Word32Array} data The data to pad.
+ * @param {number} blockSize The multiple that the data should be padded to.
+ * @example
+ *   JsCrypto.pad.Zero.pad(wordArray, 4);
+ */
+function pad(data, blockSize) {
+    // Shortcut
+    const blockSizeBytes = blockSize * 4;
+    // Pad
+    data.clamp();
+    data.setSignificantBytes(data.length() + blockSizeBytes - ((data.length() % blockSizeBytes) || blockSizeBytes));
+}
+/**
+ * Unpads data that had been padded with zero padding strategy.
+ *
+ * @param {Word32Array} data The data to unpad.
+ * @example
+ *   JsCrypto.pad.Zero.unpad(wordArray);
+ */
+function unpad(data) {
+    // Shortcut
+    const dataWords = data.raw();
+    // Unpad
+    for (let i = data.length() - 1; i >= 0; i--) {
+        if ((dataWords[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff) {
+            data.setSignificantBytes(i + 1);
+            break;
+        }
+    }
+}
+const Zero = {
     pad,
     unpad,
 };
@@ -3728,6 +3988,91 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_algorithm_cipher_mode_OFB__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/mode/OFB */ "./src/lib/algorithm/cipher/mode/OFB.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "OFB", function() { return _lib_algorithm_cipher_mode_OFB__WEBPACK_IMPORTED_MODULE_0__["OFB"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/pad/AnsiX923.ts":
+/*!*****************************!*\
+  !*** ./src/pad/AnsiX923.ts ***!
+  \*****************************/
+/*! exports provided: AnsiX923 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_pad_AnsiX923__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/AnsiX923 */ "./src/lib/algorithm/cipher/pad/AnsiX923.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AnsiX923", function() { return _lib_algorithm_cipher_pad_AnsiX923__WEBPACK_IMPORTED_MODULE_0__["AnsiX923"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/pad/ISO10126.ts":
+/*!*****************************!*\
+  !*** ./src/pad/ISO10126.ts ***!
+  \*****************************/
+/*! exports provided: ISO10126 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_pad_ISO10126__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/ISO10126 */ "./src/lib/algorithm/cipher/pad/ISO10126.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ISO10126", function() { return _lib_algorithm_cipher_pad_ISO10126__WEBPACK_IMPORTED_MODULE_0__["ISO10126"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/pad/ISO97971.ts":
+/*!*****************************!*\
+  !*** ./src/pad/ISO97971.ts ***!
+  \*****************************/
+/*! exports provided: ISO97971 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_pad_ISO97971__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/ISO97971 */ "./src/lib/algorithm/cipher/pad/ISO97971.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ISO97971", function() { return _lib_algorithm_cipher_pad_ISO97971__WEBPACK_IMPORTED_MODULE_0__["ISO97971"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/pad/Noop.ts":
+/*!*************************!*\
+  !*** ./src/pad/Noop.ts ***!
+  \*************************/
+/*! exports provided: Noop */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_pad_Noop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/Noop */ "./src/lib/algorithm/cipher/pad/Noop.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Noop", function() { return _lib_algorithm_cipher_pad_Noop__WEBPACK_IMPORTED_MODULE_0__["Noop"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/pad/Zero.ts":
+/*!*************************!*\
+  !*** ./src/pad/Zero.ts ***!
+  \*************************/
+/*! exports provided: Zero */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_pad_Zero__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/Zero */ "./src/lib/algorithm/cipher/pad/Zero.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Zero", function() { return _lib_algorithm_cipher_pad_Zero__WEBPACK_IMPORTED_MODULE_0__["Zero"]; });
 
 
 

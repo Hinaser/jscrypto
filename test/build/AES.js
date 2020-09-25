@@ -1761,7 +1761,7 @@ __webpack_require__.r(__webpack_exports__);
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.Pkcs7.pad(wordArray, 4);
+ *   JsCrypto.pad.Pkcs7.pad(wordArray, 4);
  */
 function pad(data, blockSize) {
     // Shortcut

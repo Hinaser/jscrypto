@@ -62,7 +62,7 @@ describe("hmac-sha256", function(){
   
   it("respect key sigBytes", function(){
     const key = Word32Array.random(8);
-    key.setSignificantBytes(4);
+    key.nSigBytes = 4;
     
     const keyClamped = key.clone();
     keyClamped.clamp();

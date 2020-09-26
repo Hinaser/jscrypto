@@ -422,8 +422,8 @@ class Hmac {
             oKeyWords[i] ^= 0x5c5c5c5c;
             iKeyWords[i] ^= 0x36363636;
         }
-        iKey.nSigBytes = hasherBlockSize;
-        oKey.nSigBytes = hasherBlockSize;
+        iKey.nSigBytes = hasherBlockSizeBytes;
+        oKey.nSigBytes = hasherBlockSizeBytes;
         // Set initial values
         this.reset();
     }

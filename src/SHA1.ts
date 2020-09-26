@@ -33,7 +33,7 @@ export class SHA1 extends Hasher {
   }
   
   protected _doProcessBlock(words: number[], offset: number) {
-    const H = this._hash.raw();
+    const H = this._hash.words;
   
     // Working variables
     let a = H[0];
@@ -83,16 +83,16 @@ export class SHA1 extends Hasher {
   
   protected _doFinalize(): Word32Array {
     // Shortcuts
-    const dataWords = this._data.raw();
+    const dataWords = this._data.words;
   
     const nBitsTotal = this._nBytes * 8;
-    const nBitsLeft = this._data.length() * 8;
+    const nBitsLeft = this._data.nSigBytes * 8;
   
     // Add padding
     dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
     dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
     dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
-    this._data.setSignificantBytes(dataWords.length * 4);
+    this._data.nSigBytes = dataWords.length * 4;
   
     // Hash final blocks
     this._process();

@@ -11,8 +11,8 @@ export const Latin1: IEncoder = {
    *   var latin1String = Latin1.stringify([0x293892], 6);
    */
   stringify(w: Word32Array){
-    const nSig = w.length();
-    const words = w.raw();
+    const nSig = w.nSigBytes;
+    const words = w.words;
     const latin1Chars: string[] = [];
     
     for(let i=0;i<nSig;i++){

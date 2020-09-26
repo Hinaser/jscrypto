@@ -149,21 +149,21 @@ class Hmac {
         const hasherBlockSize = hasher.blockSize;
         const hasherBlockSizeBytes = hasherBlockSize * 4;
         // Allow arbitrary length keys
-        if (key.length() > hasherBlockSizeBytes) {
+        if (key.nSigBytes > hasherBlockSizeBytes) {
             key = hasher.finalize(key);
         }
         // Clamp excess bits
         key.clamp();
         const oKey = this._oKey = key.clone();
         const iKey = this._iKey = key.clone();
-        const oKeyWords = oKey.raw();
-        const iKeyWords = iKey.raw();
+        const oKeyWords = oKey.words;
+        const iKeyWords = iKey.words;
         for (let i = 0; i < hasherBlockSize; i++) {
             oKeyWords[i] ^= 0x5c5c5c5c;
             iKeyWords[i] ^= 0x36363636;
         }
-        iKey.setSignificantBytes(hasherBlockSizeBytes);
-        oKey.setSignificantBytes(hasherBlockSizeBytes);
+        iKey.nSigBytes = hasherBlockSize;
+        oKey.nSigBytes = hasherBlockSize;
         // Set initial values
         this.reset();
     }
@@ -244,31 +244,22 @@ class Word32Array {
         this._words = words || [];
         this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
     }
-    /**
-     * Get raw reference of internal words.
-     * Modification of this raw array will affect internal words.
-     */
-    raw() {
-        return this._words;
-    }
-    /**
-     * Return a copy of an array of 32-bit words.
-     */
-    slice(start, end) {
-        return this._words.slice(start, end);
-    }
-    /**
-     * Return significantBytes
-     */
-    length() {
+    get nSigBytes() {
         return this._nSignificantBytes;
     }
     /**
      * Set significant bytes
      * @param {number} n - significant bytes
      */
-    setSignificantBytes(n) {
+    set nSigBytes(n) {
         this._nSignificantBytes = n;
+    }
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    get words() {
+        return this._words;
     }
     /**
      * Converts this word array to a string.
@@ -295,8 +286,8 @@ class Word32Array {
      *   wordArray1.concat(wordArray2);
      */
     concat(w) {
-        const words = w.slice();
-        const N = w.length();
+        const words = w.words.slice();
+        const N = w.nSigBytes;
         this.clamp();
         if (this._nSignificantBytes % 4) {
             // Copy one byte at a time
@@ -379,8 +370,8 @@ const Hex = {
      *   var hexString = Hex.stringify([0x293892], 6);
      */
     stringify(w) {
-        const nSig = w.length();
-        const words = w.raw();
+        const nSig = w.nSigBytes;
+        const words = w.words;
         const hexChars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
@@ -432,8 +423,8 @@ const Latin1 = {
      *   var latin1String = Latin1.stringify([0x293892], 6);
      */
     stringify(w) {
-        const nSig = w.length();
-        const words = w.raw();
+        const nSig = w.nSigBytes;
+        const words = w.words;
         const latin1Chars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;

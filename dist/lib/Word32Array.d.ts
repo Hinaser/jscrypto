@@ -17,24 +17,17 @@ export declare class Word32Array {
      *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
      */
     constructor(words?: number[], nSignificantBytes?: number);
-    /**
-     * Get raw reference of internal words.
-     * Modification of this raw array will affect internal words.
-     */
-    raw(): number[];
-    /**
-     * Return a copy of an array of 32-bit words.
-     */
-    slice(start?: number, end?: number): number[];
-    /**
-     * Return significantBytes
-     */
-    length(): number;
+    get nSigBytes(): number;
     /**
      * Set significant bytes
      * @param {number} n - significant bytes
      */
-    setSignificantBytes(n: number): void;
+    set nSigBytes(n: number);
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    get words(): number[];
     /**
      * Converts this word array to a string.
      *

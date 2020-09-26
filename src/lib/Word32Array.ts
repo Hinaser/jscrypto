@@ -25,25 +25,7 @@ export class Word32Array {
     this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
   }
   
-  /**
-   * Get raw reference of internal words.
-   * Modification of this raw array will affect internal words.
-   */
-  public raw(){
-    return this._words;
-  }
-  
-  /**
-   * Return a copy of an array of 32-bit words.
-   */
-  public slice(start?: number, end?: number){
-    return this._words.slice(start, end);
-  }
-  
-  /**
-   * Return significantBytes
-   */
-  public length(){
+  public get nSigBytes(){
     return this._nSignificantBytes;
   }
   
@@ -51,8 +33,16 @@ export class Word32Array {
    * Set significant bytes
    * @param {number} n - significant bytes
    */
-  public setSignificantBytes(n: number){
+  public set nSigBytes(n: number){
     this._nSignificantBytes = n;
+  }
+  
+  /**
+   * Get raw reference of internal words.
+   * Modification of this raw array will affect internal words.
+   */
+  public get words(){
+    return this._words;
   }
   
   /**
@@ -81,8 +71,8 @@ export class Word32Array {
    *   wordArray1.concat(wordArray2);
    */
   public concat(w: Word32Array){
-    const words = w.slice();
-    const N = w.length();
+    const words = w.words.slice();
+    const N = w.nSigBytes;
     
     this.clamp();
   

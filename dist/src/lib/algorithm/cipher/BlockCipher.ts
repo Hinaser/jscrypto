@@ -59,10 +59,10 @@ export class BlockCipher extends Cipher {
     }
     
     if(this._Mode && this._modeCreator=== modeCreator){
-      this._mode = new this._Mode({cipher: this, iv: this._iv && this._iv.raw()});
+      this._mode = new this._Mode({cipher: this, iv: this._iv && this._iv.words});
     }
     else{
-      this._mode = modeCreator.call(this._Mode, {cipher: this, iv: this._iv && this._iv.raw()});
+      this._mode = modeCreator.call(this._Mode, {cipher: this, iv: this._iv && this._iv.words});
       this._modeCreator = modeCreator;
     }
   }

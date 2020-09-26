@@ -160,31 +160,22 @@ class Word32Array {
         this._words = words || [];
         this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
     }
-    /**
-     * Get raw reference of internal words.
-     * Modification of this raw array will affect internal words.
-     */
-    raw() {
-        return this._words;
-    }
-    /**
-     * Return a copy of an array of 32-bit words.
-     */
-    slice(start, end) {
-        return this._words.slice(start, end);
-    }
-    /**
-     * Return significantBytes
-     */
-    length() {
+    get nSigBytes() {
         return this._nSignificantBytes;
     }
     /**
      * Set significant bytes
      * @param {number} n - significant bytes
      */
-    setSignificantBytes(n) {
+    set nSigBytes(n) {
         this._nSignificantBytes = n;
+    }
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    get words() {
+        return this._words;
     }
     /**
      * Converts this word array to a string.
@@ -211,8 +202,8 @@ class Word32Array {
      *   wordArray1.concat(wordArray2);
      */
     concat(w) {
-        const words = w.slice();
-        const N = w.length();
+        const words = w.words.slice();
+        const N = w.nSigBytes;
         this.clamp();
         if (this._nSignificantBytes % 4) {
             // Copy one byte at a time
@@ -297,7 +288,7 @@ function pad(data, blockSize) {
     // Shortcut
     const blockSizeBytes = blockSize * 4;
     // Count padding bytes
-    const nPaddingBytes = blockSizeBytes - data.length() % blockSizeBytes;
+    const nPaddingBytes = blockSizeBytes - data.nSigBytes % blockSizeBytes;
     // Pad
     data
         .concat(_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"].random(nPaddingBytes - 1))
@@ -312,9 +303,9 @@ function pad(data, blockSize) {
  */
 function unpad(data) {
     // Get number of padding bytes from last byte
-    const nPaddingBytes = data.raw()[(data.length() - 1) >>> 2] & 0xff;
+    const nPaddingBytes = data.words[(data.nSigBytes - 1) >>> 2] & 0xff;
     // Remove padding
-    data.setSignificantBytes(data.length() - nPaddingBytes);
+    data.nSigBytes -= nPaddingBytes;
 }
 const ISO10126 = {
     pad,
@@ -346,8 +337,8 @@ const Hex = {
      *   var hexString = Hex.stringify([0x293892], 6);
      */
     stringify(w) {
-        const nSig = w.length();
-        const words = w.raw();
+        const nSig = w.nSigBytes;
+        const words = w.words;
         const hexChars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;

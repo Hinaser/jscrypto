@@ -14,7 +14,7 @@ function pad(data: Word32Array, blockSize: number){
   const blockSizeBytes = blockSize * 4;
   
   // Count padding bytes
-  const nPaddingBytes = blockSizeBytes - data.length() % blockSizeBytes;
+  const nPaddingBytes = blockSizeBytes - data.nSigBytes % blockSizeBytes;
   
   // Pad
   data
@@ -31,10 +31,10 @@ function pad(data: Word32Array, blockSize: number){
  */
 function unpad(data: Word32Array){
   // Get number of padding bytes from last byte
-  const nPaddingBytes = data.raw()[(data.length() - 1) >>> 2] & 0xff;
+  const nPaddingBytes = data.words[(data.nSigBytes - 1) >>> 2] & 0xff;
   
   // Remove padding
-  data.setSignificantBytes(data.length() - nPaddingBytes);
+  data.nSigBytes -= nPaddingBytes;
 }
 
 export const ISO10126: Pad = {

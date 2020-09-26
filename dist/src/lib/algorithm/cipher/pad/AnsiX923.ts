@@ -11,7 +11,7 @@ import type {Pad} from "./type";
  */
 function pad(data: Word32Array, blockSize: number){
   // Shortcuts
-  const dataSigBytes = data.length();
+  const dataSigBytes = data.nSigBytes;
   const blockSizeBytes = blockSize * 4;
   
   // Count padding bytes
@@ -22,8 +22,8 @@ function pad(data: Word32Array, blockSize: number){
   
   // Pad
   data.clamp();
-  data.raw()[lastBytePos >>> 2] |= nPaddingBytes << (24 - (lastBytePos % 4) * 8);
-  data.setSignificantBytes(data.length() + nPaddingBytes);
+  data.words[lastBytePos >>> 2] |= nPaddingBytes << (24 - (lastBytePos % 4) * 8);
+  data.nSigBytes += nPaddingBytes;
 }
 
 /**
@@ -35,10 +35,10 @@ function pad(data: Word32Array, blockSize: number){
  */
 function unpad(data: Word32Array){
   // Get number of padding bytes from last byte
-  const nPaddingBytes = data.raw()[(data.length() - 1) >>> 2] & 0xff;
+  const nPaddingBytes = data.words[(data.nSigBytes - 1) >>> 2] & 0xff;
   
   // Remove padding
-  data.setSignificantBytes(data.length() - nPaddingBytes);
+  data.nSigBytes -= nPaddingBytes;
 }
 
 export const AnsiX923: Pad = {

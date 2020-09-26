@@ -30,7 +30,7 @@ function unpad(data: Word32Array){
   Zero.unpad(data);
   
   // Remove one more byte -- the 0x80 byte
-  data.setSignificantBytes(data.length() - 1);
+  data.nSigBytes -= 1;
 }
 
 export const ISO97971: Pad = {

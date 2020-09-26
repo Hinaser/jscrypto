@@ -14,8 +14,8 @@ export const Base64: IEncoder = {
    */
   stringify(w: Word32Array){
     // Shortcuts
-    const words = w.raw();
-    const sigBytes = w.length();
+    const words = w.words;
+    const sigBytes = w.nSigBytes;
   
     // Clamp excess bits
     w.clamp();

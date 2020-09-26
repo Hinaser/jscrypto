@@ -51,7 +51,7 @@ export class EvpKDF {
     const derivedKey = new Word32Array();
   
     // Shortcuts
-    const derivedKeyWords = derivedKey.raw();
+    const derivedKeyWords = derivedKey.words;
     const keySize = this._keySize;
     const iterations = this._iterations;
   
@@ -71,7 +71,7 @@ export class EvpKDF {
     
       derivedKey.concat(block);
     }
-    derivedKey.setSignificantBytes(keySize * 4);
+    derivedKey.nSigBytes = keySize * 4;
   
     return derivedKey;
   }

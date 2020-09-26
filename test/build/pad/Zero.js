@@ -119,7 +119,7 @@ function pad(data, blockSize) {
     const blockSizeBytes = blockSize * 4;
     // Pad
     data.clamp();
-    data.setSignificantBytes(data.length() + blockSizeBytes - ((data.length() % blockSizeBytes) || blockSizeBytes));
+    data.nSigBytes += blockSizeBytes - ((data.nSigBytes % blockSizeBytes) || blockSizeBytes);
 }
 /**
  * Unpads data that had been padded with zero padding strategy.
@@ -130,11 +130,11 @@ function pad(data, blockSize) {
  */
 function unpad(data) {
     // Shortcut
-    const dataWords = data.raw();
+    const dataWords = data.words;
     // Unpad
-    for (let i = data.length() - 1; i >= 0; i--) {
+    for (let i = data.nSigBytes - 1; i >= 0; i--) {
         if ((dataWords[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff) {
-            data.setSignificantBytes(i + 1);
+            data.nSigBytes = i + 1;
             break;
         }
     }

@@ -160,31 +160,22 @@ class Word32Array {
         this._words = words || [];
         this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
     }
-    /**
-     * Get raw reference of internal words.
-     * Modification of this raw array will affect internal words.
-     */
-    raw() {
-        return this._words;
-    }
-    /**
-     * Return a copy of an array of 32-bit words.
-     */
-    slice(start, end) {
-        return this._words.slice(start, end);
-    }
-    /**
-     * Return significantBytes
-     */
-    length() {
+    get nSigBytes() {
         return this._nSignificantBytes;
     }
     /**
      * Set significant bytes
      * @param {number} n - significant bytes
      */
-    setSignificantBytes(n) {
+    set nSigBytes(n) {
         this._nSignificantBytes = n;
+    }
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    get words() {
+        return this._words;
     }
     /**
      * Converts this word array to a string.
@@ -211,8 +202,8 @@ class Word32Array {
      *   wordArray1.concat(wordArray2);
      */
     concat(w) {
-        const words = w.slice();
-        const N = w.length();
+        const words = w.words.slice();
+        const N = w.nSigBytes;
         this.clamp();
         if (this._nSignificantBytes % 4) {
             // Copy one byte at a time
@@ -312,7 +303,7 @@ function unpad(data) {
     // Remove zero padding
     _Zero__WEBPACK_IMPORTED_MODULE_1__["Zero"].unpad(data);
     // Remove one more byte -- the 0x80 byte
-    data.setSignificantBytes(data.length() - 1);
+    data.nSigBytes -= 1;
 }
 const ISO97971 = {
     pad,
@@ -345,7 +336,7 @@ function pad(data, blockSize) {
     const blockSizeBytes = blockSize * 4;
     // Pad
     data.clamp();
-    data.setSignificantBytes(data.length() + blockSizeBytes - ((data.length() % blockSizeBytes) || blockSizeBytes));
+    data.nSigBytes += blockSizeBytes - ((data.nSigBytes % blockSizeBytes) || blockSizeBytes);
 }
 /**
  * Unpads data that had been padded with zero padding strategy.
@@ -356,11 +347,11 @@ function pad(data, blockSize) {
  */
 function unpad(data) {
     // Shortcut
-    const dataWords = data.raw();
+    const dataWords = data.words;
     // Unpad
-    for (let i = data.length() - 1; i >= 0; i--) {
+    for (let i = data.nSigBytes - 1; i >= 0; i--) {
         if ((dataWords[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff) {
-            data.setSignificantBytes(i + 1);
+            data.nSigBytes = i + 1;
             break;
         }
     }
@@ -395,8 +386,8 @@ const Hex = {
      *   var hexString = Hex.stringify([0x293892], 6);
      */
     stringify(w) {
-        const nSig = w.length();
-        const words = w.raw();
+        const nSig = w.nSigBytes;
+        const words = w.words;
         const hexChars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;

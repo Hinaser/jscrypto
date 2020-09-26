@@ -14,8 +14,8 @@ export const OpenSSLKDF: KDF = {
     const key = EvpKDF.getKey(password, salt, { keySize: keySize + ivSize });
   
     // Separate key and IV
-    const iv = new Word32Array(key.slice(keySize), ivSize * 4);
-    key.setSignificantBytes(keySize * 4);
+    const iv = new Word32Array(key.words.slice(keySize), ivSize * 4);
+    key.nSigBytes = keySize * 4;
   
     // Return params
     return new CipherParams({ key, iv, salt }) as KDFParams;

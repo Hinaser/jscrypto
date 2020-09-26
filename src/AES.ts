@@ -98,8 +98,8 @@ export class AES extends BlockCipher {
   
     // Shortcuts
     const key = this._keyPriorReset = this._key;
-    const keyWords = key.raw();
-    const keySize = key.length() / 4;
+    const keyWords = key.words;
+    const keySize = key.nSigBytes / 4;
   
     // Compute number of rounds
     const nRounds = this._nRounds = keySize + 6;

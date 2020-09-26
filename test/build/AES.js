@@ -221,8 +221,8 @@ class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__
         }
         // Shortcuts
         const key = this._keyPriorReset = this._key;
-        const keyWords = key.raw();
-        const keySize = key.length() / 4;
+        const keyWords = key.words;
+        const keySize = key.nSigBytes / 4;
         // Compute number of rounds
         const nRounds = this._nRounds = keySize + 6;
         // Compute number of key schedule rows
@@ -454,7 +454,7 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
                 | (((wordsOffsetI << 24) | (wordsOffsetI >>> 8)) & 0xff00ff00));
         }
         // Shortcuts
-        const H = this._hash.raw();
+        const H = this._hash.words;
         const wordOffset0 = words[offset];
         const wordOffset1 = words[offset + 1];
         const wordOffset2 = words[offset + 2];
@@ -550,9 +550,9 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
     _doFinalize() {
         // Shortcuts
         const data = this._data;
-        const dataWords = data.raw();
+        const dataWords = data.words;
         const nBitsTotal = this._nBytes * 8;
-        const nBitsLeft = data.length() * 8;
+        const nBitsLeft = data.nSigBytes * 8;
         // Add padding
         dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
         const nBitsTotalH = Math.floor(nBitsTotal / 0x100000000);
@@ -561,12 +561,12 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
             (((nBitsTotalH << 24) | (nBitsTotalH >>> 8)) & 0xff00ff00));
         dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = ((((nBitsTotalL << 8) | (nBitsTotalL >>> 24)) & 0x00ff00ff) |
             (((nBitsTotalL << 24) | (nBitsTotalL >>> 8)) & 0xff00ff00));
-        data.setSignificantBytes((dataWords.length + 1) * 4);
+        data.nSigBytes = (dataWords.length + 1) * 4;
         // Hash final blocks
         this._process();
         // Shortcuts
         const hash = this._hash;
-        const H = hash.raw();
+        const H = hash.words;
         // Swap endian
         for (let i = 0; i < 4; i++) {
             // Shortcut
@@ -622,31 +622,22 @@ class Word32Array {
         this._words = words || [];
         this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
     }
-    /**
-     * Get raw reference of internal words.
-     * Modification of this raw array will affect internal words.
-     */
-    raw() {
-        return this._words;
-    }
-    /**
-     * Return a copy of an array of 32-bit words.
-     */
-    slice(start, end) {
-        return this._words.slice(start, end);
-    }
-    /**
-     * Return significantBytes
-     */
-    length() {
+    get nSigBytes() {
         return this._nSignificantBytes;
     }
     /**
      * Set significant bytes
      * @param {number} n - significant bytes
      */
-    setSignificantBytes(n) {
+    set nSigBytes(n) {
         this._nSignificantBytes = n;
+    }
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    get words() {
+        return this._words;
     }
     /**
      * Converts this word array to a string.
@@ -673,8 +664,8 @@ class Word32Array {
      *   wordArray1.concat(wordArray2);
      */
     concat(w) {
-        const words = w.slice();
-        const N = w.length();
+        const words = w.words.slice();
+        const N = w.nSigBytes;
         this.clamp();
         if (this._nSignificantBytes % 4) {
             // Copy one byte at a time
@@ -781,7 +772,7 @@ class BufferedBlockAlgorithm {
     _append(data) {
         const d = typeof data === "string" ? _encoder_Utf8__WEBPACK_IMPORTED_MODULE_1__["Utf8"].parse(data) : data;
         this._data.concat(d);
-        this._nBytes += d.length();
+        this._nBytes += d.nSigBytes;
     }
     /**
      * Processes available data blocks.
@@ -795,8 +786,8 @@ class BufferedBlockAlgorithm {
      */
     _process(doFlush) {
         let processedWords;
-        const words = this._data.raw();
-        const nSigBytes = this._data.length();
+        const words = this._data.words;
+        const nSigBytes = this._data.nSigBytes;
         const blockSize = this._blockSize;
         const blockSizeByte = this._blockSize * 4;
         let nBlocksReady = nSigBytes / blockSizeByte;
@@ -819,7 +810,7 @@ class BufferedBlockAlgorithm {
             }
             // Remove processed words
             processedWords = words.splice(0, nWordsReady);
-            this._data.setSignificantBytes(this._data.length() - nBytesReady);
+            this._data.nSigBytes -= nBytesReady;
         }
         // Return processed words
         return new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](processedWords, nBytesReady);
@@ -970,10 +961,10 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
             this._minBufferSize = 1;
         }
         if (this._Mode && this._modeCreator === modeCreator) {
-            this._mode = new this._Mode({ cipher: this, iv: this._iv && this._iv.raw() });
+            this._mode = new this._Mode({ cipher: this, iv: this._iv && this._iv.words });
         }
         else {
-            this._mode = modeCreator.call(this._Mode, { cipher: this, iv: this._iv && this._iv.raw() });
+            this._mode = modeCreator.call(this._Mode, { cipher: this, iv: this._iv && this._iv.words });
             this._modeCreator = modeCreator;
         }
     }
@@ -1440,14 +1431,14 @@ const OpenSSLFormatter = {
         // Parse base64
         const cipherText = _encoder_Base64__WEBPACK_IMPORTED_MODULE_2__["Base64"].parse(openSSLStr);
         // Shortcut
-        const ciphertextWords = cipherText.raw();
+        const ciphertextWords = cipherText.words;
         // Test for salt
         if (ciphertextWords[0] === 0x53616c74 && ciphertextWords[1] === 0x65645f5f) {
             // Extract salt
             salt = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](ciphertextWords.slice(2, 4));
             // Remove salt from ciphertext
             ciphertextWords.splice(0, 4);
-            cipherText.setSignificantBytes(cipherText.length() - 16);
+            cipherText.nSigBytes -= 16;
         }
         return new _CipherParams__WEBPACK_IMPORTED_MODULE_0__["CipherParams"]({ cipherText, salt });
     }
@@ -1506,7 +1497,7 @@ class EvpKDF {
         // Initial values
         const derivedKey = new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]();
         // Shortcuts
-        const derivedKeyWords = derivedKey.raw();
+        const derivedKeyWords = derivedKey.words;
         const keySize = this._keySize;
         const iterations = this._iterations;
         // Generate key
@@ -1523,7 +1514,7 @@ class EvpKDF {
             }
             derivedKey.concat(block);
         }
-        derivedKey.setSignificantBytes(keySize * 4);
+        derivedKey.nSigBytes = keySize * 4;
         return derivedKey;
     }
     /**
@@ -1576,8 +1567,8 @@ const OpenSSLKDF = {
         // Derive key and IV
         const key = _EvpKDF__WEBPACK_IMPORTED_MODULE_2__["EvpKDF"].getKey(password, salt, { keySize: keySize + ivSize });
         // Separate key and IV
-        const iv = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](key.slice(keySize), ivSize * 4);
-        key.setSignificantBytes(keySize * 4);
+        const iv = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](key.words.slice(keySize), ivSize * 4);
+        key.nSigBytes = keySize * 4;
         // Return params
         return new _CipherParams__WEBPACK_IMPORTED_MODULE_1__["CipherParams"]({ key, iv, salt });
     }
@@ -1767,7 +1758,7 @@ function pad(data, blockSize) {
     // Shortcut
     const blockSizeBytes = blockSize * 4;
     // Count padding bytes
-    const nPaddingBytes = blockSizeBytes - data.length() % blockSizeBytes;
+    const nPaddingBytes = blockSizeBytes - data.nSigBytes % blockSizeBytes;
     // Create padding word
     const paddingWord = (nPaddingBytes << 24) | (nPaddingBytes << 16) | (nPaddingBytes << 8) | nPaddingBytes;
     // Create padding
@@ -1788,9 +1779,9 @@ function pad(data, blockSize) {
  */
 function unpad(data) {
     // Get number of padding bytes from last byte
-    const nPaddingBytes = data.raw()[(data.length() - 1) >>> 2] & 0xff;
+    const nPaddingBytes = data.words[(data.nSigBytes - 1) >>> 2] & 0xff;
     // Remove padding
-    data.setSignificantBytes(data.length() - nPaddingBytes);
+    data.nSigBytes -= nPaddingBytes;
 }
 const Pkcs7 = {
     pad,
@@ -1824,8 +1815,8 @@ const Base64 = {
      */
     stringify(w) {
         // Shortcuts
-        const words = w.raw();
-        const sigBytes = w.length();
+        const words = w.words;
+        const sigBytes = w.nSigBytes;
         // Clamp excess bits
         w.clamp();
         // Convert
@@ -1891,8 +1882,8 @@ const Hex = {
      *   var hexString = Hex.stringify([0x293892], 6);
      */
     stringify(w) {
-        const nSig = w.length();
-        const words = w.raw();
+        const nSig = w.nSigBytes;
+        const words = w.words;
         const hexChars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
@@ -1944,8 +1935,8 @@ const Latin1 = {
      *   var latin1String = Latin1.stringify([0x293892], 6);
      */
     stringify(w) {
-        const nSig = w.length();
-        const words = w.raw();
+        const nSig = w.nSigBytes;
+        const words = w.words;
         const latin1Chars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;

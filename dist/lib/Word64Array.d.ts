@@ -24,6 +24,17 @@ export declare class Word64Array {
      *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
      */
     constructor(words?: Word64[], nSignificantBytes?: number);
+    get nSigBytes(): number;
+    /**
+     * Set significant bytes
+     * @param {number} n - significant bytes
+     */
+    set nSigBytes(n: number);
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    get words(): Word64[];
     /**
      * Converts this 64-bit word array to a 32-bit word array.
      *
@@ -34,24 +45,6 @@ export declare class Word64Array {
      *     var x32WordArray = x64WordArray.toX32();
      */
     to32(): Word32Array;
-    /**
-     * Get raw reference of internal words.
-     * Modification of this raw array will affect internal words.
-     */
-    raw(): Word64[];
-    /**
-     * Return a copy of an array of 32-bit words.
-     */
-    slice(): Word64[];
-    /**
-     * Return significantBytes
-     */
-    length(): number;
-    /**
-     * Set significant bytes
-     * @param {number} n - significant bytes
-     */
-    setSignificantBytes(n: number): void;
     /**
      * Converts this word array to a string.
      *

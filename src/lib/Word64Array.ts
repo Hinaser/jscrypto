@@ -39,6 +39,26 @@ export class Word64Array {
     this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 8;
   }
   
+  public get nSigBytes(){
+    return this._nSignificantBytes;
+  }
+  
+  /**
+   * Set significant bytes
+   * @param {number} n - significant bytes
+   */
+  public set nSigBytes(n: number){
+    this._nSignificantBytes = n;
+  }
+  
+  /**
+   * Get raw reference of internal words.
+   * Modification of this raw array will affect internal words.
+   */
+  public get words(){
+    return this._words;
+  }
+  
   /**
    * Converts this 64-bit word array to a 32-bit word array.
    *
@@ -56,36 +76,6 @@ export class Word64Array {
       words32.push(word64.low);
     }
     return new Word32Array(words32, this._nSignificantBytes);
-  }
-  
-  /**
-   * Get raw reference of internal words.
-   * Modification of this raw array will affect internal words.
-   */
-  public raw(){
-    return this._words;
-  }
-  
-  /**
-   * Return a copy of an array of 32-bit words.
-   */
-  public slice(){
-    return this._words.slice();
-  }
-  
-  /**
-   * Return significantBytes
-   */
-  public length(){
-    return this._nSignificantBytes;
-  }
-  
-  /**
-   * Set significant bytes
-   * @param {number} n - significant bytes
-   */
-  public setSignificantBytes(n: number){
-    this._nSignificantBytes = n;
   }
   
   /**

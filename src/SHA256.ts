@@ -59,7 +59,7 @@ export class SHA256 extends Hasher {
   }
   
   protected _doProcessBlock(words: number[], offset: number) {
-    const _H = this._hash.raw();
+    const _H = this._hash.words;
     
     let a = _H[0];
     let b = _H[1];
@@ -119,15 +119,15 @@ export class SHA256 extends Hasher {
   }
   
   protected _doFinalize(): Word32Array {
-    const words = this._data.raw();
+    const words = this._data.words;
     const nBitsTotal = this._nBytes * 8;
-    const nBitsLeft = this._data.length() * 8;
+    const nBitsLeft = this._data.nSigBytes * 8;
   
     // Add padding
     words[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
     words[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
     words[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
-    this._data.setSignificantBytes(words.length * 4);
+    this._data.nSigBytes = words.length * 4;
   
     // Hash final blocks
     this._process();

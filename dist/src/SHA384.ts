@@ -35,7 +35,7 @@ export class SHA384 extends SHA512 {
   
   protected _doFinalize(): Word32Array {
     const hash = super._doFinalize.call(this);
-    hash.setSignificantBytes(hash.length() - 16);
+    hash.nSigBytes -= 16;
     return hash;
   }
   

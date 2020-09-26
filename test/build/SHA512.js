@@ -214,7 +214,7 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
     }
     _doProcessBlock(words, offset) {
         // Shortcuts
-        const H = this._hash.raw();
+        const H = this._hash.words;
         const H0 = H[0];
         const H1 = H[1];
         const H2 = H[2];
@@ -364,14 +364,14 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
     _doFinalize() {
         // Shortcuts
         const data = this._data;
-        const dataWords = data.raw();
+        const dataWords = data.words;
         const nBitsTotal = this._nBytes * 8;
-        const nBitsLeft = data.length() * 8;
+        const nBitsLeft = data.nSigBytes * 8;
         // Add padding
         dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
         dataWords[(((nBitsLeft + 128) >>> 10) << 5) + 30] = Math.floor(nBitsTotal / 0x100000000);
         dataWords[(((nBitsLeft + 128) >>> 10) << 5) + 31] = nBitsTotal;
-        data.setSignificantBytes(dataWords.length * 4);
+        data.nSigBytes = dataWords.length * 4;
         // Hash final blocks
         this._process();
         // Convert hash to 32-bit word array before returning
@@ -422,31 +422,22 @@ class Word32Array {
         this._words = words || [];
         this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
     }
-    /**
-     * Get raw reference of internal words.
-     * Modification of this raw array will affect internal words.
-     */
-    raw() {
-        return this._words;
-    }
-    /**
-     * Return a copy of an array of 32-bit words.
-     */
-    slice(start, end) {
-        return this._words.slice(start, end);
-    }
-    /**
-     * Return significantBytes
-     */
-    length() {
+    get nSigBytes() {
         return this._nSignificantBytes;
     }
     /**
      * Set significant bytes
      * @param {number} n - significant bytes
      */
-    setSignificantBytes(n) {
+    set nSigBytes(n) {
         this._nSignificantBytes = n;
+    }
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    get words() {
+        return this._words;
     }
     /**
      * Converts this word array to a string.
@@ -473,8 +464,8 @@ class Word32Array {
      *   wordArray1.concat(wordArray2);
      */
     concat(w) {
-        const words = w.slice();
-        const N = w.length();
+        const words = w.words.slice();
+        const N = w.nSigBytes;
         this.clamp();
         if (this._nSignificantBytes % 4) {
             // Copy one byte at a time
@@ -578,6 +569,23 @@ class Word64Array {
         this._words = words || [];
         this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 8;
     }
+    get nSigBytes() {
+        return this._nSignificantBytes;
+    }
+    /**
+     * Set significant bytes
+     * @param {number} n - significant bytes
+     */
+    set nSigBytes(n) {
+        this._nSignificantBytes = n;
+    }
+    /**
+     * Get raw reference of internal words.
+     * Modification of this raw array will affect internal words.
+     */
+    get words() {
+        return this._words;
+    }
     /**
      * Converts this 64-bit word array to a 32-bit word array.
      *
@@ -595,32 +603,6 @@ class Word64Array {
             words32.push(word64.low);
         }
         return new _Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"](words32, this._nSignificantBytes);
-    }
-    /**
-     * Get raw reference of internal words.
-     * Modification of this raw array will affect internal words.
-     */
-    raw() {
-        return this._words;
-    }
-    /**
-     * Return a copy of an array of 32-bit words.
-     */
-    slice() {
-        return this._words.slice();
-    }
-    /**
-     * Return significantBytes
-     */
-    length() {
-        return this._nSignificantBytes;
-    }
-    /**
-     * Set significant bytes
-     * @param {number} n - significant bytes
-     */
-    setSignificantBytes(n) {
-        this._nSignificantBytes = n;
     }
     /**
      * Converts this word array to a string.
@@ -703,7 +685,7 @@ class BufferedBlockAlgorithm {
     _append(data) {
         const d = typeof data === "string" ? _encoder_Utf8__WEBPACK_IMPORTED_MODULE_1__["Utf8"].parse(data) : data;
         this._data.concat(d);
-        this._nBytes += d.length();
+        this._nBytes += d.nSigBytes;
     }
     /**
      * Processes available data blocks.
@@ -717,8 +699,8 @@ class BufferedBlockAlgorithm {
      */
     _process(doFlush) {
         let processedWords;
-        const words = this._data.raw();
-        const nSigBytes = this._data.length();
+        const words = this._data.words;
+        const nSigBytes = this._data.nSigBytes;
         const blockSize = this._blockSize;
         const blockSizeByte = this._blockSize * 4;
         let nBlocksReady = nSigBytes / blockSizeByte;
@@ -741,7 +723,7 @@ class BufferedBlockAlgorithm {
             }
             // Remove processed words
             processedWords = words.splice(0, nWordsReady);
-            this._data.setSignificantBytes(this._data.length() - nBytesReady);
+            this._data.nSigBytes -= nBytesReady;
         }
         // Return processed words
         return new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](processedWords, nBytesReady);
@@ -866,8 +848,8 @@ const Hex = {
      *   var hexString = Hex.stringify([0x293892], 6);
      */
     stringify(w) {
-        const nSig = w.length();
-        const words = w.raw();
+        const nSig = w.nSigBytes;
+        const words = w.words;
         const hexChars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
@@ -919,8 +901,8 @@ const Latin1 = {
      *   var latin1String = Latin1.stringify([0x293892], 6);
      */
     stringify(w) {
-        const nSig = w.length();
-        const words = w.raw();
+        const nSig = w.nSigBytes;
+        const words = w.words;
         const latin1Chars = [];
         for (let i = 0; i < nSig; i++) {
             const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;

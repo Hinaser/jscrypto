@@ -116,7 +116,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 function pad(data, blockSize) {
     // Shortcuts
-    const dataSigBytes = data.length();
+    const dataSigBytes = data.nSigBytes;
     const blockSizeBytes = blockSize * 4;
     // Count padding bytes
     const nPaddingBytes = blockSizeBytes - dataSigBytes % blockSizeBytes;
@@ -124,8 +124,8 @@ function pad(data, blockSize) {
     const lastBytePos = dataSigBytes + nPaddingBytes - 1;
     // Pad
     data.clamp();
-    data.raw()[lastBytePos >>> 2] |= nPaddingBytes << (24 - (lastBytePos % 4) * 8);
-    data.setSignificantBytes(data.length() + nPaddingBytes);
+    data.words[lastBytePos >>> 2] |= nPaddingBytes << (24 - (lastBytePos % 4) * 8);
+    data.nSigBytes += nPaddingBytes;
 }
 /**
  * Unpads data that had been padded with ANSI X.923 padding strategy
@@ -136,9 +136,9 @@ function pad(data, blockSize) {
  */
 function unpad(data) {
     // Get number of padding bytes from last byte
-    const nPaddingBytes = data.raw()[(data.length() - 1) >>> 2] & 0xff;
+    const nPaddingBytes = data.words[(data.nSigBytes - 1) >>> 2] & 0xff;
     // Remove padding
-    data.setSignificantBytes(data.length() - nPaddingBytes);
+    data.nSigBytes -= nPaddingBytes;
 }
 const AnsiX923 = {
     pad,

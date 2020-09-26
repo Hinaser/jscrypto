@@ -71,7 +71,7 @@ export class MD5 extends Hasher {
     }
   
     // Shortcuts
-    const H = this._hash.raw();
+    const H = this._hash.words;
   
     const wordOffset0  = words[offset];
     const wordOffset1  = words[offset + 1];
@@ -175,10 +175,10 @@ export class MD5 extends Hasher {
   protected _doFinalize(): Word32Array {
     // Shortcuts
     const data = this._data;
-    const dataWords = data.raw();
+    const dataWords = data.words;
   
     const nBitsTotal = this._nBytes * 8;
-    const nBitsLeft = data.length() * 8;
+    const nBitsLeft = data.nSigBytes * 8;
   
     // Add padding
     dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
@@ -194,14 +194,14 @@ export class MD5 extends Hasher {
       (((nBitsTotalL << 24) | (nBitsTotalL >>> 8))  & 0xff00ff00)
     );
   
-    data.setSignificantBytes((dataWords.length + 1) * 4);
+    data.nSigBytes = (dataWords.length + 1) * 4;
   
     // Hash final blocks
     this._process();
   
     // Shortcuts
     const hash = this._hash;
-    const H = hash.raw();
+    const H = hash.words;
   
     // Swap endian
     for (let i=0;i<4;i++) {

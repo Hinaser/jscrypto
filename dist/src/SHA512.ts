@@ -86,7 +86,7 @@ export class SHA512 extends Hasher {
   
   protected _doProcessBlock(words: number[], offset: number) {
     // Shortcuts
-    const H = this._hash.raw();
+    const H = this._hash.words;
   
     const H0 = H[0];
     const H1 = H[1];
@@ -255,16 +255,16 @@ export class SHA512 extends Hasher {
   protected _doFinalize(): Word32Array {
     // Shortcuts
     const data = this._data;
-    const dataWords = data.raw();
+    const dataWords = data.words;
   
     const nBitsTotal = this._nBytes * 8;
-    const nBitsLeft = data.length() * 8;
+    const nBitsLeft = data.nSigBytes * 8;
   
     // Add padding
     dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
     dataWords[(((nBitsLeft + 128) >>> 10) << 5) + 30] = Math.floor(nBitsTotal / 0x100000000);
     dataWords[(((nBitsLeft + 128) >>> 10) << 5) + 31] = nBitsTotal;
-    data.setSignificantBytes(dataWords.length * 4);
+    data.nSigBytes = dataWords.length * 4;
   
     // Hash final blocks
     this._process();

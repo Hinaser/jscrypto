@@ -11,8 +11,8 @@ export const Hex: IEncoder = {
    *   var hexString = Hex.stringify([0x293892], 6);
    */
   stringify(w: Word32Array){
-    const nSig = w.length();
-    const words = w.raw();
+    const nSig = w.nSigBytes;
+    const words = w.words;
     const hexChars: string[] = [];
     
     for(let i=0;i<nSig;i++){

@@ -45,7 +45,7 @@ export class BufferedBlockAlgorithm {
   protected _append(data: Word32Array|string){
     const d = typeof data === "string" ? Utf8.parse(data) : data;
     this._data.concat(d);
-    this._nBytes += d.length();
+    this._nBytes += d.nSigBytes;
   }
   
   /**
@@ -60,8 +60,8 @@ export class BufferedBlockAlgorithm {
    */
   protected _process(doFlush?: boolean){
     let processedWords: number[]|undefined;
-    const words = this._data.raw();
-    const nSigBytes = this._data.length();
+    const words = this._data.words;
+    const nSigBytes = this._data.nSigBytes;
     const blockSize = this._blockSize;
     const blockSizeByte = this._blockSize * 4;
     
@@ -89,7 +89,7 @@ export class BufferedBlockAlgorithm {
       
       // Remove processed words
       processedWords = words.splice(0, nWordsReady);
-      this._data.setSignificantBytes(this._data.length() - nBytesReady);
+      this._data.nSigBytes -= nBytesReady;
     }
     
     // Return processed words

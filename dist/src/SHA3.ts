@@ -228,14 +228,14 @@ export class SHA3 extends Hasher {
   protected _doFinalize(): Word32Array {
     // Shortcuts
     const data = this._data;
-    const dataWords = data.raw();
-    const nBitsLeft = data.length() * 8;
+    const dataWords = data.words;
+    const nBitsLeft = data.nSigBytes * 8;
     const blockSizeBits = this.blockSize * 32;
   
     // Add padding
     dataWords[nBitsLeft >>> 5] |= 0x1 << (24 - nBitsLeft % 32);
     dataWords[((Math.ceil((nBitsLeft + 1) / blockSizeBits) * blockSizeBits) >>> 5) - 1] |= 0x80;
-    data.setSignificantBytes(dataWords.length * 4);
+    data.nSigBytes = dataWords.length * 4;
   
     // Hash final blocks
     this._process();

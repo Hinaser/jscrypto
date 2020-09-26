@@ -19,7 +19,7 @@ export class Hmac {
     const hasherBlockSizeBytes = hasherBlockSize * 4;
     
     // Allow arbitrary length keys
-    if(key.length() > hasherBlockSizeBytes){
+    if(key.nSigBytes > hasherBlockSizeBytes){
       key = hasher.finalize(key);
     }
   
@@ -29,15 +29,15 @@ export class Hmac {
     const oKey = this._oKey = key.clone();
     const iKey = this._iKey = key.clone();
     
-    const oKeyWords = oKey.raw();
-    const iKeyWords = iKey.raw();
+    const oKeyWords = oKey.words;
+    const iKeyWords = iKey.words;
     
     for(let i=0;i<hasherBlockSize;i++){
       oKeyWords[i] ^= 0x5c5c5c5c;
       iKeyWords[i] ^= 0x36363636;
     }
-    iKey.setSignificantBytes(hasherBlockSizeBytes);
-    oKey.setSignificantBytes(hasherBlockSizeBytes);
+    iKey.nSigBytes = hasherBlockSize;
+    oKey.nSigBytes = hasherBlockSize;
     
     // Set initial values
     this.reset();

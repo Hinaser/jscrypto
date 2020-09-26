@@ -45,7 +45,7 @@ export const OpenSSLFormatter: Formatter = {
     const cipherText = Base64.parse(openSSLStr);
   
     // Shortcut
-    const ciphertextWords = cipherText.raw();
+    const ciphertextWords = cipherText.words;
   
     // Test for salt
     if (ciphertextWords[0] === 0x53616c74 && ciphertextWords[1] === 0x65645f5f) {
@@ -54,7 +54,7 @@ export const OpenSSLFormatter: Formatter = {
     
       // Remove salt from ciphertext
       ciphertextWords.splice(0, 4);
-      cipherText.setSignificantBytes(cipherText.length() - 16);
+      cipherText.nSigBytes -= 16;
     }
   
     return new CipherParams({cipherText, salt });

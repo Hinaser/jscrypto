@@ -30,7 +30,7 @@ export class SHA224 extends SHA256 {
   
   protected _doFinalize(): Word32Array {
     const hash = super._doFinalize.call(this);
-    hash.setSignificantBytes(hash.length() - 4);
+    hash.nSigBytes -= 4;
     return hash;
   }
   

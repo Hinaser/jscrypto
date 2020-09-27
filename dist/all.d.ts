@@ -28,6 +28,7 @@ export declare const pad: {
     AnsiX923: import("./lib/algorithm/cipher/pad/type").Pad;
     ISO10126: import("./lib/algorithm/cipher/pad/type").Pad;
     ISO97971: import("./lib/algorithm/cipher/pad/type").Pad;
+    Pkcs7: import("./lib/algorithm/cipher/pad/type").Pad;
     Noop: import("./lib/algorithm/cipher/pad/type").Pad;
     Zero: import("./lib/algorithm/cipher/pad/type").Pad;
 };

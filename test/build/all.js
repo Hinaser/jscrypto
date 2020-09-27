@@ -1698,8 +1698,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./pad/AnsiX923 */ "./src/pad/AnsiX923.ts");
 /* harmony import */ var _pad_ISO10126__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./pad/ISO10126 */ "./src/pad/ISO10126.ts");
 /* harmony import */ var _pad_ISO97971__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./pad/ISO97971 */ "./src/pad/ISO97971.ts");
-/* harmony import */ var _pad_Noop__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./pad/Noop */ "./src/pad/Noop.ts");
-/* harmony import */ var _pad_Zero__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./pad/Zero */ "./src/pad/Zero.ts");
+/* harmony import */ var _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./pad/Pkcs7 */ "./src/pad/Pkcs7.ts");
+/* harmony import */ var _pad_Noop__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./pad/Noop */ "./src/pad/Noop.ts");
+/* harmony import */ var _pad_Zero__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./pad/Zero */ "./src/pad/Zero.ts");
 
 
 
@@ -1731,12 +1732,14 @@ const mode = {
 
 
 
+
 const pad = {
     AnsiX923: _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_19__["AnsiX923"],
     ISO10126: _pad_ISO10126__WEBPACK_IMPORTED_MODULE_20__["ISO10126"],
     ISO97971: _pad_ISO97971__WEBPACK_IMPORTED_MODULE_21__["ISO97971"],
-    Noop: _pad_Noop__WEBPACK_IMPORTED_MODULE_22__["Noop"],
-    Zero: _pad_Zero__WEBPACK_IMPORTED_MODULE_23__["Zero"],
+    Pkcs7: _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_22__["Pkcs7"],
+    Noop: _pad_Noop__WEBPACK_IMPORTED_MODULE_23__["Noop"],
+    Zero: _pad_Zero__WEBPACK_IMPORTED_MODULE_24__["Zero"],
 };
 
 
@@ -3997,7 +4000,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*****************************!*\
   !*** ./src/pad/ISO10126.ts ***!
   \*****************************/
-/*! exports provided: ISO10126 */
+/*! exports provided: ISO10126, Word32Array */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4005,6 +4008,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_algorithm_cipher_pad_ISO10126__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/ISO10126 */ "./src/lib/algorithm/cipher/pad/ISO10126.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ISO10126", function() { return _lib_algorithm_cipher_pad_ISO10126__WEBPACK_IMPORTED_MODULE_0__["ISO10126"]; });
 
+/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Word32Array", function() { return _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]; });
+
+
+// Only enable the line below for testing purpose.
 
 
 
@@ -4038,6 +4046,23 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_algorithm_cipher_pad_Noop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/Noop */ "./src/lib/algorithm/cipher/pad/Noop.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Noop", function() { return _lib_algorithm_cipher_pad_Noop__WEBPACK_IMPORTED_MODULE_0__["Noop"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./src/pad/Pkcs7.ts":
+/*!**************************!*\
+  !*** ./src/pad/Pkcs7.ts ***!
+  \**************************/
+/*! exports provided: Pkcs7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_algorithm_cipher_pad_Pkcs7__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/Pkcs7 */ "./src/lib/algorithm/cipher/pad/Pkcs7.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Pkcs7", function() { return _lib_algorithm_cipher_pad_Pkcs7__WEBPACK_IMPORTED_MODULE_0__["Pkcs7"]; });
 
 
 

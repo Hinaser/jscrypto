@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/pad/ISO10126.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/pad/Pkcs7.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -264,42 +264,48 @@ class Word32Array {
 
 /***/ }),
 
-/***/ "./src/lib/algorithm/cipher/pad/ISO10126.ts":
-/*!**************************************************!*\
-  !*** ./src/lib/algorithm/cipher/pad/ISO10126.ts ***!
-  \**************************************************/
-/*! exports provided: ISO10126 */
+/***/ "./src/lib/algorithm/cipher/pad/Pkcs7.ts":
+/*!***********************************************!*\
+  !*** ./src/lib/algorithm/cipher/pad/Pkcs7.ts ***!
+  \***********************************************/
+/*! exports provided: Pkcs7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ISO10126", function() { return ISO10126; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Pkcs7", function() { return Pkcs7; });
 /* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
 
 /**
- * ISO10126 padding strategy
+ * Pads data using the algorithm defined in PKCS #5/7.
  *
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.pad.ISO10126.pad(wordArray, 4);
+ *   JsCrypto.pad.Pkcs7.pad(wordArray, 4);
  */
 function pad(data, blockSize) {
     // Shortcut
     const blockSizeBytes = blockSize * 4;
     // Count padding bytes
     const nPaddingBytes = blockSizeBytes - data.nSigBytes % blockSizeBytes;
-    // Pad
-    data
-        .concat(_Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"].random(nPaddingBytes - 1))
-        .concat(new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"]([nPaddingBytes << 24], 1));
+    // Create padding word
+    const paddingWord = (nPaddingBytes << 24) | (nPaddingBytes << 16) | (nPaddingBytes << 8) | nPaddingBytes;
+    // Create padding
+    const paddingWords = [];
+    for (let i = 0; i < nPaddingBytes; i += 4) {
+        paddingWords.push(paddingWord);
+    }
+    const padding = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](paddingWords, nPaddingBytes);
+    // Add padding
+    data.concat(padding);
 }
 /**
- * Unpads data that had been padded with ISO10126 padding strategy.
+ * Unpads data that had been padded using the algorithm defined in PKCS #5/7.
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   JsCrypto.pad.ISO10126.unpad(wordArray);
+ *   JsCrypto.pad.Pkcs7.unpad(wordArray);
  */
 function unpad(data) {
     // Get number of padding bytes from last byte
@@ -307,7 +313,7 @@ function unpad(data) {
     // Remove padding
     data.nSigBytes -= nPaddingBytes;
 }
-const ISO10126 = {
+const Pkcs7 = {
     pad,
     unpad,
 };
@@ -408,23 +414,18 @@ const random = makeRandFunction();
 
 /***/ }),
 
-/***/ "./src/pad/ISO10126.ts":
-/*!*****************************!*\
-  !*** ./src/pad/ISO10126.ts ***!
-  \*****************************/
-/*! exports provided: ISO10126, Word32Array */
+/***/ "./src/pad/Pkcs7.ts":
+/*!**************************!*\
+  !*** ./src/pad/Pkcs7.ts ***!
+  \**************************/
+/*! exports provided: Pkcs7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _lib_algorithm_cipher_pad_ISO10126__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/ISO10126 */ "./src/lib/algorithm/cipher/pad/ISO10126.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ISO10126", function() { return _lib_algorithm_cipher_pad_ISO10126__WEBPACK_IMPORTED_MODULE_0__["ISO10126"]; });
+/* harmony import */ var _lib_algorithm_cipher_pad_Pkcs7__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/Pkcs7 */ "./src/lib/algorithm/cipher/pad/Pkcs7.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Pkcs7", function() { return _lib_algorithm_cipher_pad_Pkcs7__WEBPACK_IMPORTED_MODULE_0__["Pkcs7"]; });
 
-/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/Word32Array */ "./src/lib/Word32Array.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Word32Array", function() { return _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]; });
-
-
-// Only enable the line below for testing purpose.
 
 
 
@@ -432,4 +433,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ });
 });
-//# sourceMappingURL=ISO10126.js.map
+//# sourceMappingURL=Pkcs7.js.map

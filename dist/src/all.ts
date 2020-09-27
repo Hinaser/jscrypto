@@ -29,12 +29,14 @@ export const mode = {
 import {AnsiX923} from "./pad/AnsiX923";
 import {ISO10126} from "./pad/ISO10126";
 import {ISO97971} from "./pad/ISO97971";
+import {Pkcs7} from "./pad/Pkcs7";
 import {Noop} from "./pad/Noop";
 import {Zero} from "./pad/Zero";
 export const pad = {
   AnsiX923,
   ISO10126,
   ISO97971,
+  Pkcs7,
   Noop,
   Zero,
 };

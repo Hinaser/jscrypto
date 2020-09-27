@@ -59,6 +59,7 @@ exports.padModuleEntry = () => {
     AnsiX923: "./src/pad/AnsiX923.ts",
     ISO10126: "./src/pad/ISO10126.ts",
     ISO97971: "./src/pad/ISO97971.ts",
+    Pkcs7: "./src/pad/Pkcs7.ts",
     Noop: "./src/pad/Noop.ts",
     Zero: "./src/pad/Zero.ts",
   };

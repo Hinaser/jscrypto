@@ -55,14 +55,14 @@ export class Cipher extends BufferedBlockAlgorithm {
   /**
    * Finalizes the encryption or decryption process.
    * Note that the finalize operation is effectively a destructive, read-once operation.
-   * @param {Word32Array|string} dataUpdate The final data to encrypt or decrypt.
+   * @param {Word32Array|string?} dataUpdate The final data to encrypt or decrypt.
    * @return {Word32Array} The data after final processing.
    * @example
    *   var encrypted = cipher.finalize();
    *   var encrypted = cipher.finalize('data');
    *   var encrypted = cipher.finalize(wordArray);
    */
-  public finalize(dataUpdate: Word32Array|string){
+  public finalize(dataUpdate?: Word32Array|string){
     // Final data update
     if (dataUpdate) {
       this._append(dataUpdate);

@@ -1,5 +1,5 @@
 const path = require("path");
-const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+// const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
@@ -81,8 +81,8 @@ exports.baseConfig = (isProd) => {
   return {
     mode: isProd ? "production" : "development",
     context: __dirname, // to automatically find tsconfig.json
-    plugins: isProd ? [new CleanWebpackPlugin()] : [
-      new CleanWebpackPlugin(),
+    plugins: isProd ? [/*new CleanWebpackPlugin()*/] : [
+      // new CleanWebpackPlugin(),
       new ForkTsCheckerWebpackPlugin({
         eslint: {
           files: './src/**/*.{ts,tsx,js,jsx}' // required - same as command `eslint ./src/**/*.{ts,tsx,js,jsx} --ext .ts,.tsx,.js,.jsx`

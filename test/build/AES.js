@@ -1066,7 +1066,7 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
     /**
      * Finalizes the encryption or decryption process.
      * Note that the finalize operation is effectively a destructive, read-once operation.
-     * @param {Word32Array|string} dataUpdate The final data to encrypt or decrypt.
+     * @param {Word32Array|string?} dataUpdate The final data to encrypt or decrypt.
      * @return {Word32Array} The data after final processing.
      * @example
      *   var encrypted = cipher.finalize();
@@ -1239,7 +1239,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PasswordBasedCipher", function() { return PasswordBasedCipher; });
 /* harmony import */ var _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
 /* harmony import */ var _kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./kdf/OpenSSLKDF */ "./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts");
-/* harmony import */ var _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./formatter/OpenSSLFormatter */ "./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts");
+/* harmony import */ var _CipherParams__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CipherParams */ "./src/lib/algorithm/cipher/CipherParams.ts");
+/* harmony import */ var _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./formatter/OpenSSLFormatter */ "./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts");
+
 
 
 
@@ -1262,7 +1264,7 @@ const PasswordBasedCipher = {
         const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
         p.iv = derivedParams.iv;
         const cipherParams = _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].encrypt(Cipher, message, derivedParams.key, p);
-        return Object.assign(Object.assign({}, cipherParams), derivedParams);
+        return new _CipherParams__WEBPACK_IMPORTED_MODULE_2__["CipherParams"](Object.assign(Object.assign({}, cipherParams), { key: derivedParams.key, iv: derivedParams.iv, salt: derivedParams.salt }));
     },
     /**
      * Decrypts serialized ciphertext using a password.
@@ -1289,7 +1291,7 @@ const PasswordBasedCipher = {
     decrypt(Cipher, cipherText, password, props) {
         const p = props ? Object.assign({}, props) : {};
         const KDF = p.KDF ? p.KDF : _kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_1__["OpenSSLKDF"];
-        const formatter = p.formatter ? p.formatter : _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_2__["OpenSSLFormatter"];
+        const formatter = p.formatter ? p.formatter : _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_3__["OpenSSLFormatter"];
         const cipherTextParams = Object(_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["parseCipherText"])(cipherText, formatter);
         const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
         p.iv = derivedParams.iv;

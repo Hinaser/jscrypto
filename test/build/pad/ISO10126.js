@@ -412,7 +412,7 @@ const random = makeRandFunction();
 /*!*****************************!*\
   !*** ./src/pad/ISO10126.ts ***!
   \*****************************/
-/*! exports provided: ISO10126, Word32Array */
+/*! exports provided: ISO10126 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -420,11 +420,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_algorithm_cipher_pad_ISO10126__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/algorithm/cipher/pad/ISO10126 */ "./src/lib/algorithm/cipher/pad/ISO10126.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ISO10126", function() { return _lib_algorithm_cipher_pad_ISO10126__WEBPACK_IMPORTED_MODULE_0__["ISO10126"]; });
 
-/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/Word32Array */ "./src/lib/Word32Array.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Word32Array", function() { return _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]; });
-
-
-// Only enable the line below for testing purpose.
 
 
 

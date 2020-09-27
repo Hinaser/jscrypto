@@ -1,7 +1,7 @@
 import type {CipherParams} from "../CipherParams";
 import type {Word32Array} from "../../../Word32Array";
 
-export interface KDFParams extends CipherParams {
+export interface KDFParams extends Pick<CipherParams, "toString"> {
   key: Word32Array;
   iv: Word32Array;
   salt: Word32Array;

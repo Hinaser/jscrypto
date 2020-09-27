@@ -1,14 +1,7 @@
 const expect = require("expect.js");
-const {ISO10126, Word32Array} = require("../../../test/build/pad/ISO10126");
+const {pad: {ISO10126}, Word32Array} = require("../../../test/build/all");
 
 describe("pad/ISO10126", function(){
-  if(!Word32Array){
-    it.skip("Skip test because _W module not exported for testing purpose", function(){
-      // Skipping
-    });
-    return;
-  }
-  
   const data = {};
   data.random = Word32Array.random;
   

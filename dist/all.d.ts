@@ -1,3 +1,6 @@
+export { Word32Array, Word64Array, Word64, Hex, Latin1, Utf8, } from "./lib/index";
+export { SerializableCipher } from "./lib/algorithm/cipher/SerializableCipher";
+export { PasswordBasedCipher } from "./lib/algorithm/cipher/PasswordBasedCipher";
 export { Hmac } from "./Hmac";
 export { HmacMD5 } from "./HmacMD5";
 export { HmacSHA224 } from "./HmacSHA224";

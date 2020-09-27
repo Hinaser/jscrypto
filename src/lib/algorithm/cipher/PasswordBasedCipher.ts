@@ -8,7 +8,7 @@ import type {KDF as KDFType} from "./kdf/type";
 import {OpenSSLKDF} from "./kdf/OpenSSLKDF";
 import type {BlockCipher} from "./BlockCipher";
 import type {Word32Array} from "../../Word32Array";
-import type {CipherParams} from "./CipherParams";
+import {CipherParams} from "./CipherParams";
 import {OpenSSLFormatter} from "./formatter/OpenSSLFormatter";
 
 export interface PasswordBasedCipherProps extends SerializableCipherProps {
@@ -41,10 +41,12 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
     p.iv = derivedParams.iv;
     const cipherParams = SerializableCipher.encrypt(Cipher, message, derivedParams.key, p);
     
-    return {
+    return new CipherParams({
       ...cipherParams,
-      ...derivedParams,
-    };
+      key: derivedParams.key,
+      iv: derivedParams.iv,
+      salt: derivedParams.salt,
+    });
   },
   
   /**

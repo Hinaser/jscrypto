@@ -129,7 +129,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
+    static createEncryptor(props) {
         throw new Error("Not implemented yet");
     }
     /**
@@ -139,7 +139,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
+    static createDecryptor(props) {
         throw new Error("Not implemented yet");
     }
 }
@@ -188,8 +188,8 @@ class CBC extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new CBC.Encrypter(props);
+    static createEncryptor(props) {
+        return new CBC.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -197,14 +197,14 @@ class CBC extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new CBC.Decrypter(props);
+    static createDecryptor(props) {
+        return new CBC.Decryptor(props);
     }
 }
 /**
  * CBC encryptor.
  */
-CBC.Encrypter = class Encrypter extends CBC {
+CBC.Encryptor = class Encryptor extends CBC {
     /**
      * Processes the data block at offset.
      *
@@ -227,7 +227,7 @@ CBC.Encrypter = class Encrypter extends CBC {
 /**
  * CBC decryptor.
  */
-CBC.Decrypter = class Decrypter extends CBC {
+CBC.Decryptor = class Decryptor extends CBC {
     /**
      * Processes the data block at offset.
      *

@@ -50,10 +50,10 @@ export class BlockCipher extends Cipher {
     
     let modeCreator: (props: BlockCipherModeProps) => BlockCipherMode;
     if(this._transformMode === Cipher.ENC_TRANSFORM_MODE){
-      modeCreator = this._Mode.createEncrypter;
+      modeCreator = this._Mode.createEncryptor;
     }
     else{
-      modeCreator = this._Mode.createDecrypter;
+      modeCreator = this._Mode.createDecryptor;
       // Keep at least one block in the buffer for unpadding
       this._minBufferSize = 1;
     }

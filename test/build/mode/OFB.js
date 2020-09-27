@@ -129,7 +129,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
+    static createEncryptor(props) {
         throw new Error("Not implemented yet");
     }
     /**
@@ -139,7 +139,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
+    static createDecryptor(props) {
         throw new Error("Not implemented yet");
     }
 }
@@ -173,8 +173,8 @@ class OFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.OFB.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new OFB.Encrypter(props);
+    static createEncryptor(props) {
+        return new OFB.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -182,14 +182,14 @@ class OFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.OFB.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new OFB.Decrypter(props);
+    static createDecryptor(props) {
+        return new OFB.Decryptor(props);
     }
 }
 /**
  * OFB encryptor.
  */
-OFB.Encrypter = class Encrypter extends OFB {
+OFB.Encryptor = class Encryptor extends OFB {
     /**
      * Processes the data block at offset.
      *
@@ -220,7 +220,7 @@ OFB.Encrypter = class Encrypter extends OFB {
 /**
  * OFB decryptor.
  */
-OFB.Decrypter = OFB.Encrypter;
+OFB.Decryptor = OFB.Encryptor;
 
 
 /***/ }),

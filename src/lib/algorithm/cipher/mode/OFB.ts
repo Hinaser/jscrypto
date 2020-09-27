@@ -9,7 +9,7 @@ export class OFB extends BlockCipherMode {
   /**
    * OFB encryptor.
    */
-  public static Encrypter: typeof OFB = class Encrypter extends OFB {
+  public static Encryptor: typeof OFB = class Encryptor extends OFB {
     /**
      * Processes the data block at offset.
      *
@@ -44,7 +44,7 @@ export class OFB extends BlockCipherMode {
   /**
    * OFB decryptor.
    */
-  public static Decrypter: typeof OFB = OFB.Encrypter;
+  public static Decryptor: typeof OFB = OFB.Encryptor;
   
   public constructor(props: BlockCipherModeProps) {
     super(props);
@@ -56,8 +56,8 @@ export class OFB extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.OFB.createEncryptor(cipher, iv.words);
    */
-  public static createEncrypter(props: BlockCipherModeProps){
-    return new OFB.Encrypter(props);
+  public static createEncryptor(props: BlockCipherModeProps){
+    return new OFB.Encryptor(props);
   }
   
   /**
@@ -66,7 +66,7 @@ export class OFB extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.OFB.createDecryptor(cipher, iv.words);
    */
-  public static createDecrypter(props: BlockCipherModeProps){
-    return new OFB.Decrypter(props);
+  public static createDecryptor(props: BlockCipherModeProps){
+    return new OFB.Decryptor(props);
   }
 }

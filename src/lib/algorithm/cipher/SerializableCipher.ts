@@ -58,17 +58,17 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
     key: Word32Array,
     props?: Partial<SerializableCipherProps>,
   ){
-    const encrypter = Cipher.createEncryptor(key, props);
-    const cipherText = encrypter.finalize(message);
+    const encryptor = Cipher.createEncryptor(key, props);
+    const cipherText = encryptor.finalize(message);
     
     return new CipherParams({
       cipherText,
       key,
-      iv: encrypter.iv,
+      iv: encryptor.iv,
       Algorithm: Cipher,
-      mode: encrypter.mode,
-      padding: encrypter.padding,
-      blockSize: encrypter.blockSize,
+      mode: encryptor.mode,
+      padding: encryptor.padding,
+      blockSize: encryptor.blockSize,
       formatter: props?.formatter || OpenSSLFormatter,
     });
   },
@@ -91,8 +91,8 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
     key: Word32Array,
     props?: Partial<SerializableCipherProps>,
   ){
-    const decrypter = Cipher.createDecryptor(key, props);
+    const decryptor = Cipher.createDecryptor(key, props);
     const cipherParams = parseCipherText(cipherText, props?.formatter || OpenSSLFormatter);
-    return decrypter.finalize(cipherParams.cipherText || "");
+    return decryptor.finalize(cipherParams.cipherText || "");
   }
 }

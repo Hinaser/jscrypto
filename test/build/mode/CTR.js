@@ -129,7 +129,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
+    static createEncryptor(props) {
         throw new Error("Not implemented yet");
     }
     /**
@@ -139,7 +139,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
+    static createDecryptor(props) {
         throw new Error("Not implemented yet");
     }
 }
@@ -173,8 +173,8 @@ class CTR extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CTR.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new CTR.Encrypter(props);
+    static createEncryptor(props) {
+        return new CTR.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -182,14 +182,14 @@ class CTR extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CTR.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new CTR.Decrypter(props);
+    static createDecryptor(props) {
+        return new CTR.Decryptor(props);
     }
 }
 /**
  * CTR encryptor.
  */
-CTR.Encrypter = class Encrypter extends CTR {
+CTR.Encryptor = class Encryptor extends CTR {
     /**
      * Processes the data block at offset.
      *
@@ -223,7 +223,7 @@ CTR.Encrypter = class Encrypter extends CTR {
 /**
  * CTR decryptor.
  */
-CTR.Decrypter = CTR.Encrypter;
+CTR.Decryptor = CTR.Encryptor;
 
 
 /***/ }),

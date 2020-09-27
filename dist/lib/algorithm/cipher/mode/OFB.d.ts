@@ -7,11 +7,11 @@ export declare class OFB extends BlockCipherMode {
     /**
      * OFB encryptor.
      */
-    static Encrypter: typeof OFB;
+    static Encryptor: typeof OFB;
     /**
      * OFB decryptor.
      */
-    static Decrypter: typeof OFB;
+    static Decryptor: typeof OFB;
     constructor(props: BlockCipherModeProps);
     /**
      * Creates this mode for encryption.
@@ -19,12 +19,12 @@ export declare class OFB extends BlockCipherMode {
      * @example
      *   var mode = JsCrypto.OFB.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props: BlockCipherModeProps): OFB;
+    static createEncryptor(props: BlockCipherModeProps): OFB;
     /**
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
      * @example
      *   var mode = JsCrypto.OFB.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props: BlockCipherModeProps): OFB;
+    static createDecryptor(props: BlockCipherModeProps): OFB;
 }

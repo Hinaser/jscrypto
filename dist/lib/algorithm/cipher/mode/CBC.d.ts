@@ -6,11 +6,11 @@ export declare class CBC extends BlockCipherMode {
     /**
      * CBC encryptor.
      */
-    static Encrypter: typeof CBC;
+    static Encryptor: typeof CBC;
     /**
      * CBC decryptor.
      */
-    static Decrypter: typeof CBC;
+    static Decryptor: typeof CBC;
     constructor(props: CBCProps);
     xorBlock(words: number[], offset: number, blockSize: number): void;
     /**
@@ -19,12 +19,12 @@ export declare class CBC extends BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props: CBCProps): CBC;
+    static createEncryptor(props: CBCProps): CBC;
     /**
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props: CBCProps): CBC;
+    static createDecryptor(props: CBCProps): CBC;
 }

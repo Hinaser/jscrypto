@@ -256,7 +256,7 @@ export class AES extends BlockCipher {
    * @example
    *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
    */
-  public static createDecrypter(key: Word32Array, props?: Partial<CipherProps>){
+  public static createDecryptor(key: Word32Array, props?: Partial<CipherProps>){
     props = typeof props === "undefined" ? {} : props;
     return new AES({...props, key, transformMode: Cipher.DEC_TRANSFORM_MODE});
   }

@@ -129,7 +129,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
+    static createEncryptor(props) {
         throw new Error("Not implemented yet");
     }
     /**
@@ -139,7 +139,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
+    static createDecryptor(props) {
         throw new Error("Not implemented yet");
     }
 }
@@ -172,8 +172,8 @@ class ECB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.ECB.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new ECB.Encrypter(props);
+    static createEncryptor(props) {
+        return new ECB.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -181,14 +181,14 @@ class ECB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.ECB.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new ECB.Decrypter(props);
+    static createDecryptor(props) {
+        return new ECB.Decryptor(props);
     }
 }
 /**
  * ECB encryptor.
  */
-ECB.Encrypter = class Encrypter extends ECB {
+ECB.Encryptor = class Encryptor extends ECB {
     /**
      * Processes the data block at offset.
      *
@@ -204,7 +204,7 @@ ECB.Encrypter = class Encrypter extends ECB {
 /**
  * ECB decryptor.
  */
-ECB.Decrypter = class Decrypter extends ECB {
+ECB.Decryptor = class Decryptor extends ECB {
     /**
      * Processes the data block at offset.
      *

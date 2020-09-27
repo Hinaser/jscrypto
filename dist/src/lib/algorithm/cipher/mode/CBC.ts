@@ -8,7 +8,7 @@ export class CBC extends BlockCipherMode {
   /**
    * CBC encryptor.
    */
-  public static Encrypter: typeof CBC = class Encrypter extends CBC {
+  public static Encryptor: typeof CBC = class Encryptor extends CBC {
     /**
      * Processes the data block at offset.
      *
@@ -34,7 +34,7 @@ export class CBC extends BlockCipherMode {
   /**
    * CBC decryptor.
    */
-  public static Decrypter: typeof CBC = class Decrypter extends CBC {
+  public static Decryptor: typeof CBC = class Decryptor extends CBC {
     /**
      * Processes the data block at offset.
      *
@@ -94,8 +94,8 @@ export class CBC extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
    */
-  public static createEncrypter(props: CBCProps){
-    return new CBC.Encrypter(props);
+  public static createEncryptor(props: CBCProps){
+    return new CBC.Encryptor(props);
   }
   
   /**
@@ -104,7 +104,7 @@ export class CBC extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
    */
-  public static createDecrypter(props: CBCProps){
-    return new CBC.Decrypter(props);
+  public static createDecryptor(props: CBCProps){
+    return new CBC.Decryptor(props);
   }
 }

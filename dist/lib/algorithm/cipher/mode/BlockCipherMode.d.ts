@@ -23,7 +23,7 @@ export declare class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props: BlockCipherModeProps): BlockCipherMode;
+    static createEncryptor(props: BlockCipherModeProps): BlockCipherMode;
     /**
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
@@ -31,5 +31,5 @@ export declare class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props: BlockCipherModeProps): BlockCipherMode;
+    static createDecryptor(props: BlockCipherModeProps): BlockCipherMode;
 }

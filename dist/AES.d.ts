@@ -35,7 +35,7 @@ export declare class AES extends BlockCipher {
      * @example
      *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
-    static createDecrypter(key: Word32Array, props?: Partial<CipherProps>): AES;
+    static createDecryptor(key: Word32Array, props?: Partial<CipherProps>): AES;
     /**
      * Encrypt a message with key
      *

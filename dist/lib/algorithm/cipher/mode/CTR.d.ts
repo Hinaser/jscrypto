@@ -7,11 +7,11 @@ export declare class CTR extends BlockCipherMode {
     /**
      * CTR encryptor.
      */
-    static Encrypter: typeof CTR;
+    static Encryptor: typeof CTR;
     /**
      * CTR decryptor.
      */
-    static Decrypter: typeof CTR;
+    static Decryptor: typeof CTR;
     constructor(props: BlockCipherModeProps);
     /**
      * Creates this mode for encryption.
@@ -19,12 +19,12 @@ export declare class CTR extends BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CTR.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props: BlockCipherModeProps): CTR;
+    static createEncryptor(props: BlockCipherModeProps): CTR;
     /**
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
      * @example
      *   var mode = JsCrypto.CTR.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props: BlockCipherModeProps): CTR;
+    static createDecryptor(props: BlockCipherModeProps): CTR;
 }

@@ -10,7 +10,7 @@ export class CFB extends BlockCipherMode {
   /**
    * CFB encryptor.
    */
-  public static Encrypter: typeof CFB = class Encrypter extends CFB {
+  public static Encryptor: typeof CFB = class Encryptor extends CFB {
     /**
      * Processes the data block at offset.
      *
@@ -30,7 +30,7 @@ export class CFB extends BlockCipherMode {
   /**
    * CFB decryptor.
    */
-  public static Decrypter: typeof CFB = class Encrypter extends CFB {
+  public static Decryptor: typeof CFB = class Encryptor extends CFB {
     /**
      * Processes the data block at offset.
      *
@@ -84,8 +84,8 @@ export class CFB extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.CFB.createEncryptor(cipher, iv.words);
    */
-  public static createEncrypter(props: BlockCipherModeProps){
-    return new CFB.Encrypter(props);
+  public static createEncryptor(props: BlockCipherModeProps){
+    return new CFB.Encryptor(props);
   }
   
   /**
@@ -94,7 +94,7 @@ export class CFB extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.CFB.createDecryptor(cipher, iv.words);
    */
-  public static createDecrypter(props: BlockCipherModeProps){
-    return new CFB.Decrypter(props);
+  public static createDecryptor(props: BlockCipherModeProps){
+    return new CFB.Decryptor(props);
   }
 }

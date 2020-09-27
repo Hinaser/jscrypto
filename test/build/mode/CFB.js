@@ -129,7 +129,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
+    static createEncryptor(props) {
         throw new Error("Not implemented yet");
     }
     /**
@@ -139,7 +139,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
+    static createDecryptor(props) {
         throw new Error("Not implemented yet");
     }
 }
@@ -192,8 +192,8 @@ class CFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CFB.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new CFB.Encrypter(props);
+    static createEncryptor(props) {
+        return new CFB.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -201,14 +201,14 @@ class CFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CFB.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new CFB.Decrypter(props);
+    static createDecryptor(props) {
+        return new CFB.Decryptor(props);
     }
 }
 /**
  * CFB encryptor.
  */
-CFB.Encrypter = class Encrypter extends CFB {
+CFB.Encryptor = class Encryptor extends CFB {
     /**
      * Processes the data block at offset.
      *
@@ -226,7 +226,7 @@ CFB.Encrypter = class Encrypter extends CFB {
 /**
  * CFB decryptor.
  */
-CFB.Decrypter = class Encrypter extends CFB {
+CFB.Decryptor = class Encryptor extends CFB {
     /**
      * Processes the data block at offset.
      *

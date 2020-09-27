@@ -9,7 +9,7 @@ export class CTR extends BlockCipherMode {
   /**
    * CTR encryptor.
    */
-  public static Encrypter: typeof CTR = class Encrypter extends CTR {
+  public static Encryptor: typeof CTR = class Encryptor extends CTR {
     /**
      * Processes the data block at offset.
      *
@@ -48,7 +48,7 @@ export class CTR extends BlockCipherMode {
   /**
    * CTR decryptor.
    */
-  public static Decrypter: typeof CTR = CTR.Encrypter;
+  public static Decryptor: typeof CTR = CTR.Encryptor;
   
   public constructor(props: BlockCipherModeProps) {
     super(props);
@@ -60,8 +60,8 @@ export class CTR extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.CTR.createEncryptor(cipher, iv.words);
    */
-  public static createEncrypter(props: BlockCipherModeProps){
-    return new CTR.Encrypter(props);
+  public static createEncryptor(props: BlockCipherModeProps){
+    return new CTR.Encryptor(props);
   }
   
   /**
@@ -70,7 +70,7 @@ export class CTR extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.CTR.createDecryptor(cipher, iv.words);
    */
-  public static createDecrypter(props: BlockCipherModeProps){
-    return new CTR.Decrypter(props);
+  public static createDecryptor(props: BlockCipherModeProps){
+    return new CTR.Decryptor(props);
   }
 }

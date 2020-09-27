@@ -347,7 +347,7 @@ class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__
      * @example
      *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
-    static createDecrypter(key, props) {
+    static createDecryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
         return new AES(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE }));
     }
@@ -2219,10 +2219,10 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
         super.reset(data, nBytes);
         let modeCreator;
         if (this._transformMode === _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE) {
-            modeCreator = this._Mode.createEncrypter;
+            modeCreator = this._Mode.createEncryptor;
         }
         else {
-            modeCreator = this._Mode.createDecrypter;
+            modeCreator = this._Mode.createDecryptor;
             // Keep at least one block in the buffer for unpadding
             this._minBufferSize = 1;
         }
@@ -2610,16 +2610,16 @@ const SerializableCipher = {
      *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key, { iv: iv });
      */
     encrypt(Cipher, message, key, props) {
-        const encrypter = Cipher.createEncryptor(key, props);
-        const cipherText = encrypter.finalize(message);
+        const encryptor = Cipher.createEncryptor(key, props);
+        const cipherText = encryptor.finalize(message);
         return new _CipherParams__WEBPACK_IMPORTED_MODULE_1__["CipherParams"]({
             cipherText,
             key,
-            iv: encrypter.iv,
+            iv: encryptor.iv,
             Algorithm: Cipher,
-            mode: encrypter.mode,
-            padding: encrypter.padding,
-            blockSize: encrypter.blockSize,
+            mode: encryptor.mode,
+            padding: encryptor.padding,
+            blockSize: encryptor.blockSize,
             formatter: (props === null || props === void 0 ? void 0 : props.formatter) || _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"],
         });
     },
@@ -2636,9 +2636,9 @@ const SerializableCipher = {
      *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, ciphertextParams, key, { iv: iv, format: JsCrypto.OpenSSL });
      */
     decrypt(Cipher, cipherText, key, props) {
-        const decrypter = Cipher.createDecryptor(key, props);
+        const decryptor = Cipher.createDecryptor(key, props);
         const cipherParams = parseCipherText(cipherText, (props === null || props === void 0 ? void 0 : props.formatter) || _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"]);
-        return decrypter.finalize(cipherParams.cipherText || "");
+        return decryptor.finalize(cipherParams.cipherText || "");
     }
 };
 
@@ -2876,7 +2876,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
+    static createEncryptor(props) {
         throw new Error("Not implemented yet");
     }
     /**
@@ -2886,7 +2886,7 @@ class BlockCipherMode {
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
+    static createDecryptor(props) {
         throw new Error("Not implemented yet");
     }
 }
@@ -2935,8 +2935,8 @@ class CBC extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new CBC.Encrypter(props);
+    static createEncryptor(props) {
+        return new CBC.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -2944,14 +2944,14 @@ class CBC extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new CBC.Decrypter(props);
+    static createDecryptor(props) {
+        return new CBC.Decryptor(props);
     }
 }
 /**
  * CBC encryptor.
  */
-CBC.Encrypter = class Encrypter extends CBC {
+CBC.Encryptor = class Encryptor extends CBC {
     /**
      * Processes the data block at offset.
      *
@@ -2974,7 +2974,7 @@ CBC.Encrypter = class Encrypter extends CBC {
 /**
  * CBC decryptor.
  */
-CBC.Decrypter = class Decrypter extends CBC {
+CBC.Decryptor = class Decryptor extends CBC {
     /**
      * Processes the data block at offset.
      *
@@ -3045,8 +3045,8 @@ class CFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CFB.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new CFB.Encrypter(props);
+    static createEncryptor(props) {
+        return new CFB.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -3054,14 +3054,14 @@ class CFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CFB.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new CFB.Decrypter(props);
+    static createDecryptor(props) {
+        return new CFB.Decryptor(props);
     }
 }
 /**
  * CFB encryptor.
  */
-CFB.Encrypter = class Encrypter extends CFB {
+CFB.Encryptor = class Encryptor extends CFB {
     /**
      * Processes the data block at offset.
      *
@@ -3079,7 +3079,7 @@ CFB.Encrypter = class Encrypter extends CFB {
 /**
  * CFB decryptor.
  */
-CFB.Decrypter = class Encrypter extends CFB {
+CFB.Decryptor = class Encryptor extends CFB {
     /**
      * Processes the data block at offset.
      *
@@ -3126,8 +3126,8 @@ class CTR extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CTR.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new CTR.Encrypter(props);
+    static createEncryptor(props) {
+        return new CTR.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -3135,14 +3135,14 @@ class CTR extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.CTR.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new CTR.Decrypter(props);
+    static createDecryptor(props) {
+        return new CTR.Decryptor(props);
     }
 }
 /**
  * CTR encryptor.
  */
-CTR.Encrypter = class Encrypter extends CTR {
+CTR.Encryptor = class Encryptor extends CTR {
     /**
      * Processes the data block at offset.
      *
@@ -3176,7 +3176,7 @@ CTR.Encrypter = class Encrypter extends CTR {
 /**
  * CTR decryptor.
  */
-CTR.Decrypter = CTR.Encrypter;
+CTR.Decryptor = CTR.Encryptor;
 
 
 /***/ }),
@@ -3206,8 +3206,8 @@ class ECB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.ECB.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new ECB.Encrypter(props);
+    static createEncryptor(props) {
+        return new ECB.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -3215,14 +3215,14 @@ class ECB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.ECB.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new ECB.Decrypter(props);
+    static createDecryptor(props) {
+        return new ECB.Decryptor(props);
     }
 }
 /**
  * ECB encryptor.
  */
-ECB.Encrypter = class Encrypter extends ECB {
+ECB.Encryptor = class Encryptor extends ECB {
     /**
      * Processes the data block at offset.
      *
@@ -3238,7 +3238,7 @@ ECB.Encrypter = class Encrypter extends ECB {
 /**
  * ECB decryptor.
  */
-ECB.Decrypter = class Decrypter extends ECB {
+ECB.Decryptor = class Decryptor extends ECB {
     /**
      * Processes the data block at offset.
      *
@@ -3281,8 +3281,8 @@ class OFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.OFB.createEncryptor(cipher, iv.words);
      */
-    static createEncrypter(props) {
-        return new OFB.Encrypter(props);
+    static createEncryptor(props) {
+        return new OFB.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
@@ -3290,14 +3290,14 @@ class OFB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * @example
      *   var mode = JsCrypto.OFB.createDecryptor(cipher, iv.words);
      */
-    static createDecrypter(props) {
-        return new OFB.Decrypter(props);
+    static createDecryptor(props) {
+        return new OFB.Decryptor(props);
     }
 }
 /**
  * OFB encryptor.
  */
-OFB.Encrypter = class Encrypter extends OFB {
+OFB.Encryptor = class Encryptor extends OFB {
     /**
      * Processes the data block at offset.
      *
@@ -3328,7 +3328,7 @@ OFB.Encrypter = class Encrypter extends OFB {
 /**
  * OFB decryptor.
  */
-OFB.Decrypter = OFB.Encrypter;
+OFB.Decryptor = OFB.Encryptor;
 
 
 /***/ }),

@@ -7,7 +7,7 @@ export class ECB extends BlockCipherMode {
   /**
    * ECB encryptor.
    */
-  public static Encrypter: typeof ECB = class Encrypter extends ECB {
+  public static Encryptor: typeof ECB = class Encryptor extends ECB {
     /**
      * Processes the data block at offset.
      *
@@ -24,7 +24,7 @@ export class ECB extends BlockCipherMode {
   /**
    * ECB decryptor.
    */
-  public static Decrypter: typeof ECB = class Decrypter extends ECB {
+  public static Decryptor: typeof ECB = class Decryptor extends ECB {
     /**
      * Processes the data block at offset.
      *
@@ -49,8 +49,8 @@ export class ECB extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.ECB.createEncryptor(cipher, iv.words);
    */
-  public static createEncrypter(props: BlockCipherModeProps){
-    return new ECB.Encrypter(props);
+  public static createEncryptor(props: BlockCipherModeProps){
+    return new ECB.Encryptor(props);
   }
   
   /**
@@ -59,7 +59,7 @@ export class ECB extends BlockCipherMode {
    * @example
    *   var mode = JsCrypto.ECB.createDecryptor(cipher, iv.words);
    */
-  public static createDecrypter(props: BlockCipherModeProps){
-    return new ECB.Decrypter(props);
+  public static createDecryptor(props: BlockCipherModeProps){
+    return new ECB.Decryptor(props);
   }
 }

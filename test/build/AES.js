@@ -311,14 +311,14 @@ class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__
             s3 = _s3;
         }
         // Shift rows, sub bytes, add round key
-        const t0 = ((SBOX[s0 >>> 24] << 24) | (SBOX[(s1 >>> 16) & 0xff] << 16)
-            | (SBOX[(s2 >>> 8) & 0xff] << 8) | SBOX[s3 & 0xff]) ^ keySchedule[ksRow++];
-        const t1 = ((SBOX[s1 >>> 24] << 24) | (SBOX[(s2 >>> 16) & 0xff] << 16)
-            | (SBOX[(s3 >>> 8) & 0xff] << 8) | SBOX[s0 & 0xff]) ^ keySchedule[ksRow++];
-        const t2 = ((SBOX[s2 >>> 24] << 24) | (SBOX[(s3 >>> 16) & 0xff] << 16)
-            | (SBOX[(s0 >>> 8) & 0xff] << 8) | SBOX[s1 & 0xff]) ^ keySchedule[ksRow++];
-        const t3 = ((SBOX[s3 >>> 24] << 24) | (SBOX[(s0 >>> 16) & 0xff] << 16)
-            | (SBOX[(s1 >>> 8) & 0xff] << 8) | SBOX[s2 & 0xff]) ^ keySchedule[ksRow++];
+        const t0 = ((sBox[s0 >>> 24] << 24) | (sBox[(s1 >>> 16) & 0xff] << 16)
+            | (sBox[(s2 >>> 8) & 0xff] << 8) | sBox[s3 & 0xff]) ^ keySchedule[ksRow++];
+        const t1 = ((sBox[s1 >>> 24] << 24) | (sBox[(s2 >>> 16) & 0xff] << 16)
+            | (sBox[(s3 >>> 8) & 0xff] << 8) | sBox[s0 & 0xff]) ^ keySchedule[ksRow++];
+        const t2 = ((sBox[s2 >>> 24] << 24) | (sBox[(s3 >>> 16) & 0xff] << 16)
+            | (sBox[(s0 >>> 8) & 0xff] << 8) | sBox[s1 & 0xff]) ^ keySchedule[ksRow++];
+        const t3 = ((sBox[s3 >>> 24] << 24) | (sBox[(s0 >>> 16) & 0xff] << 16)
+            | (sBox[(s1 >>> 8) & 0xff] << 8) | sBox[s2 & 0xff]) ^ keySchedule[ksRow++];
         // Set output
         words[offset] = t0;
         words[offset + 1] = t1;

@@ -24,6 +24,7 @@ export {SHA384} from "./SHA384";
 export {SHA512} from "./SHA512";
 export {SHA3} from "./SHA3";
 export {AES} from "./AES";
+export {DES, DES3} from "./DES";
 
 import {CBC} from "./mode/CBC";
 import {CFB} from "./mode/CFB";

@@ -21,6 +21,7 @@ exports.mainEntry = () => {
     HmacSHA512: "./src/HmacSHA512.ts",
     HmacMD5: "./src/HmacMD5.ts",
     AES: "./src/AES.ts",
+    DES: "./src/DES.ts",
   };
 };
 

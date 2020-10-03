@@ -5,6 +5,9 @@ export {
   Hex,
   Latin1,
   Utf8,
+  OpenSSLKDF,
+  EvpKDF,
+  PBKDF2,
 } from "./lib/index";
 
 export {SerializableCipher} from "./lib/algorithm/cipher/SerializableCipher";

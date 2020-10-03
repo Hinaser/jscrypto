@@ -5,3 +5,6 @@ export { isIE } from "./browser";
 export { Utf8 } from "./encoder/Utf8";
 export { Latin1 } from "./encoder/Latin1";
 export { Hex } from "./encoder/Hex";
+export { OpenSSLKDF } from "./algorithm/cipher/kdf/OpenSSLKDF";
+export { PBKDF2 } from "./algorithm/cipher/kdf/module/PBKDF2";
+export { EvpKDF } from "./algorithm/cipher/kdf/module/EvpKDF";

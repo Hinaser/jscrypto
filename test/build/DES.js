@@ -2042,18 +2042,69 @@ const OpenSSLFormatter = {
 
 /***/ }),
 
-/***/ "./src/lib/algorithm/cipher/kdf/EvpKDF.ts":
-/*!************************************************!*\
-  !*** ./src/lib/algorithm/cipher/kdf/EvpKDF.ts ***!
-  \************************************************/
+/***/ "./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts":
+/*!****************************************************!*\
+  !*** ./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts ***!
+  \****************************************************/
+/*! exports provided: OpenSSLKDF */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OpenSSLKDF", function() { return OpenSSLKDF; });
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _CipherParams__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../CipherParams */ "./src/lib/algorithm/cipher/CipherParams.ts");
+/* harmony import */ var _module_EvpKDF__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./module/EvpKDF */ "./src/lib/algorithm/cipher/kdf/module/EvpKDF.ts");
+
+
+
+/**
+ * Derives a key and IV from a password.
+ *
+ * @param {string} password The password to derive from.
+ * @param {number} keySize The size in words of the key to generate.
+ * @param {number} ivSize The size in words of the IV to generate.
+ * @param {Word32Array?} salt (Optional) A 64-bit salt to use. If omitted, a salt will be generated randomly.
+ * @return {CipherParams} A cipher params object with the key, IV, and salt.
+ * @example
+ *   var derivedParams = JsCrypto.OpenSSLKDF.execute('Password', 256/32, 128/32);
+ *   var derivedParams = JsCrypto.OpenSSLKDF.execute('Password', 256/32, 128/32, 'saltsalt');
+ */
+const OpenSSLKDF = {
+    execute(password, keySize, ivSize, salt, props) {
+        // Generate random salt
+        if (!salt) {
+            salt = _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"].random(64 / 8);
+        }
+        const KDFModule = props && props.KDF || _module_EvpKDF__WEBPACK_IMPORTED_MODULE_2__["EvpKDF"];
+        const kdfProps = props ? { Hasher: props.Hasher, iterations: props.iterations } : {};
+        // Derive key and IV
+        const key = KDFModule.getKey(password, salt, Object.assign(Object.assign({}, kdfProps), { keySize: keySize + ivSize }));
+        // Separate key and IV
+        const iv = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](key.words.slice(keySize), ivSize * 4);
+        key.nSigBytes = keySize * 4;
+        // Return params
+        return new _CipherParams__WEBPACK_IMPORTED_MODULE_1__["CipherParams"]({ key, iv, salt });
+    }
+};
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/kdf/module/EvpKDF.ts":
+/*!*******************************************************!*\
+  !*** ./src/lib/algorithm/cipher/kdf/module/EvpKDF.ts ***!
+  \*******************************************************/
 /*! exports provided: EvpKDF */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EvpKDF", function() { return EvpKDF; });
-/* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../MD5 */ "./src/MD5.ts");
-/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _MD5__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../MD5 */ "./src/MD5.ts");
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _type__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../type */ "./src/lib/algorithm/cipher/kdf/type.ts");
+
 
 
 /**
@@ -2064,12 +2115,12 @@ __webpack_require__.r(__webpack_exports__);
  * @property {Hasher} hasher The hash algorithm to use. Default: MD5
  * @property {number} iterations The number of iterations to perform. Default: 1
  */
-class EvpKDF {
+class EvpKDF extends _type__WEBPACK_IMPORTED_MODULE_2__["BaseKDFModule"] {
     constructor(props) {
+        super(props);
         this._keySize = 128 / 32;
         this._Hasher = _MD5__WEBPACK_IMPORTED_MODULE_0__["MD5"];
         this._iterations = 1;
-        this._props = props;
         if (props) {
             this._keySize = typeof props.keySize !== "undefined" ? props.keySize : this._keySize;
             this._Hasher = typeof props.Hasher !== "undefined" ? props.Hasher : this._Hasher;
@@ -2125,9 +2176,9 @@ class EvpKDF {
      *
      * @example
      *
-     *     var key = CryptoJS.EvpKDF(password, salt);
-     *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8 });
-     *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8, iterations: 1000 });
+     *     var key = EvpKDF.getKey(password, salt);
+     *     var key = EvpKDF.getKey(password, salt, { keySize: 8 });
+     *     var key = EvpKDF.getKey(password, salt, { keySize: 8, iterations: 1000 });
      */
     static getKey(password, salt, props) {
         return new EvpKDF(props).compute(password, salt);
@@ -2137,37 +2188,27 @@ class EvpKDF {
 
 /***/ }),
 
-/***/ "./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts":
-/*!****************************************************!*\
-  !*** ./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts ***!
-  \****************************************************/
-/*! exports provided: OpenSSLKDF */
+/***/ "./src/lib/algorithm/cipher/kdf/type.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/kdf/type.ts ***!
+  \**********************************************/
+/*! exports provided: BaseKDFModule */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OpenSSLKDF", function() { return OpenSSLKDF; });
-/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
-/* harmony import */ var _CipherParams__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../CipherParams */ "./src/lib/algorithm/cipher/CipherParams.ts");
-/* harmony import */ var _EvpKDF__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EvpKDF */ "./src/lib/algorithm/cipher/kdf/EvpKDF.ts");
-
-
-
-const OpenSSLKDF = {
-    execute(password, keySize, ivSize, salt) {
-        // Generate random salt
-        if (!salt) {
-            salt = _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"].random(64 / 8);
-        }
-        // Derive key and IV
-        const key = _EvpKDF__WEBPACK_IMPORTED_MODULE_2__["EvpKDF"].getKey(password, salt, { keySize: keySize + ivSize });
-        // Separate key and IV
-        const iv = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](key.words.slice(keySize), ivSize * 4);
-        key.nSigBytes = keySize * 4;
-        // Return params
-        return new _CipherParams__WEBPACK_IMPORTED_MODULE_1__["CipherParams"]({ key, iv, salt });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BaseKDFModule", function() { return BaseKDFModule; });
+class BaseKDFModule {
+    constructor(props) {
+        this._props = props;
     }
-};
+    compute(password, salt) {
+        throw new Error("Not implemented");
+    }
+    static getKey(password, salt, props) {
+        throw new Error("Not implemented");
+    }
+}
 
 
 /***/ }),

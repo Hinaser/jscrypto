@@ -4,7 +4,7 @@ const {
   OpenSSLKDF,
 } = require("../../../test/build/all");
 
-describe("OpenSSLKDF", function(){
+describe("kdf/OpenSSLKDF", function(){
   it("test vector", function(){
     const derivedParams = OpenSSLKDF.execute("password", 256/32, 128/32, Hex.parse("0a9d8620cf7219f1"));
     

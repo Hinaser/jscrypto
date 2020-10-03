@@ -7,6 +7,8 @@ exports.mainEntry = () => {
   return {
     lib: "./src/lib/index.ts",
     all: "./src/all.ts",
+    Word32Array: "./src/Word32Array.ts",
+    Word64Array: "./src/Word64Array.ts",
     SHA1: "./src/SHA1.ts",
     SHA224: "./src/SHA224.ts",
     SHA256: "./src/SHA256.ts",
@@ -71,6 +73,25 @@ exports.padModuleOutput = (isProd) => {
     path: isProd ? path.resolve(__dirname, "dist", "pad") : path.resolve(__dirname, "test", "build", "pad"),
     filename: "[name].js",
     library: ["JsCrypto", "pad"],
+    libraryTarget: "umd",
+    globalObject: "this",
+  };
+};
+
+exports.encoderModuleEntry = () => {
+  return {
+    Base64: "./src/encoder/Base64.ts",
+    Hex: "./src/encoder/Hex.ts",
+    Latin1: "./src/encoder/Latin1.ts",
+    Utf8: "./src/encoder/Utf8.ts",
+  };
+};
+
+exports.encoderModuleOutput = (isProd) => {
+  return {
+    path: isProd ? path.resolve(__dirname, "dist", "encoder") : path.resolve(__dirname, "test", "build", "encoder"),
+    filename: "[name].js",
+    library: ["JsCrypto", "encoder"],
     libraryTarget: "umd",
     globalObject: "this",
   };

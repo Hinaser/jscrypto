@@ -1,11 +1,9 @@
-import type {Hasher} from "../../Hasher";
-import {MD5} from "../../../../MD5";
-import {Word32Array} from "../../../Word32Array";
+import type {Hasher} from "../../../Hasher";
+import {MD5} from "../../../../../MD5";
+import {Word32Array} from "../../../../Word32Array";
+import {BaseKDFModule, BaseKDFModuleProps} from "../type";
 
-export interface EvpKDFProps {
-  keySize: number;
-  Hasher: typeof Hasher;
-  iterations: number;
+export interface EvpKDFProps extends BaseKDFModuleProps {
 }
 
 /**
@@ -16,14 +14,13 @@ export interface EvpKDFProps {
  * @property {Hasher} hasher The hash algorithm to use. Default: MD5
  * @property {number} iterations The number of iterations to perform. Default: 1
  */
-export class EvpKDF {
-  protected _props?: Partial<EvpKDFProps>;
+export class EvpKDF extends BaseKDFModule<EvpKDFProps> {
   protected _keySize: number = 128/32;
   protected _Hasher: typeof Hasher = MD5;
   protected _iterations: number = 1;
   
   public constructor(props?: Partial<EvpKDFProps>) {
-    this._props = props;
+    super(props);
     
     if(props){
       this._keySize = typeof props.keySize !== "undefined" ? props.keySize : this._keySize;
@@ -89,9 +86,9 @@ export class EvpKDF {
    *
    * @example
    *
-   *     var key = CryptoJS.EvpKDF(password, salt);
-   *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8 });
-   *     var key = CryptoJS.EvpKDF(password, salt, { keySize: 8, iterations: 1000 });
+   *     var key = EvpKDF.getKey(password, salt);
+   *     var key = EvpKDF.getKey(password, salt, { keySize: 8 });
+   *     var key = EvpKDF.getKey(password, salt, { keySize: 8, iterations: 1000 });
    */
   public static getKey(password: Word32Array|string, salt: Word32Array|string, props?: Partial<EvpKDFProps>){
     return new EvpKDF(props).compute(password, salt);

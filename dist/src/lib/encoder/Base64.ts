@@ -2,15 +2,19 @@ import type {IEncoder} from "../type";
 import {Word32Array} from "../Word32Array";
 
 const map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+const reverseMap: number[] = [];
+for(let i=0;i<map.length;i++){
+  reverseMap[map.charCodeAt(i)] = i;
+}
 
 export const Base64: IEncoder = {
   /**
-   * Converts a word array to a hex string.
+   * Converts a word array to a base64 string.
    *
    * @param {Word32Array} w An array of 32-bit words.
-   * @return {string} The hex string.
+   * @return {string} The base64 string.
    * @example
-   *   var hexString = Hex.stringify([0x293892], 6);
+   *   var hexString = Base64.stringify([0x293892], 6);
    */
   stringify(w: Word32Array){
     // Shortcuts
@@ -46,21 +50,38 @@ export const Base64: IEncoder = {
   },
   
   /**
-   * Converts a hex string to a word array.
+   * Converts a base64 string to a word array.
    *
-   * @param {string} base64Str The hex string.
+   * @param {string} base64Str The base64 string.
    * @return {Word32Array} The word array.
    * @example
-   *   var wordArray = Hex.parse(hexString);
+   *   var wordArray = Base64.parse(base64String);
    */
   parse(base64Str: string){
-    const Len = base64Str.length;
-    const words: number[] = [];
+    let base64StrLength = base64Str.length;
     
-    for(let i=0;i<Len;i+=2){
-      words[i >>> 3] |= parseInt(base64Str.substr(i, 2), 16) << (24 - (i % 8) * 4);
+    // Ignore padding
+    const paddingChar = map.charAt(64);
+    if(paddingChar){
+      const paddingIndex = base64Str.indexOf(paddingChar);
+      if(paddingIndex !== -1){
+        base64StrLength = paddingIndex;
+      }
     }
     
-    return new Word32Array(words, Len / 2);
+    const words: number[] = [];
+    let nBytes = 0;
+    
+    for(let i=0;i<base64StrLength;i++){
+      if(i%4){
+        const bits1 = reverseMap[base64Str.charCodeAt(i - 1)] << ((i % 4) * 2);
+        const bits2 = reverseMap[base64Str.charCodeAt(i)] >>> (6 - (i % 4) * 2);
+        const bitsCombined = bits1 | bits2;
+        words[nBytes >>> 2] |= bitsCombined << (24 - (nBytes % 4) * 8);
+        nBytes++;
+      }
+    }
+    
+    return new Word32Array(words, nBytes);
   }
 }

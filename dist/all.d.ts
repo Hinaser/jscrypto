@@ -1,4 +1,4 @@
-export { Word32Array, Word64Array, Word64, Hex, Latin1, Utf8, OpenSSLKDF, EvpKDF, PBKDF2, } from "./lib/index";
+export { Word32Array, Word64Array, Word64, Base64, Hex, Latin1, Utf8, OpenSSLKDF, EvpKDF, PBKDF2, } from "./lib/index";
 export { SerializableCipher } from "./lib/algorithm/cipher/SerializableCipher";
 export { PasswordBasedCipher } from "./lib/algorithm/cipher/PasswordBasedCipher";
 export { Hmac } from "./Hmac";

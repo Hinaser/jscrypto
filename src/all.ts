@@ -2,6 +2,7 @@ export {
   Word32Array,
   Word64Array,
   Word64,
+  Base64,
   Hex,
   Latin1,
   Utf8,

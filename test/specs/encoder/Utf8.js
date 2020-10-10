@@ -4,7 +4,7 @@ const {
   Word32Array,
 } = require("../../../test/build/all");
 
-describe("encoder/Latin1", function(){
+describe("encoder/Utf8", function(){
   it("test stringify 1", function(){
     const expectedValue = "$";
     expect(Utf8.stringify(new Word32Array([0x24000000], 1))).to.be(expectedValue);

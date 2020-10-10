@@ -84,6 +84,7 @@ exports.encoderModuleEntry = () => {
     Hex: "./src/encoder/Hex.ts",
     Latin1: "./src/encoder/Latin1.ts",
     Utf8: "./src/encoder/Utf8.ts",
+    Utf16: "./src/encoder/Utf16.ts",
   };
 };
 

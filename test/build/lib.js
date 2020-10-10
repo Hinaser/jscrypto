@@ -1614,6 +1614,112 @@ const Latin1 = {
 
 /***/ }),
 
+/***/ "./src/lib/encoder/Utf16.ts":
+/*!**********************************!*\
+  !*** ./src/lib/encoder/Utf16.ts ***!
+  \**********************************/
+/*! exports provided: Utf16BE, Utf16LE, Utf16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Utf16BE", function() { return Utf16BE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Utf16LE", function() { return Utf16LE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Utf16", function() { return Utf16; });
+/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Word32Array */ "./src/lib/Word32Array.ts");
+
+/**
+ * UTF-16 BE encoding strategy.
+ */
+const Utf16BE = {
+    /**
+     * Converts a word array to a UTF-16 BE string.
+     *
+     * @param {Word32Array} w An array of 32-bit words.
+     * @return {string} The UTF-16 BE string.
+     * @example
+     *   var utf16String = Utf16.stringify(new Word32Array([0x293892]));
+     */
+    stringify(w) {
+        // Shortcuts
+        const words = w.words;
+        const sigBytes = w.nSigBytes;
+        // Convert
+        const utf16Chars = [];
+        for (let i = 0; i < sigBytes; i += 2) {
+            const codePoint = (words[i >>> 2] >>> (16 - (i % 4) * 8)) & 0xffff;
+            utf16Chars.push(String.fromCharCode(codePoint));
+        }
+        return utf16Chars.join("");
+    },
+    /**
+     * Converts a UTF-16 BE string to a word array.
+     * @param {string} utf16Str The UTF-16 BE string.
+     * @return {Word32Array} The word array.
+     * @example
+     *   const wordArray = Utf16.parse(utf16String);
+     */
+    parse(utf16Str) {
+        // Shortcut
+        const utf16StrLength = utf16Str.length;
+        // Convert
+        const words = [];
+        for (let i = 0; i < utf16StrLength; i++) {
+            words[i >>> 1] |= utf16Str.charCodeAt(i) << (16 - (i % 2) * 16);
+        }
+        return new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](words, utf16StrLength * 2);
+    }
+};
+function swapEndian(word) {
+    return ((word << 8) & 0xff00ff00) | ((word >>> 8) & 0x00ff00ff);
+}
+/**
+ * UTF-16 LE encoding strategy.
+ */
+const Utf16LE = {
+    /**
+     * Converts a word array to a UTF-16 LE string.
+     *
+     * @param {Word32Array} w An array of 32-bit words.
+     * @return {string} The UTF-16 LE string.
+     * @example
+     *   var utf16String = Utf16.stringify(new Word32Array([0x293892]));
+     */
+    stringify(w) {
+        // Shortcuts
+        const words = w.words;
+        const sigBytes = w.nSigBytes;
+        // Convert
+        const utf16Chars = [];
+        for (let i = 0; i < sigBytes; i += 2) {
+            const codePoint = swapEndian((words[i >>> 2] >>> (16 - (i % 4) * 8)) & 0xffff);
+            utf16Chars.push(String.fromCharCode(codePoint));
+        }
+        return utf16Chars.join("");
+    },
+    /**
+     * Converts a UTF-16 LE string to a word array.
+     * @param {string} utf16Str The UTF-16 LE string.
+     * @return {Word32Array} The word array.
+     * @example
+     *   const wordArray = Utf16.parse(utf16String);
+     */
+    parse(utf16Str) {
+        // Shortcut
+        const utf16StrLength = utf16Str.length;
+        // Convert
+        const words = [];
+        for (let i = 0; i < utf16StrLength; i++) {
+            words[i >>> 1] |= swapEndian(utf16Str.charCodeAt(i) << (16 - (i % 2) * 16));
+        }
+        return new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](words, utf16StrLength * 2);
+    }
+};
+const Utf16 = Utf16BE;
+
+
+/***/ }),
+
 /***/ "./src/lib/encoder/Utf8.ts":
 /*!*********************************!*\
   !*** ./src/lib/encoder/Utf8.ts ***!
@@ -1663,7 +1769,7 @@ const Utf8 = {
 /*!**************************!*\
   !*** ./src/lib/index.ts ***!
   \**************************/
-/*! exports provided: random, Word32Array, Word64, Word64Array, isIE, Base64, Utf8, Latin1, Hex, OpenSSLKDF, PBKDF2, EvpKDF */
+/*! exports provided: random, Word32Array, Word64, Word64Array, isIE, Base64, Utf8, Latin1, Hex, Utf16BE, Utf16LE, Utf16, OpenSSLKDF, PBKDF2, EvpKDF */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1694,14 +1800,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _encoder_Hex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./encoder/Hex */ "./src/lib/encoder/Hex.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Hex", function() { return _encoder_Hex__WEBPACK_IMPORTED_MODULE_7__["Hex"]; });
 
-/* harmony import */ var _algorithm_cipher_kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./algorithm/cipher/kdf/OpenSSLKDF */ "./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "OpenSSLKDF", function() { return _algorithm_cipher_kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_8__["OpenSSLKDF"]; });
+/* harmony import */ var _encoder_Utf16__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./encoder/Utf16 */ "./src/lib/encoder/Utf16.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Utf16BE", function() { return _encoder_Utf16__WEBPACK_IMPORTED_MODULE_8__["Utf16BE"]; });
 
-/* harmony import */ var _algorithm_cipher_kdf_module_PBKDF2__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./algorithm/cipher/kdf/module/PBKDF2 */ "./src/lib/algorithm/cipher/kdf/module/PBKDF2.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PBKDF2", function() { return _algorithm_cipher_kdf_module_PBKDF2__WEBPACK_IMPORTED_MODULE_9__["PBKDF2"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Utf16LE", function() { return _encoder_Utf16__WEBPACK_IMPORTED_MODULE_8__["Utf16LE"]; });
 
-/* harmony import */ var _algorithm_cipher_kdf_module_EvpKDF__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./algorithm/cipher/kdf/module/EvpKDF */ "./src/lib/algorithm/cipher/kdf/module/EvpKDF.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EvpKDF", function() { return _algorithm_cipher_kdf_module_EvpKDF__WEBPACK_IMPORTED_MODULE_10__["EvpKDF"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Utf16", function() { return _encoder_Utf16__WEBPACK_IMPORTED_MODULE_8__["Utf16"]; });
+
+/* harmony import */ var _algorithm_cipher_kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./algorithm/cipher/kdf/OpenSSLKDF */ "./src/lib/algorithm/cipher/kdf/OpenSSLKDF.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "OpenSSLKDF", function() { return _algorithm_cipher_kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_9__["OpenSSLKDF"]; });
+
+/* harmony import */ var _algorithm_cipher_kdf_module_PBKDF2__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./algorithm/cipher/kdf/module/PBKDF2 */ "./src/lib/algorithm/cipher/kdf/module/PBKDF2.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PBKDF2", function() { return _algorithm_cipher_kdf_module_PBKDF2__WEBPACK_IMPORTED_MODULE_10__["PBKDF2"]; });
+
+/* harmony import */ var _algorithm_cipher_kdf_module_EvpKDF__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./algorithm/cipher/kdf/module/EvpKDF */ "./src/lib/algorithm/cipher/kdf/module/EvpKDF.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EvpKDF", function() { return _algorithm_cipher_kdf_module_EvpKDF__WEBPACK_IMPORTED_MODULE_11__["EvpKDF"]; });
+
 
 
 

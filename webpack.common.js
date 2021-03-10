@@ -24,6 +24,7 @@ exports.mainEntry = () => {
     HmacMD5: "./src/HmacMD5.ts",
     AES: "./src/AES.ts",
     DES: "./src/DES.ts",
+    RIPEMD160: "./src/RIPEMD160.ts",
   };
 };
 

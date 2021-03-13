@@ -975,7 +975,7 @@ __webpack_require__.r(__webpack_exports__);
  * @property {Word32Array} key The key to this ciphertext.
  * @property {Word32Array} iv The IV used in the ciphering operation.
  * @property {Word32Array} salt The salt used with a key derivation function.
- * @property {typeof BlockCipher} algorithm The cipher algorithm.
+ * @property {typeof Cipher} algorithm The cipher algorithm.
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.

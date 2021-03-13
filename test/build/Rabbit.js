@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/AES.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/Rabbit.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -123,266 +123,6 @@ try {
 // easier to handle this case. if(!global) { ...}
 
 module.exports = g;
-
-
-/***/ }),
-
-/***/ "./src/AES.ts":
-/*!********************!*\
-  !*** ./src/AES.ts ***!
-  \********************/
-/*! exports provided: AES */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AES", function() { return AES; });
-/* harmony import */ var _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/cipher/Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
-/* harmony import */ var _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/cipher/BlockCipher */ "./src/lib/algorithm/cipher/BlockCipher.ts");
-/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
-/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
-
-
-
-
-// Lookup tables
-const SBOX = [];
-const INV_SBOX = [];
-const SUB_MIX_0 = [];
-const SUB_MIX_1 = [];
-const SUB_MIX_2 = [];
-const SUB_MIX_3 = [];
-const INV_SUB_MIX_0 = [];
-const INV_SUB_MIX_1 = [];
-const INV_SUB_MIX_2 = [];
-const INV_SUB_MIX_3 = [];
-(function computeLookupTables() {
-    // Compute double table
-    const d = [];
-    for (let i = 0; i < 256; i++) {
-        if (i < 128) {
-            d[i] = i << 1;
-        }
-        else {
-            d[i] = (i << 1) ^ 0x11b;
-        }
-    }
-    // Walk GF(2^8)
-    let x = 0;
-    let xi = 0;
-    for (let i = 0; i < 256; i++) {
-        // Compute sbox
-        let sx = xi ^ (xi << 1) ^ (xi << 2) ^ (xi << 3) ^ (xi << 4);
-        sx = (sx >>> 8) ^ (sx & 0xff) ^ 0x63;
-        SBOX[x] = sx;
-        INV_SBOX[sx] = x;
-        // Compute multiplication
-        const x2 = d[x];
-        const x4 = d[x2];
-        const x8 = d[x4];
-        // Compute sub bytes, mix columns tables
-        let t = (d[sx] * 0x101) ^ (sx * 0x1010100);
-        SUB_MIX_0[x] = (t << 24) | (t >>> 8);
-        SUB_MIX_1[x] = (t << 16) | (t >>> 16);
-        SUB_MIX_2[x] = (t << 8) | (t >>> 24);
-        SUB_MIX_3[x] = t;
-        // Compute inv sub bytes, inv mix columns tables
-        t = (x8 * 0x1010101) ^ (x4 * 0x10001) ^ (x2 * 0x101) ^ (x * 0x1010100);
-        INV_SUB_MIX_0[sx] = (t << 24) | (t >>> 8);
-        INV_SUB_MIX_1[sx] = (t << 16) | (t >>> 16);
-        INV_SUB_MIX_2[sx] = (t << 8) | (t >>> 24);
-        INV_SUB_MIX_3[sx] = t;
-        // Compute next counter
-        if (!x) {
-            x = xi = 1;
-        }
-        else {
-            x = x2 ^ d[d[d[x8 ^ x2]]];
-            xi ^= d[d[xi]];
-        }
-    }
-}());
-// Precomputed Rcon lookup
-const RCON = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
-class AES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__["BlockCipher"] {
-    constructor(props) {
-        super(props);
-        this._nRounds = 0;
-        this._keySchedule = [];
-        this._invKeySchedule = [];
-        this._props = props;
-        this._doReset();
-    }
-    _doReset() {
-        let t;
-        // Skip reset of nRounds has been set before and key did not change
-        if (this._nRounds && this._keyPriorReset === this._key) {
-            return;
-        }
-        // Shortcuts
-        const key = this._keyPriorReset = this._key;
-        const keyWords = key.words;
-        const keySize = key.nSigBytes / 4;
-        // Compute number of rounds
-        const nRounds = this._nRounds = keySize + 6;
-        // Compute number of key schedule rows
-        const ksRows = (nRounds + 1) * 4;
-        // Compute key schedule
-        const keySchedule = this._keySchedule = [];
-        for (let ksRow = 0; ksRow < ksRows; ksRow++) {
-            if (ksRow < keySize) {
-                keySchedule[ksRow] = keyWords[ksRow];
-            }
-            else {
-                t = keySchedule[ksRow - 1];
-                if (!(ksRow % keySize)) {
-                    // Rot word
-                    t = (t << 8) | (t >>> 24);
-                    // Sub word
-                    t = (SBOX[t >>> 24] << 24) | (SBOX[(t >>> 16) & 0xff] << 16) | (SBOX[(t >>> 8) & 0xff] << 8) | SBOX[t & 0xff];
-                    // Mix Rcon
-                    t ^= RCON[(ksRow / keySize) | 0] << 24;
-                }
-                else if (keySize > 6 && ksRow % keySize === 4) {
-                    // Sub word
-                    t = (SBOX[t >>> 24] << 24) | (SBOX[(t >>> 16) & 0xff] << 16) | (SBOX[(t >>> 8) & 0xff] << 8) | SBOX[t & 0xff];
-                }
-                keySchedule[ksRow] = keySchedule[ksRow - keySize] ^ t;
-            }
-        }
-        // Compute inv key schedule
-        this._invKeySchedule = [];
-        for (let invKsRow = 0; invKsRow < ksRows; invKsRow++) {
-            const ksRow = ksRows - invKsRow;
-            if (invKsRow % 4) {
-                t = keySchedule[ksRow];
-            }
-            else {
-                t = keySchedule[ksRow - 4];
-            }
-            if (invKsRow < 4 || ksRow <= 4) {
-                this._invKeySchedule[invKsRow] = t;
-            }
-            else {
-                this._invKeySchedule[invKsRow] = INV_SUB_MIX_0[SBOX[t >>> 24]] ^ INV_SUB_MIX_1[SBOX[(t >>> 16) & 0xff]] ^
-                    INV_SUB_MIX_2[SBOX[(t >>> 8) & 0xff]] ^ INV_SUB_MIX_3[SBOX[t & 0xff]];
-            }
-        }
-    }
-    encryptBlock(words, offset) {
-        this._doCryptBlock(words, offset, this._keySchedule, SUB_MIX_0, SUB_MIX_1, SUB_MIX_2, SUB_MIX_3, SBOX);
-    }
-    decryptBlock(words, offset) {
-        // Swap 2nd and 4th rows
-        let t = words[offset + 1];
-        words[offset + 1] = words[offset + 3];
-        words[offset + 3] = t;
-        this._doCryptBlock(words, offset, this._invKeySchedule, INV_SUB_MIX_0, INV_SUB_MIX_1, INV_SUB_MIX_2, INV_SUB_MIX_3, INV_SBOX);
-        // Inv swap 2nd and 4th rows
-        t = words[offset + 1];
-        words[offset + 1] = words[offset + 3];
-        words[offset + 3] = t;
-    }
-    _doCryptBlock(words, offset, keySchedule, subMix0, subMix1, subMix2, subMix3, sBox) {
-        // Shortcut
-        const nRounds = this._nRounds;
-        // Get input, add round key
-        let s0 = words[offset] ^ keySchedule[0];
-        let s1 = words[offset + 1] ^ keySchedule[1];
-        let s2 = words[offset + 2] ^ keySchedule[2];
-        let s3 = words[offset + 3] ^ keySchedule[3];
-        // Key schedule row counter
-        let ksRow = 4;
-        // Rounds
-        for (let round = 1; round < nRounds; round++) {
-            // Shift rows, sub bytes, mix columns, add round key
-            const _s0 = subMix0[s0 >>> 24] ^ subMix1[(s1 >>> 16) & 0xff]
-                ^ subMix2[(s2 >>> 8) & 0xff] ^ subMix3[s3 & 0xff] ^ keySchedule[ksRow++];
-            const _s1 = subMix0[s1 >>> 24] ^ subMix1[(s2 >>> 16) & 0xff]
-                ^ subMix2[(s3 >>> 8) & 0xff] ^ subMix3[s0 & 0xff] ^ keySchedule[ksRow++];
-            const _s2 = subMix0[s2 >>> 24] ^ subMix1[(s3 >>> 16) & 0xff]
-                ^ subMix2[(s0 >>> 8) & 0xff] ^ subMix3[s1 & 0xff] ^ keySchedule[ksRow++];
-            const _s3 = subMix0[s3 >>> 24] ^ subMix1[(s0 >>> 16) & 0xff]
-                ^ subMix2[(s1 >>> 8) & 0xff] ^ subMix3[s2 & 0xff] ^ keySchedule[ksRow++];
-            // Update state
-            s0 = _s0;
-            s1 = _s1;
-            s2 = _s2;
-            s3 = _s3;
-        }
-        // Shift rows, sub bytes, add round key
-        const t0 = ((sBox[s0 >>> 24] << 24) | (sBox[(s1 >>> 16) & 0xff] << 16)
-            | (sBox[(s2 >>> 8) & 0xff] << 8) | sBox[s3 & 0xff]) ^ keySchedule[ksRow++];
-        const t1 = ((sBox[s1 >>> 24] << 24) | (sBox[(s2 >>> 16) & 0xff] << 16)
-            | (sBox[(s3 >>> 8) & 0xff] << 8) | sBox[s0 & 0xff]) ^ keySchedule[ksRow++];
-        const t2 = ((sBox[s2 >>> 24] << 24) | (sBox[(s3 >>> 16) & 0xff] << 16)
-            | (sBox[(s0 >>> 8) & 0xff] << 8) | sBox[s1 & 0xff]) ^ keySchedule[ksRow++];
-        const t3 = ((sBox[s3 >>> 24] << 24) | (sBox[(s0 >>> 16) & 0xff] << 16)
-            | (sBox[(s1 >>> 8) & 0xff] << 8) | sBox[s2 & 0xff]) ^ keySchedule[ksRow++];
-        // Set output
-        words[offset] = t0;
-        words[offset + 1] = t1;
-        words[offset + 2] = t2;
-        words[offset + 3] = t3;
-    }
-    /**
-     * Creates this cipher in encryption mode.
-     *
-     * @param {Word32Array} key The key.
-     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
-     * @return {Cipher} A cipher instance.
-     * @example
-     *   var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
-     */
-    static createEncryptor(key, props) {
-        props = typeof props === "undefined" ? {} : props;
-        return new AES(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE }));
-    }
-    /**
-     * Creates this cipher in decryption mode.
-     *
-     * @param {Word32Array} key The key.
-     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
-     * @return {Cipher} A cipher instance.
-     * @example
-     *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
-     */
-    static createDecryptor(key, props) {
-        props = typeof props === "undefined" ? {} : props;
-        return new AES(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE }));
-    }
-    /**
-     * Encrypt a message with key
-     *
-     * @param {Word32Array|string} message
-     * @param {Word32Array|string} key
-     * @param {Partial<AESProps>?} props
-     * @example
-     *   var encryptedMessage = JsCrypt.AES.encrypt("test", "pass");
-     */
-    static encrypt(message, key, props) {
-        if (typeof key === "string") {
-            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__["PasswordBasedCipher"].encrypt(AES, message, key, props);
-        }
-        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__["SerializableCipher"].encrypt(AES, message, key, props);
-    }
-    /**
-     * Encrypt a encrypted message with key
-     *
-     * @param {CipherParams} cipherText
-     * @param {Word32Array|string} key
-     * @param {Partial<AESProps>?} props
-     * @example
-     *   var encryptedMessage = JsCrypt.AES.decrypt(cipherProps, "pass");
-     */
-    static decrypt(cipherText, key, props) {
-        if (typeof key === "string") {
-            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__["PasswordBasedCipher"].decrypt(AES, cipherText, key, props);
-        }
-        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__["SerializableCipher"].decrypt(AES, cipherText, key, props);
-    }
-}
-AES.keySize = 256 / 32;
 
 
 /***/ }),
@@ -585,6 +325,216 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
         return new MD5().finalize(message);
     }
 }
+
+
+/***/ }),
+
+/***/ "./src/Rabbit.ts":
+/*!***********************!*\
+  !*** ./src/Rabbit.ts ***!
+  \***********************/
+/*! exports provided: Rabbit */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Rabbit", function() { return Rabbit; });
+/* harmony import */ var _lib_algorithm_cipher_StreamCipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/cipher/StreamCipher */ "./src/lib/algorithm/cipher/StreamCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
+
+
+
+class Rabbit extends _lib_algorithm_cipher_StreamCipher__WEBPACK_IMPORTED_MODULE_0__["StreamCipher"] {
+    constructor(props) {
+        super(props);
+        this._blockSize = 128 / 32;
+        this.S = [];
+        this.C = [];
+        this.G = [];
+        this._X = [];
+        this._C = [];
+        this._b = 0;
+        this._props = props;
+        this._doReset();
+    }
+    _doReset() {
+        // Shortcuts
+        const K = this._key.words;
+        const iv = this._iv;
+        // Swap endian
+        for (let i = 0; i < 4; i++) {
+            K[i] = (((K[i] << 8) | (K[i] >>> 24)) & 0x00ff00ff)
+                | (((K[i] << 24) | (K[i] >>> 8)) & 0xff00ff00);
+        }
+        // Generate initial state values
+        const X = this._X = [
+            K[0], (K[3] << 16) | (K[2] >>> 16),
+            K[1], (K[0] << 16) | (K[3] >>> 16),
+            K[2], (K[1] << 16) | (K[0] >>> 16),
+            K[3], (K[2] << 16) | (K[1] >>> 16)
+        ];
+        // Generate initial counter values
+        const C = this._C = [
+            (K[2] << 16) | (K[2] >>> 16), (K[0] & 0xffff0000) | (K[1] & 0x0000ffff),
+            (K[3] << 16) | (K[3] >>> 16), (K[1] & 0xffff0000) | (K[2] & 0x0000ffff),
+            (K[0] << 16) | (K[0] >>> 16), (K[2] & 0xffff0000) | (K[3] & 0x0000ffff),
+            (K[1] << 16) | (K[1] >>> 16), (K[3] & 0xffff0000) | (K[0] & 0x0000ffff)
+        ];
+        // Carry bit
+        this._b = 0;
+        // Iterate the system four times
+        for (let i = 0; i < 4; i++) {
+            this.nextState();
+        }
+        // Modify the counters
+        for (let i = 0; i < 8; i++) {
+            C[i] ^= X[(i + 4) & 7];
+        }
+        // IV setup
+        if (!iv) {
+            return;
+        }
+        // Shortcuts
+        const IV = iv.words;
+        const IV_0 = IV[0];
+        const IV_1 = IV[1];
+        // Generate four sub vectors
+        const i0 = (((IV_0 << 8) | (IV_0 >>> 24)) & 0x00ff00ff) | (((IV_0 << 24) | (IV_0 >>> 8)) & 0xff00ff00);
+        const i2 = (((IV_1 << 8) | (IV_1 >>> 24)) & 0x00ff00ff) | (((IV_1 << 24) | (IV_1 >>> 8)) & 0xff00ff00);
+        const i1 = (i0 >>> 16) | (i2 & 0xffff0000);
+        const i3 = (i2 << 16) | (i0 & 0x0000ffff);
+        // Modify counter values
+        C[0] ^= i0;
+        C[1] ^= i1;
+        C[2] ^= i2;
+        C[3] ^= i3;
+        C[4] ^= i0;
+        C[5] ^= i1;
+        C[6] ^= i2;
+        C[7] ^= i3;
+        // Iterate the system four times
+        for (let i = 0; i < 4; i++) {
+            this.nextState();
+        }
+    }
+    _doProcessBlock(words, offset) {
+        // Shortcut
+        const X = this._X;
+        // Iterate the system
+        this.nextState();
+        // Generate four key stream words
+        this.S[0] = X[0] ^ (X[5] >>> 16) ^ (X[3] << 16);
+        this.S[1] = X[2] ^ (X[7] >>> 16) ^ (X[5] << 16);
+        this.S[2] = X[4] ^ (X[1] >>> 16) ^ (X[7] << 16);
+        this.S[3] = X[6] ^ (X[3] >>> 16) ^ (X[1] << 16);
+        for (let i = 0; i < 4; i++) {
+            // Swap endian
+            this.S[i] = (((this.S[i] << 8) | (this.S[i] >>> 24)) & 0x00ff00ff) |
+                (((this.S[i] << 24) | (this.S[i] >>> 8)) & 0xff00ff00);
+            // Encrypt
+            words[offset + i] ^= this.S[i];
+        }
+    }
+    nextState() {
+        // Shortcuts
+        const X = this._X;
+        const C = this._C;
+        // Save old counter values
+        for (let i = 0; i < 8; i++) {
+            this.C[i] = C[i];
+        }
+        // Calculate new counter values
+        C[0] = (C[0] + 0x4d34d34d + this._b) | 0;
+        C[1] = (C[1] + 0xd34d34d3 + ((C[0] >>> 0) < (this.C[0] >>> 0) ? 1 : 0)) | 0;
+        C[2] = (C[2] + 0x34d34d34 + ((C[1] >>> 0) < (this.C[1] >>> 0) ? 1 : 0)) | 0;
+        C[3] = (C[3] + 0x4d34d34d + ((C[2] >>> 0) < (this.C[2] >>> 0) ? 1 : 0)) | 0;
+        C[4] = (C[4] + 0xd34d34d3 + ((C[3] >>> 0) < (this.C[3] >>> 0) ? 1 : 0)) | 0;
+        C[5] = (C[5] + 0x34d34d34 + ((C[4] >>> 0) < (this.C[4] >>> 0) ? 1 : 0)) | 0;
+        C[6] = (C[6] + 0x4d34d34d + ((C[5] >>> 0) < (this.C[5] >>> 0) ? 1 : 0)) | 0;
+        C[7] = (C[7] + 0xd34d34d3 + ((C[6] >>> 0) < (this.C[6] >>> 0) ? 1 : 0)) | 0;
+        this._b = (C[7] >>> 0) < (this.C[7] >>> 0) ? 1 : 0;
+        // Calculate the g-values
+        for (let i = 0; i < 8; i++) {
+            const gx = X[i] + C[i];
+            // Construct high and low argument for squaring
+            const ga = gx & 0xffff;
+            const gb = gx >>> 16;
+            // Calculate high and low result of squaring
+            const gh = ((((ga * ga) >>> 17) + ga * gb) >>> 15) + gb * gb;
+            const gl = (((gx & 0xffff0000) * gx) | 0) + (((gx & 0x0000ffff) * gx) | 0);
+            // High XOR low
+            this.G[i] = gh ^ gl;
+        }
+        const G = this.G;
+        // Calculate new state values
+        X[0] = (G[0] + ((G[7] << 16) | (G[7] >>> 16)) + ((G[6] << 16) | (G[6] >>> 16))) | 0;
+        X[1] = (G[1] + ((G[0] << 8) | (G[0] >>> 24)) + G[7]) | 0;
+        X[2] = (G[2] + ((G[1] << 16) | (G[1] >>> 16)) + ((G[0] << 16) | (G[0] >>> 16))) | 0;
+        X[3] = (G[3] + ((G[2] << 8) | (G[2] >>> 24)) + G[1]) | 0;
+        X[4] = (G[4] + ((G[3] << 16) | (G[3] >>> 16)) + ((G[2] << 16) | (G[2] >>> 16))) | 0;
+        X[5] = (G[5] + ((G[4] << 8) | (G[4] >>> 24)) + G[3]) | 0;
+        X[6] = (G[6] + ((G[5] << 16) | (G[5] >>> 16)) + ((G[4] << 16) | (G[4] >>> 16))) | 0;
+        X[7] = (G[7] + ((G[6] << 8) | (G[6] >>> 24)) + G[5]) | 0;
+    }
+    /**
+     * Creates this cipher in encryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.Rabbit.createEncryptor(keyWordArray);
+     */
+    static createEncryptor(key, props) {
+        props = typeof props === "undefined" ? {} : props;
+        return new Rabbit(Object.assign(Object.assign({}, props), { key }));
+    }
+    /**
+     * Creates this cipher in decryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.Rabbit.createDecryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createDecryptor(key, props) {
+        props = typeof props === "undefined" ? {} : props;
+        return new Rabbit(Object.assign(Object.assign({}, props), { key }));
+    }
+    /**
+     * Encrypt a message with key
+     *
+     * @param {Word32Array|string} message
+     * @param {Word32Array|string} key
+     * @param {Partial<AESProps>?} props
+     * @example
+     *   var encryptedMessage = JsCrypt.Rabbit.encrypt("test", "pass");
+     */
+    static encrypt(message, key, props) {
+        if (typeof key === "string") {
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_1__["PasswordBasedCipher"].encrypt(Rabbit, message, key, props);
+        }
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_2__["SerializableCipher"].encrypt(Rabbit, message, key, props);
+    }
+    /**
+     * Encrypt a encrypted message with key
+     *
+     * @param {CipherParams} cipherText
+     * @param {Word32Array|string} key
+     * @param {Partial<AESProps>?} props
+     * @example
+     *   var encryptedMessage = JsCrypt.Rabbit.decrypt(cipherProps, "pass");
+     */
+    static decrypt(cipherText, key, props) {
+        if (typeof key === "string") {
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_1__["PasswordBasedCipher"].decrypt(Rabbit, cipherText, key, props);
+        }
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_2__["SerializableCipher"].decrypt(Rabbit, cipherText, key, props);
+    }
+}
+Rabbit.ivSize = 128 / 32;
 
 
 /***/ }),
@@ -907,111 +857,6 @@ class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
      */
     _doFinalize() {
         throw new Error("Not implemented");
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/lib/algorithm/cipher/BlockCipher.ts":
-/*!*************************************************!*\
-  !*** ./src/lib/algorithm/cipher/BlockCipher.ts ***!
-  \*************************************************/
-/*! exports provided: BlockCipher */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BlockCipher", function() { return BlockCipher; });
-/* harmony import */ var _Cipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
-/* harmony import */ var _mode_CBC__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mode/CBC */ "./src/lib/algorithm/cipher/mode/CBC.ts");
-/* harmony import */ var _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pad/Pkcs7 */ "./src/lib/algorithm/cipher/pad/Pkcs7.ts");
-
-
-
-class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
-    constructor(props) {
-        super(props);
-        this._blockSize = 128 / 32;
-        this._Mode = _mode_CBC__WEBPACK_IMPORTED_MODULE_1__["CBC"];
-        this._padding = _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_2__["Pkcs7"];
-        this._props = props;
-        this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
-        this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
-        this.reset(props === null || props === void 0 ? void 0 : props.data, props === null || props === void 0 ? void 0 : props.nBytes);
-    }
-    get mode() {
-        return this._mode;
-    }
-    get padding() {
-        return this._padding;
-    }
-    reset(data, nBytes) {
-        super.reset(data, nBytes);
-        let modeCreator;
-        if (this._transformMode === _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE) {
-            modeCreator = this._Mode.createEncryptor;
-        }
-        else {
-            modeCreator = this._Mode.createDecryptor;
-            // Keep at least one block in the buffer for unpadding
-            this._minBufferSize = 1;
-        }
-        if (this._Mode && this._modeCreator === modeCreator) {
-            this._mode = new this._Mode({ cipher: this, iv: this._iv && this._iv.words });
-        }
-        else {
-            this._mode = modeCreator.call(this._Mode, { cipher: this, iv: this._iv && this._iv.words });
-            this._modeCreator = modeCreator;
-        }
-    }
-    _doProcessBlock(words, offset) {
-        var _a;
-        (_a = this._mode) === null || _a === void 0 ? void 0 : _a.processBlock(words, offset);
-    }
-    _doFinalize() {
-        let finalProcessedBlocks;
-        // Shortcut
-        const padding = this._padding;
-        // Finalize
-        if (this._transformMode === _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE) {
-            // Pad data
-            padding.pad(this._data, this.blockSize);
-            // Process final blocks
-            finalProcessedBlocks = this._process(true);
-        }
-        else /* if (this._transformMode == Cipher._DEC_TRANSFORM_MODE) */ {
-            // Process final blocks
-            finalProcessedBlocks = this._process(true);
-            // Unpad data
-            padding.unpad(finalProcessedBlocks);
-        }
-        return finalProcessedBlocks;
-    }
-    /**
-     * Creates this cipher in encryption mode.
-     *
-     * @param {Word32Array} key The key.
-     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
-     * @return {Cipher} A cipher instance.
-     * @example
-     *     var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
-     */
-    static createEncryptor(key, props) {
-        props = typeof props === "undefined" ? {} : props;
-        return new BlockCipher(Object.assign(Object.assign({}, props), { key, transformMode: _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].ENC_TRANSFORM_MODE }));
-    }
-    /**
-     * Creates this cipher in decryption mode.
-     * @param {Word32Array} key The key.
-     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
-     * @return {Cipher} A cipher instance.
-     * @example
-     *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
-     */
-    static createDecryptor(key, props) {
-        props = typeof props === "undefined" ? {} : props;
-        return new BlockCipher(Object.assign(Object.assign({}, props), { key, transformMode: _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"].DEC_TRANSFORM_MODE }));
     }
 }
 
@@ -1381,6 +1226,31 @@ const SerializableCipher = {
 
 /***/ }),
 
+/***/ "./src/lib/algorithm/cipher/StreamCipher.ts":
+/*!**************************************************!*\
+  !*** ./src/lib/algorithm/cipher/StreamCipher.ts ***!
+  \**************************************************/
+/*! exports provided: StreamCipher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StreamCipher", function() { return StreamCipher; });
+/* harmony import */ var _Cipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
+
+class StreamCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
+    constructor() {
+        super(...arguments);
+        this._blockSize = 1;
+    }
+    _doFinalize() {
+        return this._process(true);
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts":
 /*!****************************************************************!*\
   !*** ./src/lib/algorithm/cipher/formatter/OpenSSLFormatter.ts ***!
@@ -1616,220 +1486,6 @@ class BaseKDFModule {
         throw new Error("Not implemented");
     }
 }
-
-
-/***/ }),
-
-/***/ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts":
-/*!**********************************************************!*\
-  !*** ./src/lib/algorithm/cipher/mode/BlockCipherMode.ts ***!
-  \**********************************************************/
-/*! exports provided: BlockCipherMode */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BlockCipherMode", function() { return BlockCipherMode; });
-/**
- * Abstract base block cipher mode template.
- * @abstract
- */
-class BlockCipherMode {
-    constructor(props) {
-        this._props = props;
-        this._cipher = props.cipher;
-        this._iv = props.iv;
-    }
-    /**
-     * @abstract
-     */
-    processBlock(words, offset) {
-        return;
-    }
-    /**
-     * Creates this mode for encryption.
-     * @param {BlockCipherModeProps} props
-     * @abstract
-     * @example
-     *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
-     */
-    static createEncryptor(props) {
-        throw new Error("Not implemented yet");
-    }
-    /**
-     * Creates this mode for decryption.
-     * @param {BlockCipherModeProps} props
-     * @abstract
-     * @example
-     *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
-     */
-    static createDecryptor(props) {
-        throw new Error("Not implemented yet");
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/lib/algorithm/cipher/mode/CBC.ts":
-/*!**********************************************!*\
-  !*** ./src/lib/algorithm/cipher/mode/CBC.ts ***!
-  \**********************************************/
-/*! exports provided: CBC */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CBC", function() { return CBC; });
-/* harmony import */ var _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BlockCipherMode */ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts");
-
-class CBC extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode"] {
-    constructor(props) {
-        super(props);
-        this._prevBlock = [];
-    }
-    xorBlock(words, offset, blockSize) {
-        let block;
-        // Shortcut
-        const iv = this._iv;
-        // Choose mixing block
-        if (iv) {
-            block = iv;
-            // Remove IV for subsequent blocks
-            this._iv = undefined;
-        }
-        else {
-            block = this._prevBlock;
-        }
-        // XOR blocks
-        for (let i = 0; i < blockSize; i++) {
-            words[offset + i] ^= block[i];
-        }
-    }
-    /**
-     * Creates this mode for encryption.
-     * @param {BlockCipherModeProps} props
-     * @example
-     *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
-     */
-    static createEncryptor(props) {
-        return new CBC.Encryptor(props);
-    }
-    /**
-     * Creates this mode for decryption.
-     * @param {BlockCipherModeProps} props
-     * @example
-     *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
-     */
-    static createDecryptor(props) {
-        return new CBC.Decryptor(props);
-    }
-}
-/**
- * CBC encryptor.
- */
-CBC.Encryptor = class Encryptor extends CBC {
-    /**
-     * Processes the data block at offset.
-     *
-     * @param {number[]} words The data words to operate on.
-     * @param {number} offset The offset where the block starts.
-     * @example
-     *   mode.processBlock(data.words, offset);
-     */
-    processBlock(words, offset) {
-        // Shortcuts
-        const cipher = this._cipher;
-        const blockSize = cipher.blockSize;
-        // XOR and encrypt
-        this.xorBlock(words, offset, blockSize);
-        cipher.encryptBlock(words, offset);
-        // Remember this block to use with next block
-        this._prevBlock = words.slice(offset, offset + blockSize);
-    }
-};
-/**
- * CBC decryptor.
- */
-CBC.Decryptor = class Decryptor extends CBC {
-    /**
-     * Processes the data block at offset.
-     *
-     * @param {number[]} words The data words to operate on.
-     * @param {number} offset The offset where the block starts.
-     * @example
-     *   mode.processBlock(data.words, offset);
-     */
-    processBlock(words, offset) {
-        // Shortcuts
-        const cipher = this._cipher;
-        const blockSize = cipher.blockSize;
-        // Remember this block to use with next block
-        const thisBlock = words.slice(offset, offset + blockSize);
-        // Decrypt and XOR
-        cipher.decryptBlock(words, offset);
-        this.xorBlock(words, offset, blockSize);
-        // This block becomes the previous block
-        this._prevBlock = thisBlock;
-    }
-};
-
-
-/***/ }),
-
-/***/ "./src/lib/algorithm/cipher/pad/Pkcs7.ts":
-/*!***********************************************!*\
-  !*** ./src/lib/algorithm/cipher/pad/Pkcs7.ts ***!
-  \***********************************************/
-/*! exports provided: Pkcs7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Pkcs7", function() { return Pkcs7; });
-/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
-
-/**
- * Pads data using the algorithm defined in PKCS #5/7.
- *
- * @param {Word32Array} data The data to pad.
- * @param {number} blockSize The multiple that the data should be padded to.
- * @example
- *   JsCrypto.pad.Pkcs7.pad(wordArray, 4);
- */
-function pad(data, blockSize) {
-    // Shortcut
-    const blockSizeBytes = blockSize * 4;
-    // Count padding bytes
-    const nPaddingBytes = blockSizeBytes - data.nSigBytes % blockSizeBytes;
-    // Create padding word
-    const paddingWord = (nPaddingBytes << 24) | (nPaddingBytes << 16) | (nPaddingBytes << 8) | nPaddingBytes;
-    // Create padding
-    const paddingWords = [];
-    for (let i = 0; i < nPaddingBytes; i += 4) {
-        paddingWords.push(paddingWord);
-    }
-    const padding = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](paddingWords, nPaddingBytes);
-    // Add padding
-    data.concat(padding);
-}
-/**
- * Unpads data that had been padded using the algorithm defined in PKCS #5/7.
- *
- * @param {Word32Array} data The data to unpad.
- * @example
- *   JsCrypto.pad.Pkcs7.unpad(wordArray);
- */
-function unpad(data) {
-    // Get number of padding bytes from last byte
-    const nPaddingBytes = data.words[(data.nSigBytes - 1) >>> 2] & 0xff;
-    // Remove padding
-    data.nSigBytes -= nPaddingBytes;
-}
-const Pkcs7 = {
-    pad,
-    unpad,
-};
 
 
 /***/ }),
@@ -2114,4 +1770,4 @@ const random = makeRandFunction();
 
 /******/ });
 });
-//# sourceMappingURL=AES.js.map
+//# sourceMappingURL=Rabbit.js.map

@@ -25,6 +25,7 @@ exports.mainEntry = () => {
     AES: "./src/AES.ts",
     DES: "./src/DES.ts",
     RIPEMD160: "./src/RIPEMD160.ts",
+    Rabbit: "./src/Rabbit.ts",
   };
 };
 

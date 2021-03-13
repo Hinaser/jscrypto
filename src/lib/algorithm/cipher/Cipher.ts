@@ -29,6 +29,10 @@ export class Cipher extends BufferedBlockAlgorithm {
     this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
   }
   
+  public get iv(){
+    return this._iv;
+  }
+  
   /**
    * Resets this cipher to its initial state.
    * @example

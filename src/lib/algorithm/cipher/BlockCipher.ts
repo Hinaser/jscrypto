@@ -33,10 +33,6 @@ export class BlockCipher extends Cipher {
     this.reset(props?.data, props?.nBytes);
   }
   
-  public get iv(){
-    return this._iv;
-  }
-  
   public get mode(){
     return this._mode;
   }

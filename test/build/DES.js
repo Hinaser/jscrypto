@@ -1533,9 +1533,6 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
         this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
         this.reset(props === null || props === void 0 ? void 0 : props.data, props === null || props === void 0 ? void 0 : props.nBytes);
     }
-    get iv() {
-        return this._iv;
-    }
     get mode() {
         return this._mode;
     }
@@ -1634,6 +1631,9 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
         this._key = props.key;
         this._iv = typeof props.iv !== "undefined" ? props.iv : this._iv;
         this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
+    }
+    get iv() {
+        return this._iv;
     }
     /**
      * Resets this cipher to its initial state.
@@ -1763,7 +1763,7 @@ __webpack_require__.r(__webpack_exports__);
  * @property {Word32Array} key The key to this ciphertext.
  * @property {Word32Array} iv The IV used in the ciphering operation.
  * @property {Word32Array} salt The salt used with a key derivation function.
- * @property {typeof BlockCipher} algorithm The cipher algorithm.
+ * @property {typeof Cipher} algorithm The cipher algorithm.
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
@@ -1842,7 +1842,7 @@ const PasswordBasedCipher = {
     /**
      * Encrypts a message using a password.
      *
-     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+     * @param {typeof Cipher} Cipher The cipher algorithm to use.
      * @param {Word32Array|string} message The message to encrypt.
      * @param {string} password The password.
      * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -1862,7 +1862,7 @@ const PasswordBasedCipher = {
     /**
      * Decrypts serialized ciphertext using a password.
      *
-     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+     * @param {typeof Cipher} Cipher The cipher algorithm to use.
      * @param {CipherParams|string} cipherText The ciphertext to decrypt.
      * @param {string} password The password.
      * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -1929,7 +1929,7 @@ const SerializableCipher = {
     /**
      * Encrypts a message.
      *
-     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+     * @param {typeof Cipher} Cipher The cipher algorithm to use.
      * @param {Word32Array|string} message The message to encrypt.
      * @param {Word32Array} key The key.
      * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -1955,7 +1955,7 @@ const SerializableCipher = {
     /**
      * Decrypts serialized ciphertext.
      *
-     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+     * @param {typeof Cipher} Cipher The cipher algorithm to use.
      * @param {CipherParams|string} cipherText The ciphertext to decrypt.
      * @param {Word32Array} key The key.
      * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.

@@ -3,6 +3,7 @@ import {OpenSSLFormatter} from "./formatter/OpenSSLFormatter";
 import type {Word32Array} from "../../Word32Array";
 import type {BlockCipher, BlockCipherProps} from "./BlockCipher";
 import {CipherParams} from "./CipherParams";
+import {Cipher as BaseCipher} from "./Cipher";
 
 export interface SerializableCipherProps extends BlockCipherProps {
   formatter: Formatter;
@@ -10,13 +11,13 @@ export interface SerializableCipherProps extends BlockCipherProps {
 
 export interface ISerializableCipher<K extends Word32Array|string> {
   encrypt: (
-    cipher: typeof BlockCipher,
+    cipher: typeof BaseCipher,
     message: Word32Array|string,
     key: K,
     props?: Partial<SerializableCipherProps>,
   ) => CipherParams;
   decrypt: (
-    cipher: typeof BlockCipher,
+    cipher: typeof BaseCipher,
     cipherText: CipherParams|string,
     key: K,
     props?: Partial<SerializableCipherProps>,
@@ -43,7 +44,7 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
   /**
    * Encrypts a message.
    *
-   * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+   * @param {typeof Cipher} Cipher The cipher algorithm to use.
    * @param {Word32Array|string} message The message to encrypt.
    * @param {Word32Array} key The key.
    * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -53,7 +54,7 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
    *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key, { iv: iv });
    */
   encrypt(
-    Cipher: typeof BlockCipher,
+    Cipher: typeof BaseCipher,
     message: Word32Array|string,
     key: Word32Array,
     props?: Partial<SerializableCipherProps>,
@@ -66,8 +67,8 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
       key,
       iv: encryptor.iv,
       Algorithm: Cipher,
-      mode: encryptor.mode,
-      padding: encryptor.padding,
+      mode: (encryptor as BlockCipher).mode,
+      padding: (encryptor as BlockCipher).padding,
       blockSize: encryptor.blockSize,
       formatter: props?.formatter || OpenSSLFormatter,
     });
@@ -76,7 +77,7 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
   /**
    * Decrypts serialized ciphertext.
    *
-   * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+   * @param {typeof Cipher} Cipher The cipher algorithm to use.
    * @param {CipherParams|string} cipherText The ciphertext to decrypt.
    * @param {Word32Array} key The key.
    * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
@@ -86,7 +87,7 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
    *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, ciphertextParams, key, { iv: iv, format: JsCrypto.OpenSSL });
    */
   decrypt(
-    Cipher: typeof BlockCipher,
+    Cipher: typeof BaseCipher,
     cipherText: CipherParams|string,
     key: Word32Array,
     props?: Partial<SerializableCipherProps>,

@@ -1631,6 +1631,443 @@ class MD5 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_1__["Hasher"] {
 
 /***/ }),
 
+/***/ "./src/RIPEMD160.ts":
+/*!**************************!*\
+  !*** ./src/RIPEMD160.ts ***!
+  \**************************/
+/*! exports provided: RIPEMD160 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RIPEMD160", function() { return RIPEMD160; });
+/* harmony import */ var _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/Hasher */ "./src/lib/algorithm/Hasher.ts");
+/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
+/** @preserve
+(c) 2012 by Cédric Mesnil. All rights reserved.
+Redistribution and use in source and binary forms, with or without modification,
+ are permitted provided that the following conditions are met:
+ 
+- Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+ 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+// Constants table
+const _zl = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+    7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8,
+    3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12,
+    1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2,
+    4, 0, 5, 9, 7, 12, 2, 10, 14, 1, 3, 8, 11, 6, 15, 13,
+]);
+const _zr = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([
+    5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12,
+    6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2,
+    15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13,
+    8, 6, 4, 1, 3, 11, 15, 0, 5, 12, 2, 13, 9, 7, 10, 14,
+    12, 15, 10, 4, 1, 5, 8, 7, 6, 2, 13, 14, 0, 3, 9, 11,
+]);
+const _sl = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([
+    11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8,
+    7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12,
+    11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5,
+    11, 12, 14, 15, 14, 15, 9, 8, 9, 14, 5, 6, 8, 6, 5, 12,
+    9, 15, 5, 11, 6, 8, 13, 12, 5, 12, 13, 14, 11, 8, 5, 6,
+]);
+const _sr = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([
+    8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6,
+    9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11,
+    9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5,
+    15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8,
+    8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11,
+]);
+const _hl = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([0x00000000, 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xA953FD4E]);
+const _hr = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([0x50A28BE6, 0x5C4DD124, 0x6D703EF3, 0x7A6D76E9, 0x00000000]);
+function f1(x, y, z) {
+    return ((x) ^ (y) ^ (z));
+}
+function f2(x, y, z) {
+    return (((x) & (y)) | ((~x) & (z)));
+}
+function f3(x, y, z) {
+    return (((x) | (~(y))) ^ (z));
+}
+function f4(x, y, z) {
+    return (((x) & (z)) | ((y) & (~(z))));
+}
+function f5(x, y, z) {
+    return ((x) ^ ((y) | (~(z))));
+}
+function rotl(x, n) {
+    return (x << n) | (x >>> (32 - n));
+}
+class RIPEMD160 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"] {
+    constructor(props) {
+        super(props);
+        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0]);
+        this._props = props;
+        if (props && typeof props.hash !== "undefined") {
+            this._hash = props.hash.clone();
+        }
+    }
+    _doReset() {
+        this._hash = new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_1__["Word32Array"]([0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0]);
+    }
+    _doProcessBlock(words, offset) {
+        // Swap endian
+        for (let i = 0; i < 16; i++) {
+            // Shortcuts
+            const offsetI = offset + i;
+            const wordsOffsetI = words[offsetI];
+            // Swap
+            words[offsetI] = ((((wordsOffsetI << 8) | (wordsOffsetI >>> 24)) & 0x00ff00ff) |
+                (((wordsOffsetI << 24) | (wordsOffsetI >>> 8)) & 0xff00ff00));
+        }
+        // Shortcut
+        const H = this._hash.words;
+        const hl = _hl.words;
+        const hr = _hr.words;
+        const zl = _zl.words;
+        const zr = _zr.words;
+        const sl = _sl.words;
+        const sr = _sr.words;
+        // Working variables
+        let al;
+        let bl;
+        let cl;
+        let dl;
+        let el;
+        let ar;
+        let br;
+        let cr;
+        let dr;
+        let er;
+        ar = al = H[0];
+        br = bl = H[1];
+        cr = cl = H[2];
+        dr = dl = H[3];
+        er = el = H[4];
+        // Computation
+        let t;
+        for (let i = 0; i < 80; i += 1) {
+            t = (al + words[offset + zl[i]]) | 0;
+            if (i < 16) {
+                t += f1(bl, cl, dl) + hl[0];
+            }
+            else if (i < 32) {
+                t += f2(bl, cl, dl) + hl[1];
+            }
+            else if (i < 48) {
+                t += f3(bl, cl, dl) + hl[2];
+            }
+            else if (i < 64) {
+                t += f4(bl, cl, dl) + hl[3];
+            }
+            else { // if (i<80) {
+                t += f5(bl, cl, dl) + hl[4];
+            }
+            t = t | 0;
+            t = rotl(t, sl[i]);
+            t = (t + el) | 0;
+            al = el;
+            el = dl;
+            dl = rotl(cl, 10);
+            cl = bl;
+            bl = t;
+            t = (ar + words[offset + zr[i]]) | 0;
+            if (i < 16) {
+                t += f5(br, cr, dr) + hr[0];
+            }
+            else if (i < 32) {
+                t += f4(br, cr, dr) + hr[1];
+            }
+            else if (i < 48) {
+                t += f3(br, cr, dr) + hr[2];
+            }
+            else if (i < 64) {
+                t += f2(br, cr, dr) + hr[3];
+            }
+            else { // if (i<80) {
+                t += f1(br, cr, dr) + hr[4];
+            }
+            t = t | 0;
+            t = rotl(t, sr[i]);
+            t = (t + er) | 0;
+            ar = er;
+            er = dr;
+            dr = rotl(cr, 10);
+            cr = br;
+            br = t;
+        }
+        // Intermediate hash value
+        t = (H[1] + cl + dr) | 0;
+        H[1] = (H[2] + dl + er) | 0;
+        H[2] = (H[3] + el + ar) | 0;
+        H[3] = (H[4] + al + br) | 0;
+        H[4] = (H[0] + bl + cr) | 0;
+        H[0] = t;
+    }
+    _doFinalize() {
+        // Shortcuts
+        const data = this._data;
+        const dataWords = data.words;
+        const nBitsTotal = this._nBytes * 8;
+        const nBitsLeft = data.nSigBytes * 8;
+        // Add padding
+        dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+        dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = ((((nBitsTotal << 8) | (nBitsTotal >>> 24)) & 0x00ff00ff) |
+            (((nBitsTotal << 24) | (nBitsTotal >>> 8)) & 0xff00ff00));
+        data.nSigBytes = (dataWords.length + 1) * 4;
+        // Hash final blocks
+        this._process();
+        // Shortcuts
+        const hash = this._hash;
+        const H = hash.words;
+        // Swap endian
+        for (let i = 0; i < 5; i++) {
+            // Shortcut
+            const Hi = H[i];
+            // Swap
+            H[i] = (((Hi << 8) | (Hi >>> 24)) & 0x00ff00ff) |
+                (((Hi << 24) | (Hi >>> 8)) & 0xff00ff00);
+        }
+        // Return final computed hash
+        return hash;
+    }
+    clone() {
+        const props = { hash: this._hash, blockSize: this._blockSize, data: this._data, nBytes: this._nBytes };
+        return new RIPEMD160(props);
+    }
+    static hash(message, props) {
+        return new RIPEMD160(props).finalize(message);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/Rabbit.ts":
+/*!***********************!*\
+  !*** ./src/Rabbit.ts ***!
+  \***********************/
+/*! exports provided: Rabbit */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Rabbit", function() { return Rabbit; });
+/* harmony import */ var _lib_algorithm_cipher_StreamCipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/cipher/StreamCipher */ "./src/lib/algorithm/cipher/StreamCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
+
+
+
+class Rabbit extends _lib_algorithm_cipher_StreamCipher__WEBPACK_IMPORTED_MODULE_0__["StreamCipher"] {
+    constructor(props) {
+        super(props);
+        this._blockSize = 128 / 32;
+        this.S = [];
+        this.C = [];
+        this.G = [];
+        this._X = [];
+        this._C = [];
+        this._b = 0;
+        this._props = props;
+        this._doReset();
+    }
+    _doReset() {
+        // Shortcuts
+        const K = this._key.words;
+        const iv = this._iv;
+        // Swap endian
+        for (let i = 0; i < 4; i++) {
+            K[i] = (((K[i] << 8) | (K[i] >>> 24)) & 0x00ff00ff)
+                | (((K[i] << 24) | (K[i] >>> 8)) & 0xff00ff00);
+        }
+        // Generate initial state values
+        const X = this._X = [
+            K[0], (K[3] << 16) | (K[2] >>> 16),
+            K[1], (K[0] << 16) | (K[3] >>> 16),
+            K[2], (K[1] << 16) | (K[0] >>> 16),
+            K[3], (K[2] << 16) | (K[1] >>> 16)
+        ];
+        // Generate initial counter values
+        const C = this._C = [
+            (K[2] << 16) | (K[2] >>> 16), (K[0] & 0xffff0000) | (K[1] & 0x0000ffff),
+            (K[3] << 16) | (K[3] >>> 16), (K[1] & 0xffff0000) | (K[2] & 0x0000ffff),
+            (K[0] << 16) | (K[0] >>> 16), (K[2] & 0xffff0000) | (K[3] & 0x0000ffff),
+            (K[1] << 16) | (K[1] >>> 16), (K[3] & 0xffff0000) | (K[0] & 0x0000ffff)
+        ];
+        // Carry bit
+        this._b = 0;
+        // Iterate the system four times
+        for (let i = 0; i < 4; i++) {
+            this.nextState();
+        }
+        // Modify the counters
+        for (let i = 0; i < 8; i++) {
+            C[i] ^= X[(i + 4) & 7];
+        }
+        // IV setup
+        if (!iv) {
+            return;
+        }
+        // Shortcuts
+        const IV = iv.words;
+        const IV_0 = IV[0];
+        const IV_1 = IV[1];
+        // Generate four sub vectors
+        const i0 = (((IV_0 << 8) | (IV_0 >>> 24)) & 0x00ff00ff) | (((IV_0 << 24) | (IV_0 >>> 8)) & 0xff00ff00);
+        const i2 = (((IV_1 << 8) | (IV_1 >>> 24)) & 0x00ff00ff) | (((IV_1 << 24) | (IV_1 >>> 8)) & 0xff00ff00);
+        const i1 = (i0 >>> 16) | (i2 & 0xffff0000);
+        const i3 = (i2 << 16) | (i0 & 0x0000ffff);
+        // Modify counter values
+        C[0] ^= i0;
+        C[1] ^= i1;
+        C[2] ^= i2;
+        C[3] ^= i3;
+        C[4] ^= i0;
+        C[5] ^= i1;
+        C[6] ^= i2;
+        C[7] ^= i3;
+        // Iterate the system four times
+        for (let i = 0; i < 4; i++) {
+            this.nextState();
+        }
+    }
+    _doProcessBlock(words, offset) {
+        // Shortcut
+        const X = this._X;
+        // Iterate the system
+        this.nextState();
+        // Generate four key stream words
+        this.S[0] = X[0] ^ (X[5] >>> 16) ^ (X[3] << 16);
+        this.S[1] = X[2] ^ (X[7] >>> 16) ^ (X[5] << 16);
+        this.S[2] = X[4] ^ (X[1] >>> 16) ^ (X[7] << 16);
+        this.S[3] = X[6] ^ (X[3] >>> 16) ^ (X[1] << 16);
+        for (let i = 0; i < 4; i++) {
+            // Swap endian
+            this.S[i] = (((this.S[i] << 8) | (this.S[i] >>> 24)) & 0x00ff00ff) |
+                (((this.S[i] << 24) | (this.S[i] >>> 8)) & 0xff00ff00);
+            // Encrypt
+            words[offset + i] ^= this.S[i];
+        }
+    }
+    nextState() {
+        // Shortcuts
+        const X = this._X;
+        const C = this._C;
+        // Save old counter values
+        for (let i = 0; i < 8; i++) {
+            this.C[i] = C[i];
+        }
+        // Calculate new counter values
+        C[0] = (C[0] + 0x4d34d34d + this._b) | 0;
+        C[1] = (C[1] + 0xd34d34d3 + ((C[0] >>> 0) < (this.C[0] >>> 0) ? 1 : 0)) | 0;
+        C[2] = (C[2] + 0x34d34d34 + ((C[1] >>> 0) < (this.C[1] >>> 0) ? 1 : 0)) | 0;
+        C[3] = (C[3] + 0x4d34d34d + ((C[2] >>> 0) < (this.C[2] >>> 0) ? 1 : 0)) | 0;
+        C[4] = (C[4] + 0xd34d34d3 + ((C[3] >>> 0) < (this.C[3] >>> 0) ? 1 : 0)) | 0;
+        C[5] = (C[5] + 0x34d34d34 + ((C[4] >>> 0) < (this.C[4] >>> 0) ? 1 : 0)) | 0;
+        C[6] = (C[6] + 0x4d34d34d + ((C[5] >>> 0) < (this.C[5] >>> 0) ? 1 : 0)) | 0;
+        C[7] = (C[7] + 0xd34d34d3 + ((C[6] >>> 0) < (this.C[6] >>> 0) ? 1 : 0)) | 0;
+        this._b = (C[7] >>> 0) < (this.C[7] >>> 0) ? 1 : 0;
+        // Calculate the g-values
+        for (let i = 0; i < 8; i++) {
+            const gx = X[i] + C[i];
+            // Construct high and low argument for squaring
+            const ga = gx & 0xffff;
+            const gb = gx >>> 16;
+            // Calculate high and low result of squaring
+            const gh = ((((ga * ga) >>> 17) + ga * gb) >>> 15) + gb * gb;
+            const gl = (((gx & 0xffff0000) * gx) | 0) + (((gx & 0x0000ffff) * gx) | 0);
+            // High XOR low
+            this.G[i] = gh ^ gl;
+        }
+        const G = this.G;
+        // Calculate new state values
+        X[0] = (G[0] + ((G[7] << 16) | (G[7] >>> 16)) + ((G[6] << 16) | (G[6] >>> 16))) | 0;
+        X[1] = (G[1] + ((G[0] << 8) | (G[0] >>> 24)) + G[7]) | 0;
+        X[2] = (G[2] + ((G[1] << 16) | (G[1] >>> 16)) + ((G[0] << 16) | (G[0] >>> 16))) | 0;
+        X[3] = (G[3] + ((G[2] << 8) | (G[2] >>> 24)) + G[1]) | 0;
+        X[4] = (G[4] + ((G[3] << 16) | (G[3] >>> 16)) + ((G[2] << 16) | (G[2] >>> 16))) | 0;
+        X[5] = (G[5] + ((G[4] << 8) | (G[4] >>> 24)) + G[3]) | 0;
+        X[6] = (G[6] + ((G[5] << 16) | (G[5] >>> 16)) + ((G[4] << 16) | (G[4] >>> 16))) | 0;
+        X[7] = (G[7] + ((G[6] << 8) | (G[6] >>> 24)) + G[5]) | 0;
+    }
+    /**
+     * Creates this cipher in encryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.Rabbit.createEncryptor(keyWordArray);
+     */
+    static createEncryptor(key, props) {
+        props = typeof props === "undefined" ? {} : props;
+        return new Rabbit(Object.assign(Object.assign({}, props), { key }));
+    }
+    /**
+     * Creates this cipher in decryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.Rabbit.createDecryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createDecryptor(key, props) {
+        props = typeof props === "undefined" ? {} : props;
+        return new Rabbit(Object.assign(Object.assign({}, props), { key }));
+    }
+    /**
+     * Encrypt a message with key
+     *
+     * @param {Word32Array|string} message
+     * @param {Word32Array|string} key
+     * @param {Partial<AESProps>?} props
+     * @example
+     *   var encryptedMessage = JsCrypt.Rabbit.encrypt("test", "pass");
+     */
+    static encrypt(message, key, props) {
+        if (typeof key === "string") {
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_1__["PasswordBasedCipher"].encrypt(Rabbit, message, key, props);
+        }
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_2__["SerializableCipher"].encrypt(Rabbit, message, key, props);
+    }
+    /**
+     * Encrypt a encrypted message with key
+     *
+     * @param {CipherParams} cipherText
+     * @param {Word32Array|string} key
+     * @param {Partial<AESProps>?} props
+     * @example
+     *   var encryptedMessage = JsCrypt.Rabbit.decrypt(cipherProps, "pass");
+     */
+    static decrypt(cipherText, key, props) {
+        if (typeof key === "string") {
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_1__["PasswordBasedCipher"].decrypt(Rabbit, cipherText, key, props);
+        }
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_2__["SerializableCipher"].decrypt(Rabbit, cipherText, key, props);
+    }
+}
+Rabbit.ivSize = 128 / 32;
+
+
+/***/ }),
+
 /***/ "./src/SHA1.ts":
 /*!*********************!*\
   !*** ./src/SHA1.ts ***!
@@ -2494,7 +2931,7 @@ class SHA512 extends _lib_algorithm_Hasher__WEBPACK_IMPORTED_MODULE_0__["Hasher"
 /*!********************!*\
   !*** ./src/all.ts ***!
   \********************/
-/*! exports provided: Word32Array, Word64Array, Word64, Base64, Hex, Latin1, Utf8, Utf16, Utf16BE, Utf16LE, OpenSSLKDF, EvpKDF, PBKDF2, SerializableCipher, PasswordBasedCipher, Hmac, HmacMD5, HmacSHA224, HmacSHA256, HmacSHA384, HmacSHA512, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3, AES, DES, DES3, mode, pad */
+/*! exports provided: Word32Array, Word64Array, Word64, Base64, Hex, Latin1, Utf8, Utf16, Utf16BE, Utf16LE, OpenSSLKDF, EvpKDF, PBKDF2, SerializableCipher, PasswordBasedCipher, Hmac, HmacMD5, HmacSHA224, HmacSHA256, HmacSHA384, HmacSHA512, MD5, SHA1, SHA224, SHA256, SHA384, SHA512, SHA3, AES, DES, DES3, RIPEMD160, Rabbit, mode, pad */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2581,17 +3018,25 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DES3", function() { return _DES__WEBPACK_IMPORTED_MODULE_17__["DES3"]; });
 
-/* harmony import */ var _mode_CBC__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./mode/CBC */ "./src/mode/CBC.ts");
-/* harmony import */ var _mode_CFB__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./mode/CFB */ "./src/mode/CFB.ts");
-/* harmony import */ var _mode_CTR__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./mode/CTR */ "./src/mode/CTR.ts");
-/* harmony import */ var _mode_ECB__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./mode/ECB */ "./src/mode/ECB.ts");
-/* harmony import */ var _mode_OFB__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./mode/OFB */ "./src/mode/OFB.ts");
-/* harmony import */ var _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./pad/AnsiX923 */ "./src/pad/AnsiX923.ts");
-/* harmony import */ var _pad_ISO10126__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./pad/ISO10126 */ "./src/pad/ISO10126.ts");
-/* harmony import */ var _pad_ISO97971__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./pad/ISO97971 */ "./src/pad/ISO97971.ts");
-/* harmony import */ var _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./pad/Pkcs7 */ "./src/pad/Pkcs7.ts");
-/* harmony import */ var _pad_Noop__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./pad/Noop */ "./src/pad/Noop.ts");
-/* harmony import */ var _pad_Zero__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./pad/Zero */ "./src/pad/Zero.ts");
+/* harmony import */ var _RIPEMD160__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./RIPEMD160 */ "./src/RIPEMD160.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RIPEMD160", function() { return _RIPEMD160__WEBPACK_IMPORTED_MODULE_18__["RIPEMD160"]; });
+
+/* harmony import */ var _Rabbit__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./Rabbit */ "./src/Rabbit.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Rabbit", function() { return _Rabbit__WEBPACK_IMPORTED_MODULE_19__["Rabbit"]; });
+
+/* harmony import */ var _mode_CBC__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./mode/CBC */ "./src/mode/CBC.ts");
+/* harmony import */ var _mode_CFB__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./mode/CFB */ "./src/mode/CFB.ts");
+/* harmony import */ var _mode_CTR__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./mode/CTR */ "./src/mode/CTR.ts");
+/* harmony import */ var _mode_ECB__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./mode/ECB */ "./src/mode/ECB.ts");
+/* harmony import */ var _mode_OFB__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./mode/OFB */ "./src/mode/OFB.ts");
+/* harmony import */ var _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./pad/AnsiX923 */ "./src/pad/AnsiX923.ts");
+/* harmony import */ var _pad_ISO10126__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./pad/ISO10126 */ "./src/pad/ISO10126.ts");
+/* harmony import */ var _pad_ISO97971__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./pad/ISO97971 */ "./src/pad/ISO97971.ts");
+/* harmony import */ var _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./pad/Pkcs7 */ "./src/pad/Pkcs7.ts");
+/* harmony import */ var _pad_Noop__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./pad/Noop */ "./src/pad/Noop.ts");
+/* harmony import */ var _pad_Zero__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./pad/Zero */ "./src/pad/Zero.ts");
+
+
 
 
 
@@ -2616,11 +3061,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const mode = {
-    CBC: _mode_CBC__WEBPACK_IMPORTED_MODULE_18__["CBC"],
-    CFB: _mode_CFB__WEBPACK_IMPORTED_MODULE_19__["CFB"],
-    CTR: _mode_CTR__WEBPACK_IMPORTED_MODULE_20__["CTR"],
-    ECB: _mode_ECB__WEBPACK_IMPORTED_MODULE_21__["ECB"],
-    OFB: _mode_OFB__WEBPACK_IMPORTED_MODULE_22__["OFB"],
+    CBC: _mode_CBC__WEBPACK_IMPORTED_MODULE_20__["CBC"],
+    CFB: _mode_CFB__WEBPACK_IMPORTED_MODULE_21__["CFB"],
+    CTR: _mode_CTR__WEBPACK_IMPORTED_MODULE_22__["CTR"],
+    ECB: _mode_ECB__WEBPACK_IMPORTED_MODULE_23__["ECB"],
+    OFB: _mode_OFB__WEBPACK_IMPORTED_MODULE_24__["OFB"],
 };
 
 
@@ -2629,12 +3074,12 @@ const mode = {
 
 
 const pad = {
-    AnsiX923: _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_23__["AnsiX923"],
-    ISO10126: _pad_ISO10126__WEBPACK_IMPORTED_MODULE_24__["ISO10126"],
-    ISO97971: _pad_ISO97971__WEBPACK_IMPORTED_MODULE_25__["ISO97971"],
-    Pkcs7: _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_26__["Pkcs7"],
-    Noop: _pad_Noop__WEBPACK_IMPORTED_MODULE_27__["Noop"],
-    Zero: _pad_Zero__WEBPACK_IMPORTED_MODULE_28__["Zero"],
+    AnsiX923: _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_25__["AnsiX923"],
+    ISO10126: _pad_ISO10126__WEBPACK_IMPORTED_MODULE_26__["ISO10126"],
+    ISO97971: _pad_ISO97971__WEBPACK_IMPORTED_MODULE_27__["ISO97971"],
+    Pkcs7: _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_28__["Pkcs7"],
+    Noop: _pad_Noop__WEBPACK_IMPORTED_MODULE_29__["Noop"],
+    Zero: _pad_Zero__WEBPACK_IMPORTED_MODULE_30__["Zero"],
 };
 
 
@@ -3104,9 +3549,6 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
         this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
         this.reset(props === null || props === void 0 ? void 0 : props.data, props === null || props === void 0 ? void 0 : props.nBytes);
     }
-    get iv() {
-        return this._iv;
-    }
     get mode() {
         return this._mode;
     }
@@ -3205,6 +3647,9 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
         this._key = props.key;
         this._iv = typeof props.iv !== "undefined" ? props.iv : this._iv;
         this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
+    }
+    get iv() {
+        return this._iv;
     }
     /**
      * Resets this cipher to its initial state.
@@ -3334,7 +3779,7 @@ __webpack_require__.r(__webpack_exports__);
  * @property {Word32Array} key The key to this ciphertext.
  * @property {Word32Array} iv The IV used in the ciphering operation.
  * @property {Word32Array} salt The salt used with a key derivation function.
- * @property {typeof BlockCipher} algorithm The cipher algorithm.
+ * @property {typeof Cipher} algorithm The cipher algorithm.
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
@@ -3413,7 +3858,7 @@ const PasswordBasedCipher = {
     /**
      * Encrypts a message using a password.
      *
-     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+     * @param {typeof Cipher} Cipher The cipher algorithm to use.
      * @param {Word32Array|string} message The message to encrypt.
      * @param {string} password The password.
      * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -3433,7 +3878,7 @@ const PasswordBasedCipher = {
     /**
      * Decrypts serialized ciphertext using a password.
      *
-     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+     * @param {typeof Cipher} Cipher The cipher algorithm to use.
      * @param {CipherParams|string} cipherText The ciphertext to decrypt.
      * @param {string} password The password.
      * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -3500,7 +3945,7 @@ const SerializableCipher = {
     /**
      * Encrypts a message.
      *
-     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+     * @param {typeof Cipher} Cipher The cipher algorithm to use.
      * @param {Word32Array|string} message The message to encrypt.
      * @param {Word32Array} key The key.
      * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
@@ -3526,7 +3971,7 @@ const SerializableCipher = {
     /**
      * Decrypts serialized ciphertext.
      *
-     * @param {typeof BlockCipher} Cipher The cipher algorithm to use.
+     * @param {typeof Cipher} Cipher The cipher algorithm to use.
      * @param {CipherParams|string} cipherText The ciphertext to decrypt.
      * @param {Word32Array} key The key.
      * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
@@ -3541,6 +3986,31 @@ const SerializableCipher = {
         return decryptor.finalize(cipherParams.cipherText || "");
     }
 };
+
+
+/***/ }),
+
+/***/ "./src/lib/algorithm/cipher/StreamCipher.ts":
+/*!**************************************************!*\
+  !*** ./src/lib/algorithm/cipher/StreamCipher.ts ***!
+  \**************************************************/
+/*! exports provided: StreamCipher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StreamCipher", function() { return StreamCipher; });
+/* harmony import */ var _Cipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
+
+class StreamCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
+    constructor() {
+        super(...arguments);
+        this._blockSize = 1;
+    }
+    _doFinalize() {
+        return this._process(true);
+    }
+}
 
 
 /***/ }),

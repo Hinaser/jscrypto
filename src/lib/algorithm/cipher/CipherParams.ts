@@ -2,8 +2,8 @@ import type {Word32Array} from "../../Word32Array";
 import type {BlockCipherMode} from "./mode/BlockCipherMode";
 import type {Pad} from "./pad/type";
 import type {Formatter} from "./formatter/type";
+import type {Cipher} from "./Cipher";
 import {OpenSSLFormatter} from "./formatter/OpenSSLFormatter";
-import type {BlockCipher} from "./BlockCipher";
 
 /**
  * A collection of cipher parameters.
@@ -12,7 +12,7 @@ import type {BlockCipher} from "./BlockCipher";
  * @property {Word32Array} key The key to this ciphertext.
  * @property {Word32Array} iv The IV used in the ciphering operation.
  * @property {Word32Array} salt The salt used with a key derivation function.
- * @property {typeof BlockCipher} algorithm The cipher algorithm.
+ * @property {typeof Cipher} algorithm The cipher algorithm.
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
@@ -23,7 +23,7 @@ export class CipherParams {
   public key?: Word32Array;
   public iv?: Word32Array;
   public salt?: Word32Array;
-  public Algorithm?: typeof BlockCipher;
+  public Algorithm?: typeof Cipher;
   public mode?: BlockCipherMode;
   public padding?: Pad;
   public blockSize?: number;

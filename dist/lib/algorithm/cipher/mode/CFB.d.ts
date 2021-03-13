@@ -1,5 +1,5 @@
 import { BlockCipherMode, BlockCipherModeProps } from "./BlockCipherMode";
-import { Cipher } from "../Cipher";
+import type { BlockCipher } from "../BlockCipher";
 /**
  * Cipher Feedback Block mode
  */
@@ -14,7 +14,7 @@ export declare class CFB extends BlockCipherMode {
      */
     static Decryptor: typeof CFB;
     constructor(props: BlockCipherModeProps);
-    generateKeyStreamAndEncrypt(words: number[], offset: number, blockSize: number, cipher: Cipher): void;
+    generateKeyStreamAndEncrypt(words: number[], offset: number, blockSize: number, cipher: BlockCipher): void;
     /**
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props

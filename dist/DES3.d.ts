@@ -1,25 +1,22 @@
 import { BlockCipher, BlockCipherProps } from "./lib/algorithm/cipher/BlockCipher";
 import { CipherProps, PropsWithKey } from "./lib/algorithm/cipher/Cipher";
+import { DES } from "./DES";
 import { Word32Array } from "./lib/Word32Array";
 import { CipherParams } from "./lib/algorithm/cipher/CipherParams";
-export interface DESProps extends BlockCipherProps {
+export interface DES3Props extends BlockCipherProps {
 }
-export declare class DES extends BlockCipher {
+export declare class DES3 extends BlockCipher {
     static readonly keySize: number;
     static readonly ivSize: number;
     protected static readonly _blockSize: number;
-    _props: PropsWithKey<DESProps>;
-    protected _subKeys: number[][];
-    protected _invSubKeys: number[][];
-    protected _lBlock: number;
-    protected _rBlock: number;
-    constructor(props: PropsWithKey<DESProps>);
+    protected _des1: DES;
+    protected _des2: DES;
+    protected _des3: DES;
+    constructor(props: PropsWithKey<DES3Props>);
+    protected _get3DES(): DES[];
     protected _doReset(): void;
     encryptBlock(words: number[], offset: number): void;
     decryptBlock(words: number[], offset: number): void;
-    protected _doCryptoBlock(words: number[], offset: number, subKeys: number[][]): void;
-    protected _exchangeLR(offset: number, mask: number): void;
-    protected _exchangeRL(offset: number, mask: number): void;
     /**
      * Creates this cipher in encryption mode.
      *
@@ -27,9 +24,9 @@ export declare class DES extends BlockCipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.DES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = JsCrypto.DES3.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
-    static createEncryptor(key: Word32Array, props?: Partial<CipherProps>): DES;
+    static createEncryptor(key: Word32Array, props?: Partial<CipherProps>): DES3;
     /**
      * Creates this cipher in decryption mode.
      *
@@ -37,9 +34,9 @@ export declare class DES extends BlockCipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.DES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = JsCrypto.DES3.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
-    static createDecryptor(key: Word32Array, props?: Partial<CipherProps>): DES;
+    static createDecryptor(key: Word32Array, props?: Partial<CipherProps>): DES3;
     /**
      * Encrypt a message with key
      *
@@ -47,9 +44,9 @@ export declare class DES extends BlockCipher {
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.DES.encrypt("test", "pass");
+     *   var encryptedMessage = JsCrypt.DES3.encrypt("test", "pass");
      */
-    static encrypt(message: Word32Array | string, key: Word32Array | string, props?: Partial<DESProps>): CipherParams;
+    static encrypt(message: Word32Array | string, key: Word32Array | string, props?: Partial<DES3Props>): CipherParams;
     /**
      * Encrypt a encrypted message with key
      *
@@ -57,7 +54,7 @@ export declare class DES extends BlockCipher {
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.DES.decrypt(cipherProps, "pass");
+     *   var encryptedMessage = JsCrypt.DES3.decrypt(cipherProps, "pass");
      */
-    static decrypt(cipherText: CipherParams, key: Word32Array | string, props?: Partial<DESProps>): Word32Array;
+    static decrypt(cipherText: CipherParams, key: Word32Array | string, props?: Partial<DES3Props>): Word32Array;
 }

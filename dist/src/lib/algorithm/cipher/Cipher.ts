@@ -29,6 +29,10 @@ export class Cipher extends BufferedBlockAlgorithm {
     this._transformMode = typeof props.transformMode !== "undefined" ? props.transformMode : this._transformMode;
   }
   
+  public get iv(){
+    return this._iv;
+  }
+  
   /**
    * Resets this cipher to its initial state.
    * @example
@@ -82,13 +86,6 @@ export class Cipher extends BufferedBlockAlgorithm {
   /**
    * @abstract
    */
-  protected _doProcess(): void {
-    throw new Error("Not implemented");
-  }
-  
-  /**
-   * @abstract
-   */
   protected _doProcessBlock(words: number[], offset: number): void {
     throw new Error("Not implemented");
   }
@@ -97,20 +94,6 @@ export class Cipher extends BufferedBlockAlgorithm {
    * @abstract
    */
   protected _doFinalize(): Word32Array {
-    throw new Error("Not implemented");
-  }
-  
-  /**
-   * @abstract
-   */
-  public encryptBlock(words: number[], offset: number): void {
-    throw new Error("Not implemented");
-  }
-  
-  /**
-   * @abstract
-   */
-  public decryptBlock(words: number[], offset: number): void {
     throw new Error("Not implemented");
   }
   

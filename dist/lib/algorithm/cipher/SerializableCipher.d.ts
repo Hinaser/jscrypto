@@ -1,13 +1,14 @@
 import type { Formatter } from "./formatter/type";
 import type { Word32Array } from "../../Word32Array";
-import type { BlockCipher, BlockCipherProps } from "./BlockCipher";
+import type { BlockCipherProps } from "./BlockCipher";
 import { CipherParams } from "./CipherParams";
+import { Cipher as BaseCipher } from "./Cipher";
 export interface SerializableCipherProps extends BlockCipherProps {
     formatter: Formatter;
 }
 export interface ISerializableCipher<K extends Word32Array | string> {
-    encrypt: (cipher: typeof BlockCipher, message: Word32Array | string, key: K, props?: Partial<SerializableCipherProps>) => CipherParams;
-    decrypt: (cipher: typeof BlockCipher, cipherText: CipherParams | string, key: K, props?: Partial<SerializableCipherProps>) => Word32Array;
+    encrypt: (cipher: typeof BaseCipher, message: Word32Array | string, key: K, props?: Partial<SerializableCipherProps>) => CipherParams;
+    decrypt: (cipher: typeof BaseCipher, cipherText: CipherParams | string, key: K, props?: Partial<SerializableCipherProps>) => Word32Array;
 }
 /**
  * Converts serialized ciphertext to CipherParams,

@@ -2,7 +2,7 @@ import type { Word32Array } from "../../Word32Array";
 import type { BlockCipherMode } from "./mode/BlockCipherMode";
 import type { Pad } from "./pad/type";
 import type { Formatter } from "./formatter/type";
-import type { BlockCipher } from "./BlockCipher";
+import type { Cipher } from "./Cipher";
 /**
  * A collection of cipher parameters.
  *
@@ -10,7 +10,7 @@ import type { BlockCipher } from "./BlockCipher";
  * @property {Word32Array} key The key to this ciphertext.
  * @property {Word32Array} iv The IV used in the ciphering operation.
  * @property {Word32Array} salt The salt used with a key derivation function.
- * @property {typeof BlockCipher} algorithm The cipher algorithm.
+ * @property {typeof Cipher} algorithm The cipher algorithm.
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
@@ -21,7 +21,7 @@ export declare class CipherParams {
     key?: Word32Array;
     iv?: Word32Array;
     salt?: Word32Array;
-    Algorithm?: typeof BlockCipher;
+    Algorithm?: typeof Cipher;
     mode?: BlockCipherMode;
     padding?: Pad;
     blockSize?: number;

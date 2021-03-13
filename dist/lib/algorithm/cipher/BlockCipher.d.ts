@@ -18,12 +18,19 @@ export declare class BlockCipher extends Cipher {
      */
     ["constructor"]: typeof BlockCipher;
     constructor(props: PropsWithKey<BlockCipherProps>);
-    get iv(): Word32Array | undefined;
     get mode(): BlockCipherMode | undefined;
     get padding(): Pad;
     reset(data?: Word32Array, nBytes?: number): void;
     protected _doProcessBlock(words: number[], offset: number): void;
     protected _doFinalize(): Word32Array;
+    /**
+     * @abstract
+     */
+    encryptBlock(words: number[], offset: number): void;
+    /**
+     * @abstract
+     */
+    decryptBlock(words: number[], offset: number): void;
     /**
      * Creates this cipher in encryption mode.
      *

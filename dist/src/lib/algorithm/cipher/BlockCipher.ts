@@ -33,10 +33,6 @@ export class BlockCipher extends Cipher {
     this.reset(props?.data, props?.nBytes);
   }
   
-  public get iv(){
-    return this._iv;
-  }
-  
   public get mode(){
     return this._mode;
   }
@@ -94,6 +90,20 @@ export class BlockCipher extends Cipher {
     }
   
     return finalProcessedBlocks;
+  }
+  
+  /**
+   * @abstract
+   */
+  public encryptBlock(words: number[], offset: number): void {
+    throw new Error("Not implemented");
+  }
+  
+  /**
+   * @abstract
+   */
+  public decryptBlock(words: number[], offset: number): void {
+    throw new Error("Not implemented");
   }
   
   /**

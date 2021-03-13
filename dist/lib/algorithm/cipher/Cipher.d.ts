@@ -16,6 +16,7 @@ export declare class Cipher extends BufferedBlockAlgorithm {
     protected _key: Word32Array;
     protected _iv?: Word32Array;
     constructor(props: PropsWithKey<CipherProps>);
+    get iv(): Word32Array | undefined;
     /**
      * Resets this cipher to its initial state.
      * @example
@@ -49,23 +50,11 @@ export declare class Cipher extends BufferedBlockAlgorithm {
     /**
      * @abstract
      */
-    protected _doProcess(): void;
-    /**
-     * @abstract
-     */
     protected _doProcessBlock(words: number[], offset: number): void;
     /**
      * @abstract
      */
     protected _doFinalize(): Word32Array;
-    /**
-     * @abstract
-     */
-    encryptBlock(words: number[], offset: number): void;
-    /**
-     * @abstract
-     */
-    decryptBlock(words: number[], offset: number): void;
     /**
      * Creates this cipher in encryption mode.
      *

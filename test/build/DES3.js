@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/DES.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/DES3.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -868,6 +868,137 @@ class DES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0__
 DES.keySize = 64 / 32;
 DES.ivSize = 64 / 32;
 DES._blockSize = 64 / 32;
+
+
+/***/ }),
+
+/***/ "./src/DES3.ts":
+/*!*********************!*\
+  !*** ./src/DES3.ts ***!
+  \*********************/
+/*! exports provided: DES3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DES3", function() { return DES3; });
+/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/cipher/BlockCipher */ "./src/lib/algorithm/cipher/BlockCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
+/* harmony import */ var _DES__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DES */ "./src/DES.ts");
+/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
+
+
+
+
+
+
+class DES3 extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__["BlockCipher"] {
+    constructor(props) {
+        super(props);
+        this._props = props;
+        const TripleDES = this._get3DES();
+        // Create DES instances
+        this._des1 = TripleDES[0];
+        this._des2 = TripleDES[1];
+        this._des3 = TripleDES[2];
+    }
+    _get3DES() {
+        // Shortcuts
+        const key = this._key;
+        const keyWords = key.words;
+        // Make sure the key length is valid (64, 128 or >= 192 bit)
+        if (keyWords.length !== 2 && keyWords.length !== 4 && keyWords.length < 6) {
+            throw new Error("Invalid key length - 3DES requires the key length to be 64, 128, 192 or >192.");
+        }
+        // Extend the key according to the keying options defined in 3DES standard
+        const key1 = keyWords.slice(0, 2);
+        const key2 = keyWords.length < 4 ? keyWords.slice(0, 2) : keyWords.slice(2, 4);
+        const key3 = keyWords.length < 6 ? keyWords.slice(0, 2) : keyWords.slice(4, 6);
+        // Create DES instances
+        const des1 = _DES__WEBPACK_IMPORTED_MODULE_3__["DES"].createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_4__["Word32Array"](key1));
+        const des2 = _DES__WEBPACK_IMPORTED_MODULE_3__["DES"].createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_4__["Word32Array"](key2));
+        const des3 = _DES__WEBPACK_IMPORTED_MODULE_3__["DES"].createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_4__["Word32Array"](key3));
+        return [des1, des2, des3];
+    }
+    _doReset() {
+        const TripleDES = this._get3DES();
+        // Create DES instances
+        this._des1 = TripleDES[0];
+        this._des2 = TripleDES[1];
+        this._des3 = TripleDES[2];
+    }
+    encryptBlock(words, offset) {
+        this._des1.encryptBlock(words, offset);
+        this._des2.decryptBlock(words, offset);
+        this._des3.encryptBlock(words, offset);
+    }
+    decryptBlock(words, offset) {
+        this._des3.decryptBlock(words, offset);
+        this._des2.encryptBlock(words, offset);
+        this._des1.decryptBlock(words, offset);
+    }
+    /**
+     * Creates this cipher in encryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.DES3.createEncryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createEncryptor(key, props) {
+        props = typeof props === "undefined" ? {} : props;
+        return new DES3(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_2__["Cipher"].ENC_TRANSFORM_MODE }));
+    }
+    /**
+     * Creates this cipher in decryption mode.
+     *
+     * @param {Word32Array} key The key.
+     * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
+     * @return {Cipher} A cipher instance.
+     * @example
+     *   var cipher = JsCrypto.DES3.createDecryptor(keyWordArray, { iv: ivWordArray });
+     */
+    static createDecryptor(key, props) {
+        props = typeof props === "undefined" ? {} : props;
+        return new DES3(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_2__["Cipher"].DEC_TRANSFORM_MODE }));
+    }
+    /**
+     * Encrypt a message with key
+     *
+     * @param {Word32Array|string} message
+     * @param {Word32Array|string} key
+     * @param {Partial<AESProps>?} props
+     * @example
+     *   var encryptedMessage = JsCrypt.DES3.encrypt("test", "pass");
+     */
+    static encrypt(message, key, props) {
+        if (typeof key === "string") {
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_5__["PasswordBasedCipher"].encrypt(DES3, message, key, props);
+        }
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].encrypt(DES3, message, key, props);
+    }
+    /**
+     * Encrypt a encrypted message with key
+     *
+     * @param {CipherParams} cipherText
+     * @param {Word32Array|string} key
+     * @param {Partial<AESProps>?} props
+     * @example
+     *   var encryptedMessage = JsCrypt.DES3.decrypt(cipherProps, "pass");
+     */
+    static decrypt(cipherText, key, props) {
+        if (typeof key === "string") {
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_5__["PasswordBasedCipher"].decrypt(DES3, cipherText, key, props);
+        }
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].decrypt(DES3, cipherText, key, props);
+    }
+}
+DES3.keySize = 192 / 32;
+DES3.ivSize = 64 / 32;
+DES3._blockSize = 64 / 32;
 
 
 /***/ }),
@@ -2599,4 +2730,4 @@ const random = makeRandFunction();
 
 /******/ });
 });
-//# sourceMappingURL=DES.js.map
+//# sourceMappingURL=DES3.js.map

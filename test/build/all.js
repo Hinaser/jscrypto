@@ -391,20 +391,17 @@ AES.keySize = 256 / 32;
 /*!********************!*\
   !*** ./src/DES.ts ***!
   \********************/
-/*! exports provided: DES, DES3 */
+/*! exports provided: DES */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DES", function() { return DES; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DES3", function() { return DES3; });
 /* harmony import */ var _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/cipher/BlockCipher */ "./src/lib/algorithm/cipher/BlockCipher.ts");
 /* harmony import */ var _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/cipher/Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
-/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
-/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
-/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
 // Permuted Choice 1 constants
-
 
 
 
@@ -1108,9 +1105,9 @@ class DES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0__
      */
     static encrypt(message, key, props) {
         if (typeof key === "string") {
-            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__["PasswordBasedCipher"].encrypt(DES, message, key, props);
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__["PasswordBasedCipher"].encrypt(DES, message, key, props);
         }
-        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__["SerializableCipher"].encrypt(DES, message, key, props);
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__["SerializableCipher"].encrypt(DES, message, key, props);
     }
     /**
      * Encrypt a encrypted message with key
@@ -1123,15 +1120,41 @@ class DES extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0__
      */
     static decrypt(cipherText, key, props) {
         if (typeof key === "string") {
-            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__["PasswordBasedCipher"].decrypt(DES, cipherText, key, props);
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_2__["PasswordBasedCipher"].decrypt(DES, cipherText, key, props);
         }
-        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__["SerializableCipher"].decrypt(DES, cipherText, key, props);
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_3__["SerializableCipher"].decrypt(DES, cipherText, key, props);
     }
 }
 DES.keySize = 64 / 32;
 DES.ivSize = 64 / 32;
 DES._blockSize = 64 / 32;
-class DES3 extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0__["BlockCipher"] {
+
+
+/***/ }),
+
+/***/ "./src/DES3.ts":
+/*!*********************!*\
+  !*** ./src/DES3.ts ***!
+  \*********************/
+/*! exports provided: DES3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DES3", function() { return DES3; });
+/* harmony import */ var _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/algorithm/cipher/SerializableCipher */ "./src/lib/algorithm/cipher/SerializableCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/algorithm/cipher/BlockCipher */ "./src/lib/algorithm/cipher/BlockCipher.ts");
+/* harmony import */ var _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lib/algorithm/cipher/Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
+/* harmony import */ var _DES__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DES */ "./src/DES.ts");
+/* harmony import */ var _lib_Word32Array__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./lib/Word32Array */ "./src/lib/Word32Array.ts");
+/* harmony import */ var _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./lib/algorithm/cipher/PasswordBasedCipher */ "./src/lib/algorithm/cipher/PasswordBasedCipher.ts");
+
+
+
+
+
+
+class DES3 extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_1__["BlockCipher"] {
     constructor(props) {
         super(props);
         this._props = props;
@@ -1154,9 +1177,9 @@ class DES3 extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0_
         const key2 = keyWords.length < 4 ? keyWords.slice(0, 2) : keyWords.slice(2, 4);
         const key3 = keyWords.length < 6 ? keyWords.slice(0, 2) : keyWords.slice(4, 6);
         // Create DES instances
-        const des1 = DES.createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_2__["Word32Array"](key1));
-        const des2 = DES.createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_2__["Word32Array"](key2));
-        const des3 = DES.createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_2__["Word32Array"](key3));
+        const des1 = _DES__WEBPACK_IMPORTED_MODULE_3__["DES"].createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_4__["Word32Array"](key1));
+        const des2 = _DES__WEBPACK_IMPORTED_MODULE_3__["DES"].createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_4__["Word32Array"](key2));
+        const des3 = _DES__WEBPACK_IMPORTED_MODULE_3__["DES"].createEncryptor(new _lib_Word32Array__WEBPACK_IMPORTED_MODULE_4__["Word32Array"](key3));
         return [des1, des2, des3];
     }
     _doReset() {
@@ -1187,7 +1210,7 @@ class DES3 extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0_
      */
     static createEncryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
-        return new DES3(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_1__["Cipher"].ENC_TRANSFORM_MODE }));
+        return new DES3(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_2__["Cipher"].ENC_TRANSFORM_MODE }));
     }
     /**
      * Creates this cipher in decryption mode.
@@ -1200,7 +1223,7 @@ class DES3 extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0_
      */
     static createDecryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
-        return new DES3(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_1__["Cipher"].DEC_TRANSFORM_MODE }));
+        return new DES3(Object.assign(Object.assign({}, props), { key, transformMode: _lib_algorithm_cipher_Cipher__WEBPACK_IMPORTED_MODULE_2__["Cipher"].DEC_TRANSFORM_MODE }));
     }
     /**
      * Encrypt a message with key
@@ -1213,9 +1236,9 @@ class DES3 extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0_
      */
     static encrypt(message, key, props) {
         if (typeof key === "string") {
-            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__["PasswordBasedCipher"].encrypt(DES3, message, key, props);
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_5__["PasswordBasedCipher"].encrypt(DES3, message, key, props);
         }
-        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__["SerializableCipher"].encrypt(DES3, message, key, props);
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].encrypt(DES3, message, key, props);
     }
     /**
      * Encrypt a encrypted message with key
@@ -1228,9 +1251,9 @@ class DES3 extends _lib_algorithm_cipher_BlockCipher__WEBPACK_IMPORTED_MODULE_0_
      */
     static decrypt(cipherText, key, props) {
         if (typeof key === "string") {
-            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_3__["PasswordBasedCipher"].decrypt(DES3, cipherText, key, props);
+            return _lib_algorithm_cipher_PasswordBasedCipher__WEBPACK_IMPORTED_MODULE_5__["PasswordBasedCipher"].decrypt(DES3, cipherText, key, props);
         }
-        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_4__["SerializableCipher"].decrypt(DES3, cipherText, key, props);
+        return _lib_algorithm_cipher_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].decrypt(DES3, cipherText, key, props);
     }
 }
 DES3.keySize = 192 / 32;
@@ -3245,31 +3268,33 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _DES__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./DES */ "./src/DES.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DES", function() { return _DES__WEBPACK_IMPORTED_MODULE_17__["DES"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DES3", function() { return _DES__WEBPACK_IMPORTED_MODULE_17__["DES3"]; });
+/* harmony import */ var _DES3__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./DES3 */ "./src/DES3.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DES3", function() { return _DES3__WEBPACK_IMPORTED_MODULE_18__["DES3"]; });
 
-/* harmony import */ var _RIPEMD160__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./RIPEMD160 */ "./src/RIPEMD160.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RIPEMD160", function() { return _RIPEMD160__WEBPACK_IMPORTED_MODULE_18__["RIPEMD160"]; });
+/* harmony import */ var _RIPEMD160__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./RIPEMD160 */ "./src/RIPEMD160.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RIPEMD160", function() { return _RIPEMD160__WEBPACK_IMPORTED_MODULE_19__["RIPEMD160"]; });
 
-/* harmony import */ var _Rabbit__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./Rabbit */ "./src/Rabbit.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Rabbit", function() { return _Rabbit__WEBPACK_IMPORTED_MODULE_19__["Rabbit"]; });
+/* harmony import */ var _Rabbit__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./Rabbit */ "./src/Rabbit.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Rabbit", function() { return _Rabbit__WEBPACK_IMPORTED_MODULE_20__["Rabbit"]; });
 
-/* harmony import */ var _RC4__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./RC4 */ "./src/RC4.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RC4", function() { return _RC4__WEBPACK_IMPORTED_MODULE_20__["RC4"]; });
+/* harmony import */ var _RC4__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./RC4 */ "./src/RC4.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RC4", function() { return _RC4__WEBPACK_IMPORTED_MODULE_21__["RC4"]; });
 
-/* harmony import */ var _RC4Drop__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./RC4Drop */ "./src/RC4Drop.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RC4Drop", function() { return _RC4Drop__WEBPACK_IMPORTED_MODULE_21__["RC4Drop"]; });
+/* harmony import */ var _RC4Drop__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./RC4Drop */ "./src/RC4Drop.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RC4Drop", function() { return _RC4Drop__WEBPACK_IMPORTED_MODULE_22__["RC4Drop"]; });
 
-/* harmony import */ var _mode_CBC__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./mode/CBC */ "./src/mode/CBC.ts");
-/* harmony import */ var _mode_CFB__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./mode/CFB */ "./src/mode/CFB.ts");
-/* harmony import */ var _mode_CTR__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./mode/CTR */ "./src/mode/CTR.ts");
-/* harmony import */ var _mode_ECB__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./mode/ECB */ "./src/mode/ECB.ts");
-/* harmony import */ var _mode_OFB__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./mode/OFB */ "./src/mode/OFB.ts");
-/* harmony import */ var _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./pad/AnsiX923 */ "./src/pad/AnsiX923.ts");
-/* harmony import */ var _pad_ISO10126__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./pad/ISO10126 */ "./src/pad/ISO10126.ts");
-/* harmony import */ var _pad_ISO97971__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./pad/ISO97971 */ "./src/pad/ISO97971.ts");
-/* harmony import */ var _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./pad/Pkcs7 */ "./src/pad/Pkcs7.ts");
-/* harmony import */ var _pad_Noop__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./pad/Noop */ "./src/pad/Noop.ts");
-/* harmony import */ var _pad_Zero__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./pad/Zero */ "./src/pad/Zero.ts");
+/* harmony import */ var _mode_CBC__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./mode/CBC */ "./src/mode/CBC.ts");
+/* harmony import */ var _mode_CFB__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./mode/CFB */ "./src/mode/CFB.ts");
+/* harmony import */ var _mode_CTR__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./mode/CTR */ "./src/mode/CTR.ts");
+/* harmony import */ var _mode_ECB__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./mode/ECB */ "./src/mode/ECB.ts");
+/* harmony import */ var _mode_OFB__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./mode/OFB */ "./src/mode/OFB.ts");
+/* harmony import */ var _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./pad/AnsiX923 */ "./src/pad/AnsiX923.ts");
+/* harmony import */ var _pad_ISO10126__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./pad/ISO10126 */ "./src/pad/ISO10126.ts");
+/* harmony import */ var _pad_ISO97971__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./pad/ISO97971 */ "./src/pad/ISO97971.ts");
+/* harmony import */ var _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./pad/Pkcs7 */ "./src/pad/Pkcs7.ts");
+/* harmony import */ var _pad_Noop__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./pad/Noop */ "./src/pad/Noop.ts");
+/* harmony import */ var _pad_Zero__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./pad/Zero */ "./src/pad/Zero.ts");
+
 
 
 
@@ -3298,11 +3323,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const mode = {
-    CBC: _mode_CBC__WEBPACK_IMPORTED_MODULE_22__["CBC"],
-    CFB: _mode_CFB__WEBPACK_IMPORTED_MODULE_23__["CFB"],
-    CTR: _mode_CTR__WEBPACK_IMPORTED_MODULE_24__["CTR"],
-    ECB: _mode_ECB__WEBPACK_IMPORTED_MODULE_25__["ECB"],
-    OFB: _mode_OFB__WEBPACK_IMPORTED_MODULE_26__["OFB"],
+    CBC: _mode_CBC__WEBPACK_IMPORTED_MODULE_23__["CBC"],
+    CFB: _mode_CFB__WEBPACK_IMPORTED_MODULE_24__["CFB"],
+    CTR: _mode_CTR__WEBPACK_IMPORTED_MODULE_25__["CTR"],
+    ECB: _mode_ECB__WEBPACK_IMPORTED_MODULE_26__["ECB"],
+    OFB: _mode_OFB__WEBPACK_IMPORTED_MODULE_27__["OFB"],
 };
 
 
@@ -3311,12 +3336,12 @@ const mode = {
 
 
 const pad = {
-    AnsiX923: _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_27__["AnsiX923"],
-    ISO10126: _pad_ISO10126__WEBPACK_IMPORTED_MODULE_28__["ISO10126"],
-    ISO97971: _pad_ISO97971__WEBPACK_IMPORTED_MODULE_29__["ISO97971"],
-    Pkcs7: _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_30__["Pkcs7"],
-    Noop: _pad_Noop__WEBPACK_IMPORTED_MODULE_31__["Noop"],
-    Zero: _pad_Zero__WEBPACK_IMPORTED_MODULE_32__["Zero"],
+    AnsiX923: _pad_AnsiX923__WEBPACK_IMPORTED_MODULE_28__["AnsiX923"],
+    ISO10126: _pad_ISO10126__WEBPACK_IMPORTED_MODULE_29__["ISO10126"],
+    ISO97971: _pad_ISO97971__WEBPACK_IMPORTED_MODULE_30__["ISO97971"],
+    Pkcs7: _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_31__["Pkcs7"],
+    Noop: _pad_Noop__WEBPACK_IMPORTED_MODULE_32__["Noop"],
+    Zero: _pad_Zero__WEBPACK_IMPORTED_MODULE_33__["Zero"],
 };
 
 

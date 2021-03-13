@@ -93,6 +93,20 @@ export class BlockCipher extends Cipher {
   }
   
   /**
+   * @abstract
+   */
+  public encryptBlock(words: number[], offset: number): void {
+    throw new Error("Not implemented");
+  }
+  
+  /**
+   * @abstract
+   */
+  public decryptBlock(words: number[], offset: number): void {
+    throw new Error("Not implemented");
+  }
+  
+  /**
    * Creates this cipher in encryption mode.
    *
    * @param {Word32Array} key The key.

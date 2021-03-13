@@ -86,13 +86,6 @@ export class Cipher extends BufferedBlockAlgorithm {
   /**
    * @abstract
    */
-  protected _doProcess(): void {
-    throw new Error("Not implemented");
-  }
-  
-  /**
-   * @abstract
-   */
   protected _doProcessBlock(words: number[], offset: number): void {
     throw new Error("Not implemented");
   }
@@ -101,20 +94,6 @@ export class Cipher extends BufferedBlockAlgorithm {
    * @abstract
    */
   protected _doFinalize(): Word32Array {
-    throw new Error("Not implemented");
-  }
-  
-  /**
-   * @abstract
-   */
-  public encryptBlock(words: number[], offset: number): void {
-    throw new Error("Not implemented");
-  }
-  
-  /**
-   * @abstract
-   */
-  public decryptBlock(words: number[], offset: number): void {
     throw new Error("Not implemented");
   }
   

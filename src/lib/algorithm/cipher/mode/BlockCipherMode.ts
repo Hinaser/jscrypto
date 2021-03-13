@@ -1,7 +1,7 @@
-import type {Cipher} from "../Cipher";
+import type {BlockCipher} from "../BlockCipher";
 
 export interface BlockCipherModeProps {
-  cipher: Cipher;
+  cipher: BlockCipher;
   iv: number[]|undefined;
 }
 
@@ -11,7 +11,7 @@ export interface BlockCipherModeProps {
  */
 export class BlockCipherMode {
   protected _props: BlockCipherModeProps;
-  protected _cipher: Cipher;
+  protected _cipher: BlockCipher;
   protected _iv?: number[];
   
   public constructor(props: BlockCipherModeProps) {

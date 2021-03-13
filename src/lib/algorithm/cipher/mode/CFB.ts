@@ -1,5 +1,5 @@
 import {BlockCipherMode, BlockCipherModeProps} from "./BlockCipherMode";
-import {Cipher} from "../Cipher";
+import type {BlockCipher} from "../BlockCipher";
 
 /**
  * Cipher Feedback Block mode
@@ -54,7 +54,7 @@ export class CFB extends BlockCipherMode {
     super(props);
   }
   
-  public generateKeyStreamAndEncrypt(words: number[], offset: number, blockSize: number, cipher: Cipher){
+  public generateKeyStreamAndEncrypt(words: number[], offset: number, blockSize: number, cipher: BlockCipher){
     let keyStream;
   
     // Shortcut

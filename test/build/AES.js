@@ -989,6 +989,18 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
         return finalProcessedBlocks;
     }
     /**
+     * @abstract
+     */
+    encryptBlock(words, offset) {
+        throw new Error("Not implemented");
+    }
+    /**
+     * @abstract
+     */
+    decryptBlock(words, offset) {
+        throw new Error("Not implemented");
+    }
+    /**
      * Creates this cipher in encryption mode.
      *
      * @param {Word32Array} key The key.
@@ -1103,18 +1115,6 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
      * @abstract
      */
     _doFinalize() {
-        throw new Error("Not implemented");
-    }
-    /**
-     * @abstract
-     */
-    encryptBlock(words, offset) {
-        throw new Error("Not implemented");
-    }
-    /**
-     * @abstract
-     */
-    decryptBlock(words, offset) {
         throw new Error("Not implemented");
     }
     /**

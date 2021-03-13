@@ -26,6 +26,8 @@ exports.mainEntry = () => {
     DES: "./src/DES.ts",
     RIPEMD160: "./src/RIPEMD160.ts",
     Rabbit: "./src/Rabbit.ts",
+    RC4: "./src/RC4.ts",
+    RC4Drop: "./src/RC4Drop.ts",
   };
 };
 

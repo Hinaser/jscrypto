@@ -34,6 +34,8 @@ export {AES} from "./AES";
 export {DES, DES3} from "./DES";
 export {RIPEMD160} from "./RIPEMD160";
 export {Rabbit} from "./Rabbit";
+export {RC4} from "./RC4";
+export {RC4Drop} from "./RC4Drop";
 
 import {CBC} from "./mode/CBC";
 import {CFB} from "./mode/CFB";

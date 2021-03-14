@@ -24,15 +24,15 @@ jobs:
         run: mkdir -p ./test/build
 
       - name: Get yarn version
-        run: echo "::set-env name=yarn_version::$(yarn -v)"
+        run: echo "yarn_version=$(yarn -v)" >> $GITHUB_ENV
 
       - name: Get yarn(v1) cache directory path
         if: startsWith(env.yarn_version, '1')
-        run: echo "::set-env name=cache_dir::$(yarn cache dir)"
+        run: echo "cache_dir=$(yarn cache dir)" >> $GITHUB_ENV
 
       - name: Get yarn(v2) cache directory path
         if: startsWith(env.yarn_version, '2')
-        run: echo "::set-env name=cache_dir::$(yarn config get cacheFolder)"
+        run: echo "cache_dir=$(yarn config get cacheFolder)"
 
       - name: Cache Node.js modules
         id: yarn-cache

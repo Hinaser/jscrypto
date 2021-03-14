@@ -255,11 +255,5 @@ $RECYCLE.BIN/
 .history/
 
 .idea/
-
-test/dist/
-
-/dist/xspy.*.map
-/dist/xspy.js
-/dist/xspy.es5.js
-/test/coverage/
+test/build/
 .npmrc

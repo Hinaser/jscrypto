@@ -47,7 +47,7 @@ export class ECB extends BlockCipherMode {
    * Creates this mode for encryption.
    * @param {BlockCipherModeProps} props
    * @example
-   *   var mode = JsCrypto.ECB.createEncryptor(cipher, iv.words);
+   *   var mode = ECB.createEncryptor(cipher, iv.words);
    */
   public static createEncryptor(props: BlockCipherModeProps){
     return new ECB.Encryptor(props);
@@ -57,7 +57,7 @@ export class ECB extends BlockCipherMode {
    * Creates this mode for decryption.
    * @param {BlockCipherModeProps} props
    * @example
-   *   var mode = JsCrypto.ECB.createDecryptor(cipher, iv.words);
+   *   var mode = ECB.createDecryptor(cipher, iv.words);
    */
   public static createDecryptor(props: BlockCipherModeProps){
     return new ECB.Decryptor(props);

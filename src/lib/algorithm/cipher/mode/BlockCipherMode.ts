@@ -32,7 +32,7 @@ export class BlockCipherMode {
    * @param {BlockCipherModeProps} props
    * @abstract
    * @example
-   *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
+   *   var mode = CBC.createEncryptor(cipher, iv.words);
    */
   public static createEncryptor(props: BlockCipherModeProps): BlockCipherMode {
     throw new Error("Not implemented yet");
@@ -43,7 +43,7 @@ export class BlockCipherMode {
    * @param {BlockCipherModeProps} props
    * @abstract
    * @example
-   *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
+   *   var mode = CBC.createDecryptor(cipher, iv.words);
    */
   public static createDecryptor(props: BlockCipherModeProps): BlockCipherMode {
     throw new Error("Not implemented yet");

@@ -82,7 +82,7 @@ export class CFB extends BlockCipherMode {
    * Creates this mode for encryption.
    * @param {BlockCipherModeProps} props
    * @example
-   *   var mode = JsCrypto.CFB.createEncryptor(cipher, iv.words);
+   *   var mode = CFB.createEncryptor(cipher, iv.words);
    */
   public static createEncryptor(props: BlockCipherModeProps){
     return new CFB.Encryptor(props);
@@ -92,7 +92,7 @@ export class CFB extends BlockCipherMode {
    * Creates this mode for decryption.
    * @param {BlockCipherModeProps} props
    * @example
-   *   var mode = JsCrypto.CFB.createDecryptor(cipher, iv.words);
+   *   var mode = CFB.createDecryptor(cipher, iv.words);
    */
   public static createDecryptor(props: BlockCipherModeProps){
     return new CFB.Decryptor(props);

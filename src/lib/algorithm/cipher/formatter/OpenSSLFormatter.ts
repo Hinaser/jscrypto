@@ -10,7 +10,7 @@ export const OpenSSLFormatter: Formatter = {
    * @param {CipherParams} cipherParams The cipher params object.
    * @return {string} The OpenSSL-compatible string.
    * @example
-   *   var openSSLString = CryptoJS.format.OpenSSL.stringify(cipherParams);
+   *   var openSSLString = OpenSSLFormatter.stringify(cipherParams);
    */
   stringify(cipherParams: CipherParams){
     // Shortcuts
@@ -36,7 +36,7 @@ export const OpenSSLFormatter: Formatter = {
    * @param {string} openSSLStr The OpenSSL-compatible string.
    * @return {CipherParams} The cipher params object.
    * @example
-   *   var cipherParams = CryptoJS.format.OpenSSL.parse(openSSLString);
+   *   var cipherParams = OpenSSLFormatter.parse(openSSLString);
    */
   parse(openSSLStr: string){
     let salt;

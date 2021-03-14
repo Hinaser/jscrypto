@@ -54,7 +54,7 @@ export class OFB extends BlockCipherMode {
    * Creates this mode for encryption.
    * @param {BlockCipherModeProps} props
    * @example
-   *   var mode = JsCrypto.OFB.createEncryptor(cipher, iv.words);
+   *   var mode = OFB.createEncryptor(cipher, iv.words);
    */
   public static createEncryptor(props: BlockCipherModeProps){
     return new OFB.Encryptor(props);
@@ -64,7 +64,7 @@ export class OFB extends BlockCipherMode {
    * Creates this mode for decryption.
    * @param {BlockCipherModeProps} props
    * @example
-   *   var mode = JsCrypto.OFB.createDecryptor(cipher, iv.words);
+   *   var mode = OFB.createDecryptor(cipher, iv.words);
    */
   public static createDecryptor(props: BlockCipherModeProps){
     return new OFB.Decryptor(props);

@@ -31,7 +31,7 @@ export interface ISerializableCipher<K extends Word32Array|string> {
  * @param {Formatter} formatter The formatting strategy to use to parse serialized ciphertext.
  * @return {CipherParams} The un-serialized ciphertext.
  * @example
- *   var ciphertextParams = JsCrypto.SerializableCipher.parse(ciphertextStringOrParams, format);
+ *   var ciphertextParams = SerializableCipher.parse(ciphertextStringOrParams, format);
  */
 export function parseCipherText(cipherTextParams: CipherParams|string, formatter: Formatter){
   if(typeof cipherTextParams === "string"){
@@ -50,8 +50,8 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
    * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {CipherParams} A cipher params object.
    * @example
-   *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key);
-   *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key, { iv: iv });
+   *   var ciphertextParams = SerializableCipher.encrypt(AES, message, key);
+   *   var ciphertextParams = SerializableCipher.encrypt(AES, message, key, { iv: iv });
    */
   encrypt(
     Cipher: typeof BaseCipher,
@@ -83,8 +83,8 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
    * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
    * @return {Word32Array} The plaintext.
    * @example
-   *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, formattedCiphertext, key, { iv: iv, format: JsCrypto.OpenSSL });
-   *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, ciphertextParams, key, { iv: iv, format: JsCrypto.OpenSSL });
+   *     var plaintext = SerializableCipher.decrypt(AES, formattedCiphertext, key, { iv: iv, format: OpenSSLFormatter });
+   *     var plaintext = SerializableCipher.decrypt(AES, ciphertextParams, key, { iv: iv, format: OpenSSLFormatter });
    */
   decrypt(
     Cipher: typeof BaseCipher,

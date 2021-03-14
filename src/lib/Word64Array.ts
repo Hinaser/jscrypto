@@ -86,7 +86,7 @@ export class Word64Array {
    * @example
    *   var string = wordArray + '';
    *   var string = wordArray.toString();
-   *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+   *   var string = wordArray.toString(Utf8);
    */
   public toString(encoder?: IEncoder){
     if(!encoder){

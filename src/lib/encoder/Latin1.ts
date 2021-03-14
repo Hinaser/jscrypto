@@ -8,7 +8,7 @@ export const Latin1: IEncoder = {
    * @param {Word32Array} w An array of 32-bit words.
    * @return {string} The Latin1 string.
    * @example
-   *   var latin1String = Latin1.stringify([0x293892], 6);
+   *   var latin1String = Latin1.stringify(new Word32Array([0x293892], 6));
    */
   stringify(w: Word32Array){
     const nSig = w.nSigBytes;

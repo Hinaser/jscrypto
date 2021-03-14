@@ -25,8 +25,8 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
    * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {CipherParams} A cipher params object.
    * @example
-   *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password');
-   *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password', { format: JsCrypto.OpenSSLFormatter });
+   *   var params = PasswordBasedCipher.encrypt(AES, message, 'password');
+   *   var params = PasswordBasedCipher.encrypt(AES, message, 'password', { format: OpenSSLFormatter });
    */
   encrypt(
     Cipher: typeof BaseCipher,
@@ -58,17 +58,17 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
    * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Word32Array} The plaintext.
    * @example
-   *   var plaintext = JsCrypto.PasswordBasedCipher.decrypt(
-   *     JsCrypto.AES,
+   *   var plaintext = PasswordBasedCipher.decrypt(
+   *     AES,
    *     formattedCiphertext,
    *     'password',
-   *     { format: JsCrypto.OpenSSLFormatter }
+   *     { format: OpenSSLFormatter }
    *   );
-   *   var plaintext = JsCrypto.PasswordBasedCipher.decrypt(
-   *     JsCrypto.AES,
+   *   var plaintext = PasswordBasedCipher.decrypt(
+   *     AES,
    *     ciphertextParams,
    *     'password',
-   *     { format: JsCrypto.OpenSSLFormatter }
+   *     { format: OpenSSLFormatter }
    *   );
    */
   decrypt(

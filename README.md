@@ -134,6 +134,7 @@ w3.toString(JsCrypto.Base64); // "ASNFZ4mrze8="
 ```
 
 <h4 id='word64array'>Word64Array</h4>
+
 ```js
 var w1 = new Word64Array([new Word64(0x00010203, 0x04050607)]);
 w1.toString(); // "0001020304050607"

@@ -8,7 +8,7 @@ import {Zero} from "./Zero";
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.pad.ISO97971.pad(wordArray, 4);
+ *   ISO97971.pad(wordArray, 4);
  */
 function pad(data: Word32Array, blockSize: number){
   // Add 0x80 byte
@@ -23,7 +23,7 @@ function pad(data: Word32Array, blockSize: number){
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   JsCrypto.pad.ISO97971.unpad(wordArray);
+ *   ISO97971.unpad(wordArray);
  */
 function unpad(data: Word32Array){
   // Remove zero padding

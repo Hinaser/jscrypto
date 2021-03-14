@@ -1,5 +1,5 @@
 const expect = require("expect.js");
-const {pad: {ISO10126}, Word32Array} = require("../../../test/build/all");
+const {pad: {ISO10126}, Word32Array} = require("../../../test/build");
 
 describe("pad/ISO10126", function(){
   const data = {};

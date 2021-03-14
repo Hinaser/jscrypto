@@ -408,7 +408,7 @@ class RC4 extends _lib_algorithm_cipher_StreamCipher__WEBPACK_IMPORTED_MODULE_0_
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.RC4.createEncryptor(keyWordArray);
+     *   var cipher = RC4.createEncryptor(keyWordArray);
      */
     static createEncryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -421,7 +421,7 @@ class RC4 extends _lib_algorithm_cipher_StreamCipher__WEBPACK_IMPORTED_MODULE_0_
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.RC4.createDecryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = RC4.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -434,7 +434,7 @@ class RC4 extends _lib_algorithm_cipher_StreamCipher__WEBPACK_IMPORTED_MODULE_0_
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.RC4.encrypt("test", "pass");
+     *   var encryptedMessage = RC4.encrypt("test", "pass");
      */
     static encrypt(message, key, props) {
         if (typeof key === "string") {
@@ -449,7 +449,7 @@ class RC4 extends _lib_algorithm_cipher_StreamCipher__WEBPACK_IMPORTED_MODULE_0_
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.RC4.decrypt(cipherProps, "pass");
+     *   var encryptedMessage = RC4.decrypt(cipherProps, "pass");
      */
     static decrypt(cipherText, key, props) {
         if (typeof key === "string") {
@@ -522,7 +522,7 @@ class Word32Array {
      * @example
      *   var string = wordArray + '';
      *   var string = wordArray.toString();
-     *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+     *   var string = wordArray.toString(Utf8);
      */
     toString(encoder) {
         if (!encoder) {
@@ -575,7 +575,7 @@ class Word32Array {
      *
      * @return {Word32Array} The clone.
      * @example
-     *   var clone = wordArray.clone();
+     *   var clone = word32Array.clone();
      */
     clone() {
         return new Word32Array(this._words.slice(), this._nSignificantBytes);
@@ -587,7 +587,7 @@ class Word32Array {
      * @return {Word32Array} The random word array.
      * @static
      * @example
-     *   var wordArray = CryptoJS.lib.WordArray.random(16);
+     *   var wordArray = Word32Array.random(16);
      */
     static random(nBytes) {
         const words = [];
@@ -876,7 +876,7 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *     var cipher = CryptoJS.algo.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     *     var cipher = AES.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -888,7 +888,7 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = CryptoJS.algo.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -934,16 +934,16 @@ class CipherParams {
      *
      * @param {Partial<CipherParams>} cp An object with any of the possible cipher parameters.
      * @example
-     *   var cipherParams = CryptoJS.lib.CipherParams.create({
+     *   var cipherParams = new CipherParams({
      *       ciphertext: ciphertextWordArray,
      *       key: keyWordArray,
      *       iv: ivWordArray,
      *       salt: saltWordArray,
-     *       algorithm: JsCrypto.AES,
-     *       mode: JsCrypto.CBC,
-     *       padding: JsCrypto.PKCS7,
+     *       algorithm: AES,
+     *       mode: CBC,
+     *       padding: PKCS7,
      *       blockSize: 4,
-     *       formatter: JsCrypto.OpenSSLFormatter
+     *       formatter: OpenSSLFormatter
      *     });
      */
     constructor(cp) {
@@ -969,7 +969,7 @@ class CipherParams {
      * @example
      *   var string = cipherParams + '';
      *   var string = cipherParams.toString();
-     *   var string = cipherParams.toString(CryptoJS.format.OpenSSL);
+     *   var string = cipherParams.toString(OpenSSLFormatter);
      */
     toString(formatter) {
         return (formatter || this.formatter).stringify(this);
@@ -1007,8 +1007,8 @@ const PasswordBasedCipher = {
      * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {CipherParams} A cipher params object.
      * @example
-     *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password');
-     *   var params = JsCrypto.PasswordBasedCipher.encrypt(JsCrypto.AES, message, 'password', { format: JsCrypto.OpenSSLFormatter });
+     *   var params = PasswordBasedCipher.encrypt(AES, message, 'password');
+     *   var params = PasswordBasedCipher.encrypt(AES, message, 'password', { format: OpenSSLFormatter });
      */
     encrypt(Cipher, message, password, props) {
         const p = props ? Object.assign({}, props) : {};
@@ -1022,32 +1022,32 @@ const PasswordBasedCipher = {
      * Decrypts serialized ciphertext using a password.
      *
      * @param {typeof Cipher} Cipher The cipher algorithm to use.
-     * @param {CipherParams|string} cipherText The ciphertext to decrypt.
+     * @param {CipherParams|string} cipherParams The ciphertext to decrypt.
      * @param {string} password The password.
      * @param {Partial<PasswordBasedCipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Word32Array} The plaintext.
      * @example
-     *   var plaintext = JsCrypto.PasswordBasedCipher.decrypt(
-     *     JsCrypto.AES,
+     *   var plaintext = PasswordBasedCipher.decrypt(
+     *     AES,
      *     formattedCiphertext,
      *     'password',
-     *     { format: JsCrypto.OpenSSLFormatter }
+     *     { format: OpenSSLFormatter }
      *   );
-     *   var plaintext = JsCrypto.PasswordBasedCipher.decrypt(
-     *     JsCrypto.AES,
+     *   var plaintext = PasswordBasedCipher.decrypt(
+     *     AES,
      *     ciphertextParams,
      *     'password',
-     *     { format: JsCrypto.OpenSSLFormatter }
+     *     { format: OpenSSLFormatter }
      *   );
      */
-    decrypt(Cipher, cipherText, password, props) {
+    decrypt(Cipher, cipherParams, password, props) {
         const p = props ? Object.assign({}, props) : {};
         const KDF = p.KDF ? p.KDF : _kdf_OpenSSLKDF__WEBPACK_IMPORTED_MODULE_1__["OpenSSLKDF"];
         const formatter = p.formatter ? p.formatter : _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_3__["OpenSSLFormatter"];
-        const cipherTextParams = Object(_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["parseCipherText"])(cipherText, formatter);
+        const cipherParamsObj = Object(_SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["parseCipherText"])(cipherParams, formatter);
         const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
         p.iv = derivedParams.iv;
-        return _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].decrypt(Cipher, cipherTextParams, derivedParams.key, props);
+        return _SerializableCipher__WEBPACK_IMPORTED_MODULE_0__["SerializableCipher"].decrypt(Cipher, cipherParamsObj, derivedParams.key, p);
     }
 };
 
@@ -1076,7 +1076,7 @@ __webpack_require__.r(__webpack_exports__);
  * @param {Formatter} formatter The formatting strategy to use to parse serialized ciphertext.
  * @return {CipherParams} The un-serialized ciphertext.
  * @example
- *   var ciphertextParams = JsCrypto.SerializableCipher.parse(ciphertextStringOrParams, format);
+ *   var ciphertextParams = SerializableCipher.parse(ciphertextStringOrParams, format);
  */
 function parseCipherText(cipherTextParams, formatter) {
     if (typeof cipherTextParams === "string") {
@@ -1094,8 +1094,8 @@ const SerializableCipher = {
      * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {CipherParams} A cipher params object.
      * @example
-     *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key);
-     *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key, { iv: iv });
+     *   var ciphertextParams = SerializableCipher.encrypt(AES, message, key);
+     *   var ciphertextParams = SerializableCipher.encrypt(AES, message, key, { iv: iv });
      */
     encrypt(Cipher, message, key, props) {
         const encryptor = Cipher.createEncryptor(key, props);
@@ -1115,18 +1115,18 @@ const SerializableCipher = {
      * Decrypts serialized ciphertext.
      *
      * @param {typeof Cipher} Cipher The cipher algorithm to use.
-     * @param {CipherParams|string} cipherText The ciphertext to decrypt.
+     * @param {CipherParams|string} cipherParams The ciphertext to decrypt.
      * @param {Word32Array} key The key.
      * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
      * @return {Word32Array} The plaintext.
      * @example
-     *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, formattedCiphertext, key, { iv: iv, format: JsCrypto.OpenSSL });
-     *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, ciphertextParams, key, { iv: iv, format: JsCrypto.OpenSSL });
+     *     var plaintext = SerializableCipher.decrypt(AES, formattedCiphertext, key, { iv: iv, format: OpenSSLFormatter });
+     *     var plaintext = SerializableCipher.decrypt(AES, ciphertextParams, key, { iv: iv, format: OpenSSLFormatter });
      */
-    decrypt(Cipher, cipherText, key, props) {
+    decrypt(Cipher, cipherParams, key, props) {
         const decryptor = Cipher.createDecryptor(key, props);
-        const cipherParams = parseCipherText(cipherText, (props === null || props === void 0 ? void 0 : props.formatter) || _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"]);
-        return decryptor.finalize(cipherParams.cipherText || "");
+        const cipherParamsObj = parseCipherText(cipherParams, (props === null || props === void 0 ? void 0 : props.formatter) || _formatter_OpenSSLFormatter__WEBPACK_IMPORTED_MODULE_0__["OpenSSLFormatter"]);
+        return decryptor.finalize(cipherParamsObj.cipherText || "");
     }
 };
 
@@ -1181,7 +1181,7 @@ const OpenSSLFormatter = {
      * @param {CipherParams} cipherParams The cipher params object.
      * @return {string} The OpenSSL-compatible string.
      * @example
-     *   var openSSLString = CryptoJS.format.OpenSSL.stringify(cipherParams);
+     *   var openSSLString = OpenSSLFormatter.stringify(cipherParams);
      */
     stringify(cipherParams) {
         // Shortcuts
@@ -1203,7 +1203,7 @@ const OpenSSLFormatter = {
      * @param {string} openSSLStr The OpenSSL-compatible string.
      * @return {CipherParams} The cipher params object.
      * @example
-     *   var cipherParams = CryptoJS.format.OpenSSL.parse(openSSLString);
+     *   var cipherParams = OpenSSLFormatter.parse(openSSLString);
      */
     parse(openSSLStr) {
         let salt;
@@ -1251,8 +1251,8 @@ __webpack_require__.r(__webpack_exports__);
  * @param {Word32Array?} salt (Optional) A 64-bit salt to use. If omitted, a salt will be generated randomly.
  * @return {CipherParams} A cipher params object with the key, IV, and salt.
  * @example
- *   var derivedParams = JsCrypto.OpenSSLKDF.execute('Password', 256/32, 128/32);
- *   var derivedParams = JsCrypto.OpenSSLKDF.execute('Password', 256/32, 128/32, 'saltsalt');
+ *   var derivedParams = OpenSSLKDF.execute('Password', 256/32, 128/32);
+ *   var derivedParams = OpenSSLKDF.execute('Password', 256/32, 128/32, 'saltsalt');
  */
 const OpenSSLKDF = {
     execute(password, keySize, ivSize, salt, props) {
@@ -1318,6 +1318,7 @@ class EvpKDF extends _type__WEBPACK_IMPORTED_MODULE_2__["BaseKDFModule"] {
      * @param {Word32Array|string} salt A salt.
      * @return {Word32Array} The derived key.
      * @example
+     *   var kdf = new EvpKDF();
      *   var key = kdf.compute(password, salt);
      */
     compute(password, salt) {
@@ -1353,11 +1354,8 @@ class EvpKDF extends _type__WEBPACK_IMPORTED_MODULE_2__["BaseKDFModule"] {
      * @param {Word32Array|string} password The password.
      * @param {Word32Array|string} salt A salt.
      * @param {Partial<EvpKDFProps>?} props (Optional) The configuration options to use for this computation.
-     *
      * @return {Word32Array} The derived key.
-     *
      * @static
-     *
      * @example
      *
      *     var key = EvpKDF.getKey(password, salt);
@@ -1421,7 +1419,7 @@ const Base64 = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The base64 string.
      * @example
-     *   var hexString = Base64.stringify([0x293892], 6);
+     *   var hexString = Base64.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         // Shortcuts
@@ -1504,7 +1502,7 @@ const Hex = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The hex string.
      * @example
-     *   var hexString = Hex.stringify([0x293892], 6);
+     *   var hexString = Hex.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         const nSig = w.nSigBytes;
@@ -1557,7 +1555,7 @@ const Latin1 = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The Latin1 string.
      * @example
-     *   var latin1String = Latin1.stringify([0x293892], 6);
+     *   var latin1String = Latin1.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         const nSig = w.nSigBytes;

@@ -16,14 +16,14 @@ export declare class ECB extends BlockCipherMode {
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.ECB.createEncryptor(cipher, iv.words);
+     *   var mode = ECB.createEncryptor(cipher, iv.words);
      */
     static createEncryptor(props: BlockCipherModeProps): ECB;
     /**
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.ECB.createDecryptor(cipher, iv.words);
+     *   var mode = ECB.createDecryptor(cipher, iv.words);
      */
     static createDecryptor(props: BlockCipherModeProps): ECB;
 }

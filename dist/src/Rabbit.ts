@@ -177,7 +177,7 @@ export class Rabbit extends StreamCipher {
    * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Cipher} A cipher instance.
    * @example
-   *   var cipher = JsCrypto.Rabbit.createEncryptor(keyWordArray);
+   *   var cipher = Rabbit.createEncryptor(keyWordArray);
    */
   public static createEncryptor(key: Word32Array, props?: Partial<CipherProps>){
     props = typeof props === "undefined" ? {} : props;
@@ -191,7 +191,7 @@ export class Rabbit extends StreamCipher {
    * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Cipher} A cipher instance.
    * @example
-   *   var cipher = JsCrypto.Rabbit.createDecryptor(keyWordArray, { iv: ivWordArray });
+   *   var cipher = Rabbit.createDecryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createDecryptor(key: Word32Array, props?: Partial<CipherProps>){
     props = typeof props === "undefined" ? {} : props;
@@ -205,7 +205,7 @@ export class Rabbit extends StreamCipher {
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
-   *   var encryptedMessage = JsCrypt.Rabbit.encrypt("test", "pass");
+   *   var encryptedMessage = Rabbit.encrypt("test", "pass");
    */
   public static encrypt(message: Word32Array|string, key: Word32Array|string, props?: Partial<RabbitProps>){
     if(typeof key === "string"){
@@ -221,7 +221,7 @@ export class Rabbit extends StreamCipher {
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
-   *   var encryptedMessage = JsCrypt.Rabbit.decrypt(cipherProps, "pass");
+   *   var encryptedMessage = Rabbit.decrypt(cipherProps, "pass");
    */
   public static decrypt(cipherText: CipherParams, key: Word32Array|string, props?: Partial<RabbitProps>){
     if(typeof key === "string"){

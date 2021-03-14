@@ -7,7 +7,7 @@ import { CipherParams } from "./CipherParams";
  * @param {Formatter} formatter The formatting strategy to use to parse serialized ciphertext.
  * @return {CipherParams} The un-serialized ciphertext.
  * @example
- *   var ciphertextParams = JsCrypto.SerializableCipher.parse(ciphertextStringOrParams, format);
+ *   var ciphertextParams = SerializableCipher.parse(ciphertextStringOrParams, format);
  */
 export function parseCipherText(cipherTextParams, formatter) {
     if (typeof cipherTextParams === "string") {
@@ -25,8 +25,8 @@ export const SerializableCipher = {
      * @param {Partial<SerializableCipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {CipherParams} A cipher params object.
      * @example
-     *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key);
-     *   var ciphertextParams = JsCrypto.SerializableCipher.encrypt(JsCrypto.AES, message, key, { iv: iv });
+     *   var ciphertextParams = SerializableCipher.encrypt(AES, message, key);
+     *   var ciphertextParams = SerializableCipher.encrypt(AES, message, key, { iv: iv });
      */
     encrypt(Cipher, message, key, props) {
         const encryptor = Cipher.createEncryptor(key, props);
@@ -46,17 +46,17 @@ export const SerializableCipher = {
      * Decrypts serialized ciphertext.
      *
      * @param {typeof Cipher} Cipher The cipher algorithm to use.
-     * @param {CipherParams|string} cipherText The ciphertext to decrypt.
+     * @param {CipherParams|string} cipherParams The ciphertext to decrypt.
      * @param {Word32Array} key The key.
      * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
      * @return {Word32Array} The plaintext.
      * @example
-     *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, formattedCiphertext, key, { iv: iv, format: JsCrypto.OpenSSL });
-     *     var plaintext = JsCrypto.SerializableCipher.decrypt(JsCrypto.AES, ciphertextParams, key, { iv: iv, format: JsCrypto.OpenSSL });
+     *     var plaintext = SerializableCipher.decrypt(AES, formattedCiphertext, key, { iv: iv, format: OpenSSLFormatter });
+     *     var plaintext = SerializableCipher.decrypt(AES, ciphertextParams, key, { iv: iv, format: OpenSSLFormatter });
      */
-    decrypt(Cipher, cipherText, key, props) {
+    decrypt(Cipher, cipherParams, key, props) {
         const decryptor = Cipher.createDecryptor(key, props);
-        const cipherParams = parseCipherText(cipherText, (props === null || props === void 0 ? void 0 : props.formatter) || OpenSSLFormatter);
-        return decryptor.finalize(cipherParams.cipherText || "");
+        const cipherParamsObj = parseCipherText(cipherParams, (props === null || props === void 0 ? void 0 : props.formatter) || OpenSSLFormatter);
+        return decryptor.finalize(cipherParamsObj.cipherText || "");
     }
 };

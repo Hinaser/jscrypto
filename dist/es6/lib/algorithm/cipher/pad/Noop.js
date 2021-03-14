@@ -4,7 +4,7 @@
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.pad.Noop.pad(wordArray, 4);
+ *   Noop.pad(wordArray, 4);
  */
 function pad(data, blockSize) {
     // Noop
@@ -14,7 +14,7 @@ function pad(data, blockSize) {
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   JsCrypto.pad.Noop.unpad(wordArray);
+ *   Noop.unpad(wordArray);
  */
 function unpad(data) {
     // Noop

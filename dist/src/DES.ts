@@ -709,7 +709,7 @@ export class DES extends BlockCipher {
    * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Cipher} A cipher instance.
    * @example
-   *   var cipher = JsCrypto.DES.createEncryptor(keyWordArray, { iv: ivWordArray });
+   *   var cipher = DES.createEncryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createEncryptor(key: Word32Array, props?: Partial<CipherProps>){
     props = typeof props === "undefined" ? {} : props;
@@ -723,7 +723,7 @@ export class DES extends BlockCipher {
    * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Cipher} A cipher instance.
    * @example
-   *   var cipher = JsCrypto.DES.createDecryptor(keyWordArray, { iv: ivWordArray });
+   *   var cipher = DES.createDecryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createDecryptor(key: Word32Array, props?: Partial<CipherProps>){
     props = typeof props === "undefined" ? {} : props;
@@ -737,7 +737,7 @@ export class DES extends BlockCipher {
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
-   *   var encryptedMessage = JsCrypt.DES.encrypt("test", "pass");
+   *   var encryptedMessage = DES.encrypt("test", "pass");
    */
   public static encrypt(message: Word32Array|string, key: Word32Array|string, props?: Partial<DESProps>){
     if(typeof key === "string"){
@@ -753,7 +753,7 @@ export class DES extends BlockCipher {
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
-   *   var encryptedMessage = JsCrypt.DES.decrypt(cipherProps, "pass");
+   *   var encryptedMessage = DES.decrypt(cipherProps, "pass");
    */
   public static decrypt(cipherText: CipherParams, key: Word32Array|string, props?: Partial<DESProps>){
     if(typeof key === "string"){

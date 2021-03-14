@@ -90,7 +90,7 @@ export class RC4 extends StreamCipher {
    * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Cipher} A cipher instance.
    * @example
-   *   var cipher = JsCrypto.RC4.createEncryptor(keyWordArray);
+   *   var cipher = RC4.createEncryptor(keyWordArray);
    */
   public static createEncryptor(key: Word32Array, props?: Partial<StreamCipherProps>){
     props = typeof props === "undefined" ? {} : props;
@@ -104,7 +104,7 @@ export class RC4 extends StreamCipher {
    * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Cipher} A cipher instance.
    * @example
-   *   var cipher = JsCrypto.RC4.createDecryptor(keyWordArray, { iv: ivWordArray });
+   *   var cipher = RC4.createDecryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createDecryptor(key: Word32Array, props?: Partial<StreamCipherProps>){
     props = typeof props === "undefined" ? {} : props;
@@ -118,7 +118,7 @@ export class RC4 extends StreamCipher {
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
-   *   var encryptedMessage = JsCrypt.RC4.encrypt("test", "pass");
+   *   var encryptedMessage = RC4.encrypt("test", "pass");
    */
   public static encrypt(message: Word32Array|string, key: Word32Array|string, props?: Partial<RC4Props>){
     if(typeof key === "string"){
@@ -134,7 +134,7 @@ export class RC4 extends StreamCipher {
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
-   *   var encryptedMessage = JsCrypt.RC4.decrypt(cipherProps, "pass");
+   *   var encryptedMessage = RC4.decrypt(cipherProps, "pass");
    */
   public static decrypt(cipherText: CipherParams, key: Word32Array|string, props?: Partial<RC4Props>){
     if(typeof key === "string"){

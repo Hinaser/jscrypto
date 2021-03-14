@@ -39,7 +39,7 @@ export class RC4Drop extends RC4 {
    * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Cipher} A cipher instance.
    * @example
-   *   var cipher = JsCrypto.RC4Drop.createEncryptor(keyWordArray);
+   *   var cipher = RC4Drop.createEncryptor(keyWordArray);
    */
   public static createEncryptor(key: Word32Array, props?: Partial<CipherProps>){
     props = typeof props === "undefined" ? {} : props;
@@ -53,7 +53,7 @@ export class RC4Drop extends RC4 {
    * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
    * @return {Cipher} A cipher instance.
    * @example
-   *   var cipher = JsCrypto.RC4Drop.createDecryptor(keyWordArray, { iv: ivWordArray });
+   *   var cipher = RC4Drop.createDecryptor(keyWordArray, { iv: ivWordArray });
    */
   public static createDecryptor(key: Word32Array, props?: Partial<CipherProps>){
     props = typeof props === "undefined" ? {} : props;
@@ -67,7 +67,7 @@ export class RC4Drop extends RC4 {
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
-   *   var encryptedMessage = JsCrypt.RC4Drop.encrypt("test", "pass");
+   *   var encryptedMessage = RC4Drop.encrypt("test", "pass");
    */
   public static encrypt(message: Word32Array|string, key: Word32Array|string, props?: Partial<RC4DropProps>){
     if(typeof key === "string"){
@@ -83,7 +83,7 @@ export class RC4Drop extends RC4 {
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
-   *   var encryptedMessage = JsCrypt.RC4Drop.decrypt(cipherProps, "pass");
+   *   var encryptedMessage = RC4Drop.decrypt(cipherProps, "pass");
    */
   public static decrypt(cipherText: CipherParams, key: Word32Array|string, props?: Partial<RC4DropProps>){
     if(typeof key === "string"){

@@ -10,8 +10,8 @@ import { EvpKDF } from "./module/EvpKDF";
  * @param {Word32Array?} salt (Optional) A 64-bit salt to use. If omitted, a salt will be generated randomly.
  * @return {CipherParams} A cipher params object with the key, IV, and salt.
  * @example
- *   var derivedParams = JsCrypto.OpenSSLKDF.execute('Password', 256/32, 128/32);
- *   var derivedParams = JsCrypto.OpenSSLKDF.execute('Password', 256/32, 128/32, 'saltsalt');
+ *   var derivedParams = OpenSSLKDF.execute('Password', 256/32, 128/32);
+ *   var derivedParams = OpenSSLKDF.execute('Password', 256/32, 128/32, 'saltsalt');
  */
 export const OpenSSLKDF = {
     execute(password, keySize, ivSize, salt, props) {

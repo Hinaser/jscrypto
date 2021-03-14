@@ -62,7 +62,7 @@ export declare class Cipher extends BufferedBlockAlgorithm {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *     var cipher = CryptoJS.algo.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     *     var cipher = AES.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key: Word32Array, props?: Partial<CipherProps>): Cipher;
     /**
@@ -71,7 +71,7 @@ export declare class Cipher extends BufferedBlockAlgorithm {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = CryptoJS.algo.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key: Word32Array, props?: Partial<CipherProps>): Cipher;
 }

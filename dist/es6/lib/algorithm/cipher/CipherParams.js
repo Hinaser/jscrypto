@@ -18,16 +18,16 @@ export class CipherParams {
      *
      * @param {Partial<CipherParams>} cp An object with any of the possible cipher parameters.
      * @example
-     *   var cipherParams = CryptoJS.lib.CipherParams.create({
+     *   var cipherParams = new CipherParams({
      *       ciphertext: ciphertextWordArray,
      *       key: keyWordArray,
      *       iv: ivWordArray,
      *       salt: saltWordArray,
-     *       algorithm: JsCrypto.AES,
-     *       mode: JsCrypto.CBC,
-     *       padding: JsCrypto.PKCS7,
+     *       algorithm: AES,
+     *       mode: CBC,
+     *       padding: PKCS7,
      *       blockSize: 4,
-     *       formatter: JsCrypto.OpenSSLFormatter
+     *       formatter: OpenSSLFormatter
      *     });
      */
     constructor(cp) {
@@ -53,7 +53,7 @@ export class CipherParams {
      * @example
      *   var string = cipherParams + '';
      *   var string = cipherParams.toString();
-     *   var string = cipherParams.toString(CryptoJS.format.OpenSSL);
+     *   var string = cipherParams.toString(OpenSSLFormatter);
      */
     toString(formatter) {
         return (formatter || this.formatter).stringify(this);

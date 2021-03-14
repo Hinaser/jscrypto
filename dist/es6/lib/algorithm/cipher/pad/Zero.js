@@ -4,7 +4,7 @@
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.pad.Zero.pad(wordArray, 4);
+ *   Zero.pad(wordArray, 4);
  */
 function pad(data, blockSize) {
     // Shortcut
@@ -18,7 +18,7 @@ function pad(data, blockSize) {
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   JsCrypto.pad.Zero.unpad(wordArray);
+ *   Zero.unpad(wordArray);
  */
 function unpad(data) {
     // Shortcut

@@ -2,7 +2,7 @@ const expect = require("expect.js");
 const {
   Latin1,
   Word32Array,
-} = require("../../../test/build/all");
+} = require("../../../test/build");
 
 describe("encoder/Latin1", function(){
   it("test stringify", function(){

@@ -8,7 +8,7 @@ const {
   SerializableCipher,
   PasswordBasedCipher,
   AES,
-} = require("../../test/build/all");
+} = require("../../test/build");
 
 describe("aes", function(){
   it("test encrypt key size 128", function(){

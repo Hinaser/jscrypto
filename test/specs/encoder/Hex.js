@@ -2,7 +2,7 @@ const expect = require("expect.js");
 const {
   Hex,
   Word32Array,
-} = require("../../../test/build/all");
+} = require("../../../test/build");
 
 describe("encoder/Hex", function(){
   it("test stringify", function(){

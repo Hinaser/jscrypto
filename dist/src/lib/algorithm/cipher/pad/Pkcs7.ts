@@ -7,7 +7,7 @@ import type {Pad} from "./type";
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.pad.Pkcs7.pad(wordArray, 4);
+ *   Pkcs7.pad(wordArray, 4);
  */
 function pad(data: Word32Array, blockSize: number){
   // Shortcut
@@ -35,7 +35,7 @@ function pad(data: Word32Array, blockSize: number){
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   JsCrypto.pad.Pkcs7.unpad(wordArray);
+ *   Pkcs7.unpad(wordArray);
  */
 function unpad(data: Word32Array){
   // Get number of padding bytes from last byte

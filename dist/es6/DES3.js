@@ -56,7 +56,7 @@ export class DES3 extends BlockCipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.DES3.createEncryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = DES3.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -69,7 +69,7 @@ export class DES3 extends BlockCipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.DES3.createDecryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = DES3.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -82,7 +82,7 @@ export class DES3 extends BlockCipher {
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.DES3.encrypt("test", "pass");
+     *   var encryptedMessage = DES3.encrypt("test", "pass");
      */
     static encrypt(message, key, props) {
         if (typeof key === "string") {
@@ -97,7 +97,7 @@ export class DES3 extends BlockCipher {
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.DES3.decrypt(cipherProps, "pass");
+     *   var encryptedMessage = DES3.decrypt(cipherProps, "pass");
      */
     static decrypt(cipherText, key, props) {
         if (typeof key === "string") {

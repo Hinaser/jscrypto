@@ -8,7 +8,7 @@ export interface SerializableCipherProps extends BlockCipherProps {
 }
 export interface ISerializableCipher<K extends Word32Array | string> {
     encrypt: (cipher: typeof BaseCipher, message: Word32Array | string, key: K, props?: Partial<SerializableCipherProps>) => CipherParams;
-    decrypt: (cipher: typeof BaseCipher, cipherText: CipherParams | string, key: K, props?: Partial<SerializableCipherProps>) => Word32Array;
+    decrypt: (cipher: typeof BaseCipher, cipherParams: CipherParams | string, key: K, props?: Partial<SerializableCipherProps>) => Word32Array;
 }
 /**
  * Converts serialized ciphertext to CipherParams,
@@ -17,7 +17,7 @@ export interface ISerializableCipher<K extends Word32Array | string> {
  * @param {Formatter} formatter The formatting strategy to use to parse serialized ciphertext.
  * @return {CipherParams} The un-serialized ciphertext.
  * @example
- *   var ciphertextParams = JsCrypto.SerializableCipher.parse(ciphertextStringOrParams, format);
+ *   var ciphertextParams = SerializableCipher.parse(ciphertextStringOrParams, format);
  */
 export declare function parseCipherText(cipherTextParams: CipherParams | string, formatter: Formatter): CipherParams;
 export declare const SerializableCipher: ISerializableCipher<Word32Array>;

@@ -8,7 +8,7 @@ const {
   SerializableCipher,
   PasswordBasedCipher,
   DES,
-} = require("../../test/build/all");
+} = require("../../test/build");
 
 describe("des", function(){
   it("test encrypt 1", function(){

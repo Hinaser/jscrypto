@@ -22,6 +22,7 @@ export declare class PBKDF2 extends BaseKDFModule<PBKDF2Props> {
      * @param {Word32Array|string} salt A salt.
      * @return {Word32Array} The derived key.
      * @example
+     *   var kdf = new PBKDF2();
      *   var key = kdf.compute(password, salt);
      */
     compute(password: Word32Array | string, salt: Word32Array | string): Word32Array;
@@ -31,13 +32,9 @@ export declare class PBKDF2 extends BaseKDFModule<PBKDF2Props> {
      * @param {Word32Array|string} password The password.
      * @param {Word32Array|string} salt A salt.
      * @param {Partial<PBKDF2Props>?} props (Optional) The configuration options to use for this computation.
-     *
      * @return {Word32Array} The derived key.
-     *
      * @static
-     *
      * @example
-     *
      *     var key = PBKDF2.getKey(password, salt);
      *     var key = PBKDF2.getKey(password, salt, { keySize: 8 });
      *     var key = PBKDF2.getKey(password, salt, { keySize: 8, iterations: 1000 });

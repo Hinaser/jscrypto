@@ -17,14 +17,14 @@ export declare class OFB extends BlockCipherMode {
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.OFB.createEncryptor(cipher, iv.words);
+     *   var mode = OFB.createEncryptor(cipher, iv.words);
      */
     static createEncryptor(props: BlockCipherModeProps): OFB;
     /**
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.OFB.createDecryptor(cipher, iv.words);
+     *   var mode = OFB.createDecryptor(cipher, iv.words);
      */
     static createDecryptor(props: BlockCipherModeProps): OFB;
 }

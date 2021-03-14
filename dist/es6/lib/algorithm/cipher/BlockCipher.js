@@ -79,7 +79,7 @@ export class BlockCipher extends Cipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *     var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     *     var cipher = AES.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -91,7 +91,7 @@ export class BlockCipher extends Cipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;

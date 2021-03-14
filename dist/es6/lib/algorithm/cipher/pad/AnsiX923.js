@@ -4,7 +4,7 @@
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.pad.AnsiX923.pad(wordArray, 4);
+ *   AnsiX923.pad(wordArray, 4);
  */
 function pad(data, blockSize) {
     // Shortcuts
@@ -24,7 +24,7 @@ function pad(data, blockSize) {
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   JsCrypto.pad.AnsiX923.unpad(wordArray);
+ *   AnsiX923.unpad(wordArray);
  */
 function unpad(data) {
     // Get number of padding bytes from last byte

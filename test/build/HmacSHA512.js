@@ -552,7 +552,7 @@ class Word32Array {
      * @example
      *   var string = wordArray + '';
      *   var string = wordArray.toString();
-     *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+     *   var string = wordArray.toString(Utf8);
      */
     toString(encoder) {
         if (!encoder) {
@@ -605,7 +605,7 @@ class Word32Array {
      *
      * @return {Word32Array} The clone.
      * @example
-     *   var clone = wordArray.clone();
+     *   var clone = word32Array.clone();
      */
     clone() {
         return new Word32Array(this._words.slice(), this._nSignificantBytes);
@@ -617,7 +617,7 @@ class Word32Array {
      * @return {Word32Array} The random word array.
      * @static
      * @example
-     *   var wordArray = CryptoJS.lib.WordArray.random(16);
+     *   var wordArray = Word32Array.random(16);
      */
     static random(nBytes) {
         const words = [];
@@ -717,7 +717,7 @@ class Word64Array {
      * @example
      *   var string = wordArray + '';
      *   var string = wordArray.toString();
-     *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+     *   var string = wordArray.toString(Utf8);
      */
     toString(encoder) {
         if (!encoder) {
@@ -950,7 +950,7 @@ const Hex = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The hex string.
      * @example
-     *   var hexString = Hex.stringify([0x293892], 6);
+     *   var hexString = Hex.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         const nSig = w.nSigBytes;
@@ -1003,7 +1003,7 @@ const Latin1 = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The Latin1 string.
      * @example
-     *   var latin1String = Latin1.stringify([0x293892], 6);
+     *   var latin1String = Latin1.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         const nSig = w.nSigBytes;

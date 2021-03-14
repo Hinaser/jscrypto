@@ -23,7 +23,7 @@ export declare class AES extends BlockCipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = AES.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key: Word32Array, props?: Partial<CipherProps>): AES;
     /**
@@ -33,7 +33,7 @@ export declare class AES extends BlockCipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key: Word32Array, props?: Partial<CipherProps>): AES;
     /**
@@ -43,17 +43,17 @@ export declare class AES extends BlockCipher {
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.AES.encrypt("test", "pass");
+     *   var encryptedMessage = AES.encrypt("test", "pass");
      */
     static encrypt(message: Word32Array | string, key: Word32Array | string, props?: Partial<AESProps>): CipherParams;
     /**
      * Encrypt a encrypted message with key
      *
-     * @param {CipherParams} cipherText
+     * @param {CipherParams|string} cipherParams
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.AES.decrypt(cipherProps, "pass");
+     *   var encryptedMessage = AES.decrypt(cipherProps, "pass");
      */
-    static decrypt(cipherText: CipherParams, key: Word32Array | string, props?: Partial<AESProps>): Word32Array;
+    static decrypt(cipherParams: CipherParams | string, key: Word32Array | string, props?: Partial<AESProps>): Word32Array;
 }

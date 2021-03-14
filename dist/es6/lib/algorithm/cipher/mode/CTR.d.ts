@@ -17,14 +17,14 @@ export declare class CTR extends BlockCipherMode {
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.CTR.createEncryptor(cipher, iv.words);
+     *   var mode = CTR.createEncryptor(cipher, iv.words);
      */
     static createEncryptor(props: BlockCipherModeProps): CTR;
     /**
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.CTR.createDecryptor(cipher, iv.words);
+     *   var mode = CTR.createDecryptor(cipher, iv.words);
      */
     static createDecryptor(props: BlockCipherModeProps): CTR;
 }

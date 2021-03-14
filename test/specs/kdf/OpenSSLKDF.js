@@ -2,7 +2,7 @@ const expect = require("expect.js");
 const {
   Hex,
   OpenSSLKDF,
-} = require("../../../test/build/all");
+} = require("../../../test/build");
 
 describe("kdf/OpenSSLKDF", function(){
   it("test vector", function(){

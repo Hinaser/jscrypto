@@ -3,7 +3,7 @@ const {
   Hex,
   PBKDF2,
   Word32Array,
-} = require("../../../test/build/all");
+} = require("../../../test/build");
 
 describe("kdf/PBKDF2", function(){
   it("test key size 128", function(){

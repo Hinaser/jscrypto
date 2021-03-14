@@ -189,7 +189,7 @@ export class AES extends BlockCipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = AES.createEncryptor(keyWordArray, { iv: ivWordArray });
      */
     static createEncryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -202,7 +202,7 @@ export class AES extends BlockCipher {
      * @param {Partial<CipherProps>?} props (Optional) The configuration options to use for this operation.
      * @return {Cipher} A cipher instance.
      * @example
-     *   var cipher = JsCrypto.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+     *   var cipher = AES.createDecryptor(keyWordArray, { iv: ivWordArray });
      */
     static createDecryptor(key, props) {
         props = typeof props === "undefined" ? {} : props;
@@ -215,7 +215,7 @@ export class AES extends BlockCipher {
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.AES.encrypt("test", "pass");
+     *   var encryptedMessage = AES.encrypt("test", "pass");
      */
     static encrypt(message, key, props) {
         if (typeof key === "string") {
@@ -226,17 +226,17 @@ export class AES extends BlockCipher {
     /**
      * Encrypt a encrypted message with key
      *
-     * @param {CipherParams} cipherText
+     * @param {CipherParams|string} cipherParams
      * @param {Word32Array|string} key
      * @param {Partial<AESProps>?} props
      * @example
-     *   var encryptedMessage = JsCrypt.AES.decrypt(cipherProps, "pass");
+     *   var encryptedMessage = AES.decrypt(cipherProps, "pass");
      */
-    static decrypt(cipherText, key, props) {
+    static decrypt(cipherParams, key, props) {
         if (typeof key === "string") {
-            return PasswordBasedCipher.decrypt(AES, cipherText, key, props);
+            return PasswordBasedCipher.decrypt(AES, cipherParams, key, props);
         }
-        return SerializableCipher.decrypt(AES, cipherText, key, props);
+        return SerializableCipher.decrypt(AES, cipherParams, key, props);
     }
 }
 AES.keySize = 256 / 32;

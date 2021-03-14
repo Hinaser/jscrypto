@@ -8,7 +8,7 @@ export const Hex: IEncoder = {
    * @param {Word32Array} w An array of 32-bit words.
    * @return {string} The hex string.
    * @example
-   *   var hexString = Hex.stringify([0x293892], 6);
+   *   var hexString = Hex.stringify(new Word32Array([0x293892], 6));
    */
   stringify(w: Word32Array){
     const nSig = w.nSigBytes;

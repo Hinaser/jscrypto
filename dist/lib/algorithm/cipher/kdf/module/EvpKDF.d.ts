@@ -23,6 +23,7 @@ export declare class EvpKDF extends BaseKDFModule<EvpKDFProps> {
      * @param {Word32Array|string} salt A salt.
      * @return {Word32Array} The derived key.
      * @example
+     *   var kdf = new EvpKDF();
      *   var key = kdf.compute(password, salt);
      */
     compute(password: Word32Array | string, salt: Word32Array | string): Word32Array;
@@ -32,11 +33,8 @@ export declare class EvpKDF extends BaseKDFModule<EvpKDFProps> {
      * @param {Word32Array|string} password The password.
      * @param {Word32Array|string} salt A salt.
      * @param {Partial<EvpKDFProps>?} props (Optional) The configuration options to use for this computation.
-     *
      * @return {Word32Array} The derived key.
-     *
      * @static
-     *
      * @example
      *
      *     var key = EvpKDF.getKey(password, salt);

@@ -577,7 +577,7 @@ class Word32Array {
      * @example
      *   var string = wordArray + '';
      *   var string = wordArray.toString();
-     *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+     *   var string = wordArray.toString(Utf8);
      */
     toString(encoder) {
         if (!encoder) {
@@ -630,7 +630,7 @@ class Word32Array {
      *
      * @return {Word32Array} The clone.
      * @example
-     *   var clone = wordArray.clone();
+     *   var clone = word32Array.clone();
      */
     clone() {
         return new Word32Array(this._words.slice(), this._nSignificantBytes);
@@ -642,7 +642,7 @@ class Word32Array {
      * @return {Word32Array} The random word array.
      * @static
      * @example
-     *   var wordArray = CryptoJS.lib.WordArray.random(16);
+     *   var wordArray = Word32Array.random(16);
      */
     static random(nBytes) {
         const words = [];
@@ -742,7 +742,7 @@ class Word64Array {
      * @example
      *   var string = wordArray + '';
      *   var string = wordArray.toString();
-     *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+     *   var string = wordArray.toString(Utf8);
      */
     toString(encoder) {
         if (!encoder) {
@@ -987,16 +987,16 @@ class CipherParams {
      *
      * @param {Partial<CipherParams>} cp An object with any of the possible cipher parameters.
      * @example
-     *   var cipherParams = CryptoJS.lib.CipherParams.create({
+     *   var cipherParams = new CipherParams({
      *       ciphertext: ciphertextWordArray,
      *       key: keyWordArray,
      *       iv: ivWordArray,
      *       salt: saltWordArray,
-     *       algorithm: JsCrypto.AES,
-     *       mode: JsCrypto.CBC,
-     *       padding: JsCrypto.PKCS7,
+     *       algorithm: AES,
+     *       mode: CBC,
+     *       padding: PKCS7,
      *       blockSize: 4,
-     *       formatter: JsCrypto.OpenSSLFormatter
+     *       formatter: OpenSSLFormatter
      *     });
      */
     constructor(cp) {
@@ -1022,7 +1022,7 @@ class CipherParams {
      * @example
      *   var string = cipherParams + '';
      *   var string = cipherParams.toString();
-     *   var string = cipherParams.toString(CryptoJS.format.OpenSSL);
+     *   var string = cipherParams.toString(OpenSSLFormatter);
      */
     toString(formatter) {
         return (formatter || this.formatter).stringify(this);
@@ -1055,7 +1055,7 @@ const OpenSSLFormatter = {
      * @param {CipherParams} cipherParams The cipher params object.
      * @return {string} The OpenSSL-compatible string.
      * @example
-     *   var openSSLString = CryptoJS.format.OpenSSL.stringify(cipherParams);
+     *   var openSSLString = OpenSSLFormatter.stringify(cipherParams);
      */
     stringify(cipherParams) {
         // Shortcuts
@@ -1077,7 +1077,7 @@ const OpenSSLFormatter = {
      * @param {string} openSSLStr The OpenSSL-compatible string.
      * @return {CipherParams} The cipher params object.
      * @example
-     *   var cipherParams = CryptoJS.format.OpenSSL.parse(openSSLString);
+     *   var cipherParams = OpenSSLFormatter.parse(openSSLString);
      */
     parse(openSSLStr) {
         let salt;
@@ -1125,8 +1125,8 @@ __webpack_require__.r(__webpack_exports__);
  * @param {Word32Array?} salt (Optional) A 64-bit salt to use. If omitted, a salt will be generated randomly.
  * @return {CipherParams} A cipher params object with the key, IV, and salt.
  * @example
- *   var derivedParams = JsCrypto.OpenSSLKDF.execute('Password', 256/32, 128/32);
- *   var derivedParams = JsCrypto.OpenSSLKDF.execute('Password', 256/32, 128/32, 'saltsalt');
+ *   var derivedParams = OpenSSLKDF.execute('Password', 256/32, 128/32);
+ *   var derivedParams = OpenSSLKDF.execute('Password', 256/32, 128/32, 'saltsalt');
  */
 const OpenSSLKDF = {
     execute(password, keySize, ivSize, salt, props) {
@@ -1192,6 +1192,7 @@ class EvpKDF extends _type__WEBPACK_IMPORTED_MODULE_2__["BaseKDFModule"] {
      * @param {Word32Array|string} salt A salt.
      * @return {Word32Array} The derived key.
      * @example
+     *   var kdf = new EvpKDF();
      *   var key = kdf.compute(password, salt);
      */
     compute(password, salt) {
@@ -1227,11 +1228,8 @@ class EvpKDF extends _type__WEBPACK_IMPORTED_MODULE_2__["BaseKDFModule"] {
      * @param {Word32Array|string} password The password.
      * @param {Word32Array|string} salt A salt.
      * @param {Partial<EvpKDFProps>?} props (Optional) The configuration options to use for this computation.
-     *
      * @return {Word32Array} The derived key.
-     *
      * @static
-     *
      * @example
      *
      *     var key = EvpKDF.getKey(password, salt);
@@ -1290,6 +1288,7 @@ class PBKDF2 extends _type__WEBPACK_IMPORTED_MODULE_3__["BaseKDFModule"] {
      * @param {Word32Array|string} salt A salt.
      * @return {Word32Array} The derived key.
      * @example
+     *   var kdf = new PBKDF2();
      *   var key = kdf.compute(password, salt);
      */
     compute(password, salt) {
@@ -1334,13 +1333,9 @@ class PBKDF2 extends _type__WEBPACK_IMPORTED_MODULE_3__["BaseKDFModule"] {
      * @param {Word32Array|string} password The password.
      * @param {Word32Array|string} salt A salt.
      * @param {Partial<PBKDF2Props>?} props (Optional) The configuration options to use for this computation.
-     *
      * @return {Word32Array} The derived key.
-     *
      * @static
-     *
      * @example
-     *
      *     var key = PBKDF2.getKey(password, salt);
      *     var key = PBKDF2.getKey(password, salt, { keySize: 8 });
      *     var key = PBKDF2.getKey(password, salt, { keySize: 8, iterations: 1000 });
@@ -1445,7 +1440,7 @@ const Base64 = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The base64 string.
      * @example
-     *   var hexString = Base64.stringify([0x293892], 6);
+     *   var hexString = Base64.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         // Shortcuts
@@ -1528,7 +1523,7 @@ const Hex = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The hex string.
      * @example
-     *   var hexString = Hex.stringify([0x293892], 6);
+     *   var hexString = Hex.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         const nSig = w.nSigBytes;
@@ -1581,7 +1576,7 @@ const Latin1 = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The Latin1 string.
      * @example
-     *   var latin1String = Latin1.stringify([0x293892], 6);
+     *   var latin1String = Latin1.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         const nSig = w.nSigBytes;

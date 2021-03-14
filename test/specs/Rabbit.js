@@ -6,7 +6,7 @@ const {
   SerializableCipher,
   PasswordBasedCipher,
   Rabbit,
-} = require("../../test/build/all");
+} = require("../../test/build");
 
 describe("rabbit", function(){
   it("test vector1", function(){

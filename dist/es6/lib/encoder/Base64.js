@@ -11,7 +11,7 @@ export const Base64 = {
      * @param {Word32Array} w An array of 32-bit words.
      * @return {string} The base64 string.
      * @example
-     *   var hexString = Base64.stringify([0x293892], 6);
+     *   var hexString = Base64.stringify(new Word32Array([0x293892], 6));
      */
     stringify(w) {
         // Shortcuts

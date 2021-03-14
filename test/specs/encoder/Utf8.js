@@ -2,7 +2,7 @@ const expect = require("expect.js");
 const {
   Utf8,
   Word32Array,
-} = require("../../../test/build/all");
+} = require("../../../test/build");
 
 describe("encoder/Utf8", function(){
   it("test stringify 1", function(){

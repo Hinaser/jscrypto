@@ -36,7 +36,7 @@ export declare class Word32Array {
      * @example
      *   var string = wordArray + '';
      *   var string = wordArray.toString();
-     *   var string = wordArray.toString(CryptoJS.enc.Utf8);
+     *   var string = wordArray.toString(Utf8);
      */
     toString(encoder?: IEncoder): string;
     /**
@@ -60,7 +60,7 @@ export declare class Word32Array {
      *
      * @return {Word32Array} The clone.
      * @example
-     *   var clone = wordArray.clone();
+     *   var clone = word32Array.clone();
      */
     clone(): Word32Array;
     /**
@@ -70,7 +70,7 @@ export declare class Word32Array {
      * @return {Word32Array} The random word array.
      * @static
      * @example
-     *   var wordArray = CryptoJS.lib.WordArray.random(16);
+     *   var wordArray = Word32Array.random(16);
      */
     static random(nBytes: number): Word32Array;
 }

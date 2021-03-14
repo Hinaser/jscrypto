@@ -2,7 +2,7 @@ const expect = require("expect.js");
 const {
   Base64,
   Word32Array,
-} = require("../../../test/build/all");
+} = require("../../../test/build");
 
 describe("encoder/Base64", function(){
   it("test stringify 0", function(){

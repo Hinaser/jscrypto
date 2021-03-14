@@ -3,7 +3,7 @@ const {
   Hex,
   EvpKDF,
   Word32Array,
-} = require("../../../test/build/all");
+} = require("../../../test/build");
 
 describe("kdf/EvpKDF", function(){
   it("test vector", function(){

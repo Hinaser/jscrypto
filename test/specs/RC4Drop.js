@@ -7,7 +7,7 @@ const {
   PasswordBasedCipher,
   RC4,
   RC4Drop,
-} = require("../../test/build/all");
+} = require("../../test/build");
 
 describe("rc4drop", function(){
   it("test drop", function(){

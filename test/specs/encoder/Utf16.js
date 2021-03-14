@@ -3,7 +3,7 @@ const {
   Utf16,
   Utf16LE,
   Word32Array,
-} = require("../../../test/build/all");
+} = require("../../../test/build");
 
 describe("encoder/Utf16", function(){
   it("test stringify 1", function(){

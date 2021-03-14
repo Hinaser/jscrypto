@@ -127,7 +127,7 @@ class BlockCipherMode {
      * @param {BlockCipherModeProps} props
      * @abstract
      * @example
-     *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
+     *   var mode = CBC.createEncryptor(cipher, iv.words);
      */
     static createEncryptor(props) {
         throw new Error("Not implemented yet");
@@ -137,7 +137,7 @@ class BlockCipherMode {
      * @param {BlockCipherModeProps} props
      * @abstract
      * @example
-     *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
+     *   var mode = CBC.createDecryptor(cipher, iv.words);
      */
     static createDecryptor(props) {
         throw new Error("Not implemented yet");
@@ -170,7 +170,7 @@ class ECB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.ECB.createEncryptor(cipher, iv.words);
+     *   var mode = ECB.createEncryptor(cipher, iv.words);
      */
     static createEncryptor(props) {
         return new ECB.Encryptor(props);
@@ -179,7 +179,7 @@ class ECB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.ECB.createDecryptor(cipher, iv.words);
+     *   var mode = ECB.createDecryptor(cipher, iv.words);
      */
     static createDecryptor(props) {
         return new ECB.Decryptor(props);

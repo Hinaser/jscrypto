@@ -6,7 +6,7 @@ const {
   SerializableCipher,
   PasswordBasedCipher,
   RC4,
-} = require("../../test/build/all");
+} = require("../../test/build");
 
 describe("rc4", function(){
   it("test vector1", function(){

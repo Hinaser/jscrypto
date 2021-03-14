@@ -98,8 +98,8 @@ Then directly load js file into `<script>` tag.
 `jscrypto` supports crypto modules as well as `cryptojs`.
 
 ### *Popular*
-**Hasher** `MD5`, `SHA1`, `SHA3`, `SHA224`, `SHA256`, `SHA384`, `SHA512`, `RIPEMD160`,  
-`HMAC-MD5`, `HMAC-SHA1`, `HMAC-SHA3`, `HMAC-SHA224`, `HMAC-SHA256`, `HMAC-SHA384`, `HMAC-SHA512`  
+**Hash** `MD5`, `SHA1`, `SHA3`, `SHA224`, `SHA256`, `SHA384`, `SHA512`, `RIPEMD160`,  
+**Message/Key Hash** `HMAC-MD5`, `HMAC-SHA1`, `HMAC-SHA3`, `HMAC-SHA224`, `HMAC-SHA256`, `HMAC-SHA384`, `HMAC-SHA512`  
 **Block Cipher** `AES`, `DES`, `DES3`
 
 ### *Basic structure*

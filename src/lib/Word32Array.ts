@@ -16,9 +16,9 @@ export class Word32Array {
    * @param {number} nSignificantBytes (Optional) The number of significant bytes in the words.
    *
    * @example
-   *   var wordArray = new WordArray();
-   *   var wordArray = new WordArray([0x00010203, 0x04050607]);
-   *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
+   *   var wordArray = new Word32Array();
+   *   var wordArray = new Word32Array([0x00010203, 0x04050607]);
+   *   var wordArray = new Word32Array([0x00010203, 0x04050607], 6);
    */
   public constructor(words?: number[], nSignificantBytes?: number) {
     this._words = words || [];

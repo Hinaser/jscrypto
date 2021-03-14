@@ -1,6 +1,5 @@
 const expect = require("expect.js");
-const {Word32Array, Hex} = require("../../test/build/lib");
-const {SHA3} = require("../../test/build/SHA3");
+const {Word32Array, Hex, SHA3} = require("../../test/build");
 
 describe("sha3", function(){
   it("digest '' with outputLength:512 as expected", function(){

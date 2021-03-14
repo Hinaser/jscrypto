@@ -1,6 +1,5 @@
 const expect = require("expect.js");
-const {Word32Array} = require("../../test/build/lib");
-const {RIPEMD160} = require("../../test/build/RIPEMD160");
+const {Word32Array, RIPEMD160} = require("../../test/build");
 
 describe("ripemd160", function(){
   it("digest 'The quick brown fox jumps over the lazy dog' as expected", function(){

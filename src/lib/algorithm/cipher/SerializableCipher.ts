@@ -18,7 +18,7 @@ export interface ISerializableCipher<K extends Word32Array|string> {
   ) => CipherParams;
   decrypt: (
     cipher: typeof BaseCipher,
-    cipherText: CipherParams|string,
+    cipherParams: CipherParams|string,
     key: K,
     props?: Partial<SerializableCipherProps>,
   ) => Word32Array;
@@ -78,7 +78,7 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
    * Decrypts serialized ciphertext.
    *
    * @param {typeof Cipher} Cipher The cipher algorithm to use.
-   * @param {CipherParams|string} cipherText The ciphertext to decrypt.
+   * @param {CipherParams|string} cipherParams The ciphertext to decrypt.
    * @param {Word32Array} key The key.
    * @param {Partial<SerializableCipherProps>} props (Optional) The configuration options to use for this operation.
    * @return {Word32Array} The plaintext.
@@ -88,12 +88,12 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
    */
   decrypt(
     Cipher: typeof BaseCipher,
-    cipherText: CipherParams|string,
+    cipherParams: CipherParams|string,
     key: Word32Array,
     props?: Partial<SerializableCipherProps>,
   ){
     const decryptor = Cipher.createDecryptor(key, props);
-    const cipherParams = parseCipherText(cipherText, props?.formatter || OpenSSLFormatter);
-    return decryptor.finalize(cipherParams.cipherText || "");
+    const cipherParamsObj = parseCipherText(cipherParams, props?.formatter || OpenSSLFormatter);
+    return decryptor.finalize(cipherParamsObj.cipherText || "");
   }
 }

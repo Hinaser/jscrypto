@@ -280,16 +280,16 @@ export class AES extends BlockCipher {
   /**
    * Encrypt a encrypted message with key
    *
-   * @param {CipherParams} cipherText
+   * @param {CipherParams|string} cipherParams
    * @param {Word32Array|string} key
    * @param {Partial<AESProps>?} props
    * @example
    *   var encryptedMessage = AES.decrypt(cipherProps, "pass");
    */
-  public static decrypt(cipherText: CipherParams, key: Word32Array|string, props?: Partial<AESProps>){
+  public static decrypt(cipherParams: CipherParams|string, key: Word32Array|string, props?: Partial<AESProps>){
     if(typeof key === "string"){
-      return PasswordBasedCipher.decrypt(AES, cipherText, key, props);
+      return PasswordBasedCipher.decrypt(AES, cipherParams, key, props);
     }
-    return SerializableCipher.decrypt(AES, cipherText, key, props);
+    return SerializableCipher.decrypt(AES, cipherParams, key, props);
   }
 }

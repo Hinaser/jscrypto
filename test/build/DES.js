@@ -1409,8 +1409,8 @@ class Hasher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BlockCipher", function() { return BlockCipher; });
 /* harmony import */ var _Cipher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cipher */ "./src/lib/algorithm/cipher/Cipher.ts");
-/* harmony import */ var _mode_CBC__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mode/CBC */ "./src/lib/algorithm/cipher/mode/CBC.ts");
-/* harmony import */ var _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pad/Pkcs7 */ "./src/lib/algorithm/cipher/pad/Pkcs7.ts");
+/* harmony import */ var _mode_ECB__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mode/ECB */ "./src/lib/algorithm/cipher/mode/ECB.ts");
+/* harmony import */ var _pad_Noop__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pad/Noop */ "./src/lib/algorithm/cipher/pad/Noop.ts");
 
 
 
@@ -1418,8 +1418,8 @@ class BlockCipher extends _Cipher__WEBPACK_IMPORTED_MODULE_0__["Cipher"] {
     constructor(props) {
         super(props);
         this._blockSize = 128 / 32;
-        this._Mode = _mode_CBC__WEBPACK_IMPORTED_MODULE_1__["CBC"];
-        this._padding = _pad_Pkcs7__WEBPACK_IMPORTED_MODULE_2__["Pkcs7"];
+        this._Mode = _mode_ECB__WEBPACK_IMPORTED_MODULE_1__["ECB"];
+        this._padding = _pad_Noop__WEBPACK_IMPORTED_MODULE_2__["Noop"];
         this._props = props;
         this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
         this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
@@ -1582,12 +1582,6 @@ class Cipher extends _BufferedBlockAlgorithm__WEBPACK_IMPORTED_MODULE_0__["Buffe
      * @abstract
      */
     _doReset() {
-        throw new Error("Not implemented");
-    }
-    /**
-     * @abstract
-     */
-    _doProcess() {
         throw new Error("Not implemented");
     }
     /**
@@ -2156,64 +2150,48 @@ class BlockCipherMode {
 
 /***/ }),
 
-/***/ "./src/lib/algorithm/cipher/mode/CBC.ts":
+/***/ "./src/lib/algorithm/cipher/mode/ECB.ts":
 /*!**********************************************!*\
-  !*** ./src/lib/algorithm/cipher/mode/CBC.ts ***!
+  !*** ./src/lib/algorithm/cipher/mode/ECB.ts ***!
   \**********************************************/
-/*! exports provided: CBC */
+/*! exports provided: ECB */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CBC", function() { return CBC; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ECB", function() { return ECB; });
 /* harmony import */ var _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BlockCipherMode */ "./src/lib/algorithm/cipher/mode/BlockCipherMode.ts");
 
-class CBC extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode"] {
+/**
+ * Electronic Codebook block mode.
+ */
+class ECB extends _BlockCipherMode__WEBPACK_IMPORTED_MODULE_0__["BlockCipherMode"] {
     constructor(props) {
         super(props);
-        this._prevBlock = [];
-    }
-    xorBlock(words, offset, blockSize) {
-        let block;
-        // Shortcut
-        const iv = this._iv;
-        // Choose mixing block
-        if (iv) {
-            block = iv;
-            // Remove IV for subsequent blocks
-            this._iv = undefined;
-        }
-        else {
-            block = this._prevBlock;
-        }
-        // XOR blocks
-        for (let i = 0; i < blockSize; i++) {
-            words[offset + i] ^= block[i];
-        }
     }
     /**
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.CBC.createEncryptor(cipher, iv.words);
+     *   var mode = JsCrypto.ECB.createEncryptor(cipher, iv.words);
      */
     static createEncryptor(props) {
-        return new CBC.Encryptor(props);
+        return new ECB.Encryptor(props);
     }
     /**
      * Creates this mode for decryption.
      * @param {BlockCipherModeProps} props
      * @example
-     *   var mode = JsCrypto.CBC.createDecryptor(cipher, iv.words);
+     *   var mode = JsCrypto.ECB.createDecryptor(cipher, iv.words);
      */
     static createDecryptor(props) {
-        return new CBC.Decryptor(props);
+        return new ECB.Decryptor(props);
     }
 }
 /**
- * CBC encryptor.
+ * ECB encryptor.
  */
-CBC.Encryptor = class Encryptor extends CBC {
+ECB.Encryptor = class Encryptor extends ECB {
     /**
      * Processes the data block at offset.
      *
@@ -2223,20 +2201,13 @@ CBC.Encryptor = class Encryptor extends CBC {
      *   mode.processBlock(data.words, offset);
      */
     processBlock(words, offset) {
-        // Shortcuts
-        const cipher = this._cipher;
-        const blockSize = cipher.blockSize;
-        // XOR and encrypt
-        this.xorBlock(words, offset, blockSize);
-        cipher.encryptBlock(words, offset);
-        // Remember this block to use with next block
-        this._prevBlock = words.slice(offset, offset + blockSize);
+        this._cipher.encryptBlock(words, offset);
     }
 };
 /**
- * CBC decryptor.
+ * ECB decryptor.
  */
-CBC.Decryptor = class Decryptor extends CBC {
+ECB.Decryptor = class Decryptor extends ECB {
     /**
      * Processes the data block at offset.
      *
@@ -2246,72 +2217,45 @@ CBC.Decryptor = class Decryptor extends CBC {
      *   mode.processBlock(data.words, offset);
      */
     processBlock(words, offset) {
-        // Shortcuts
-        const cipher = this._cipher;
-        const blockSize = cipher.blockSize;
-        // Remember this block to use with next block
-        const thisBlock = words.slice(offset, offset + blockSize);
-        // Decrypt and XOR
-        cipher.decryptBlock(words, offset);
-        this.xorBlock(words, offset, blockSize);
-        // This block becomes the previous block
-        this._prevBlock = thisBlock;
+        this._cipher.decryptBlock(words, offset);
     }
 };
 
 
 /***/ }),
 
-/***/ "./src/lib/algorithm/cipher/pad/Pkcs7.ts":
-/*!***********************************************!*\
-  !*** ./src/lib/algorithm/cipher/pad/Pkcs7.ts ***!
-  \***********************************************/
-/*! exports provided: Pkcs7 */
+/***/ "./src/lib/algorithm/cipher/pad/Noop.ts":
+/*!**********************************************!*\
+  !*** ./src/lib/algorithm/cipher/pad/Noop.ts ***!
+  \**********************************************/
+/*! exports provided: Noop */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Pkcs7", function() { return Pkcs7; });
-/* harmony import */ var _Word32Array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../Word32Array */ "./src/lib/Word32Array.ts");
-
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Noop", function() { return Noop; });
 /**
- * Pads data using the algorithm defined in PKCS #5/7.
+ * A noop padding strategy
  *
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   JsCrypto.pad.Pkcs7.pad(wordArray, 4);
+ *   JsCrypto.pad.Noop.pad(wordArray, 4);
  */
 function pad(data, blockSize) {
-    // Shortcut
-    const blockSizeBytes = blockSize * 4;
-    // Count padding bytes
-    const nPaddingBytes = blockSizeBytes - data.nSigBytes % blockSizeBytes;
-    // Create padding word
-    const paddingWord = (nPaddingBytes << 24) | (nPaddingBytes << 16) | (nPaddingBytes << 8) | nPaddingBytes;
-    // Create padding
-    const paddingWords = [];
-    for (let i = 0; i < nPaddingBytes; i += 4) {
-        paddingWords.push(paddingWord);
-    }
-    const padding = new _Word32Array__WEBPACK_IMPORTED_MODULE_0__["Word32Array"](paddingWords, nPaddingBytes);
-    // Add padding
-    data.concat(padding);
+    // Noop
 }
 /**
- * Unpads data that had been padded using the algorithm defined in PKCS #5/7.
+ * Unpads data that had been padded with Noop strategy.
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   JsCrypto.pad.Pkcs7.unpad(wordArray);
+ *   JsCrypto.pad.Noop.unpad(wordArray);
  */
 function unpad(data) {
-    // Get number of padding bytes from last byte
-    const nPaddingBytes = data.words[(data.nSigBytes - 1) >>> 2] & 0xff;
-    // Remove padding
-    data.nSigBytes -= nPaddingBytes;
+    // Noop
 }
-const Pkcs7 = {
+const Noop = {
     pad,
     unpad,
 };

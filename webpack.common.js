@@ -6,7 +6,7 @@ const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 exports.mainEntry = () => {
   return {
     lib: "./src/lib/index.ts",
-    all: "./src/all.ts",
+    index: "./src/index.ts",
     Word32Array: "./src/Word32Array.ts",
     Word64Array: "./src/Word64Array.ts",
     SHA1: "./src/SHA1.ts",
@@ -130,7 +130,7 @@ exports.baseConfig = (isProd) => {
       ],
     },
     resolve: {
-      extensions: [".tsx", ".ts", "js"],
+      extensions: [".tsx", ".ts", ".js"],
     },
     optimization: isProd ? {
       minimizer: [

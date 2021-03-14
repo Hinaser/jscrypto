@@ -1,7 +1,7 @@
 {
   "name": "jscrypto",
   "version": "0.0.0-beta.0",
-  "main": "./all.js",
+  "main": "./index.js",
   "author": "Izumi Hoshino <rindo.hinase@gmail.com>",
   "license": "MIT",
   "description": "",
@@ -14,9 +14,9 @@
   "scripts": {
     "test": "mocha --enable-source-maps ./test/specs/",
     "build": "webpack --config webpack.dev.js",
-    "build:prod": "webpack --config webpack.prod.es5.js && node ./bin/pre_publish.js && yarn tsc",
-    "tsc": "tsc --project tsconfig.es5.json --emitDeclarationOnly --declaration --declarationDir ./dist --allowJS false",
-    "tsdoc": "typedoc src/XSpy.ts --mode file --excludePrivate --excludeProtected --excludeNotExported --out docs --includeVersion --gaID UA-91245492-8"
+    "build:prod": "webpack --config webpack.prod.es5.js && node bin/pre_publish.js && yarn tsc && yarn build:es6",
+    "build:es6": "tsc --project tsconfig.json --allowJS false --declaration --declarationDir ./dist/es6",
+    "tsc": "tsc --project tsconfig.es5.json --emitDeclarationOnly --declaration --declarationDir ./dist --allowJS false"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.1.0",

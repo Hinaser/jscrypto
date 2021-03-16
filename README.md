@@ -1,7 +1,7 @@
 # jscrypto
 ![Build](https://github.com/Hinaser/jscrypto/actions/workflows/test.yml/badge.svg?)
 
-[crypto-js](https://github.com/brix/crypto-js) clone for modern javascript environments.
+[crypto-js](https://github.com/brix/crypto-js) enhancement for modern javascript environments.
 
 - Loadable from ES6/CommonJS/Typescript/Browser runtimes.
 - Written in Typescript with many type declarations.
@@ -38,7 +38,7 @@ This can greatly reduce bundle size by bundlers tree-shaking ability.
 Don't forget to add `/es6` following `jscrypto`
 ```ecmascript 6
 // Load whole library modules.
-import JsCrypto from "jscrypto/es6"; // Heavy loading. Not recommended.
+import JsCrypto from "jscrypto/es6";
 console.log(JsCrypto.SHA256.hash("test").toString());
 ...
 import {SHA256} from "jscrypto/es6/SHA256"; // Recommended
@@ -62,7 +62,7 @@ module.exports = {
 **Be sure to load the module from `jscrypto/es6`.**
 ```ecmascript 6
 // Load whole library modules.
-import * as JsCrypto from "jscrypto/es6"; // Heavy loading. Not recommended.
+import * as JsCrypto from "jscrypto/es6";
 console.log(JsCrypto.SHA256.hash("test").toString());
 ...
 import {SHA256} from "jscrypto/es6/SHA256"; // Recommended
@@ -99,7 +99,7 @@ Then directly load js file into `<script>` tag.
 
 ### *Popular*
 **Hash** [`MD5`](#md5), [`SHA1`](#sha1), [`SHA3`](#sha3), [`SHA224`](#sha224), [`SHA256`](#sha256), [`SHA384`](#sha384), [`SHA512`](#sha512), [`RIPEMD160`](#ripemd160),  
-**Message/Key Hash** [`HMAC-MD5`](#HMAC-MD5), [`HMAC-SHA1`](#HMAC-SHA1), [`HMAC-SHA3`](#HMAC-SHA3), [`HMAC-SHA224`](#hmac-sha224), [`HMAC-SHA256`](#hmac-sha256), [`HMAC-SHA384`](#hmac-sha384), [`HMAC-SHA512`](#hmac-sha512)  
+**Message/Key Hash** [`HMAC-MD5`](#hmac-md5), [`HMAC-SHA224`](#hmac-sha224), [`HMAC-SHA256`](#hmac-sha256), [`HMAC-SHA384`](#hmac-sha384), [`HMAC-SHA512`](#hmac-sha512)  
 **Block Cipher** [`AES`](#aes), [`DES`](#des), [`DES3`](#des3)
 
 ### *Basic structure*
@@ -116,6 +116,21 @@ Then directly load js file into `<script>` tag.
 ---
 
 ### Hash
+#### General
+Hash module can take both string/binary word as a hashing target.
+```js
+JsCrypto.SHA256.hash("string");
+// or
+var w = new Word32Array([0x61626364]); // Binary representation of "abcd"
+JsCrypt.SHA256.hash(w);
+// or
+// Byte array can be hashed.
+// ArrayBuffer | Uint8Array | Int8Array | Uint8ClampedArray | Int16Array | Uint16Array 
+// Int32Array | Uint32Array | Float32Array | Float64Array
+var w = new Word32Array(typedArray);
+JsCrypt.SHA256.hash(w);
+```
+
 <h4 id='md5'>MD5</h4>
 
 ```js
@@ -232,6 +247,97 @@ hashedWord.toString(JsCrypto.Base64); // "jrII9+BdmHqbBEqOmMawh/FaC/w="
 
 // Binary words can be hashed as well as MD5. See MD5 example above.
 // You can do gradual update as well as MD5. See MD5 example above.
+```
+
+### Message/Key Hash
+#### General
+HMAC can be generated like below.
+```js
+var hmacMD5 = new JsCrypto.Hmac(new JsCrypto.MD5(), "key");
+var words = hmacMD5.finalize("message");
+words.toString(); //  "4e4748e62b463521f6775fbf921234b5"
+// or
+var hmacSHA1 = new JsCrypto.Hmac(new JsCrypto.SHA1(), "key");
+var words = hmacSHA1.finalize("message");
+words.toString(); // "2088df74d5f2146b48146caf4965377e9d0be3a4"
+// or simply
+JsCrypto.HmacSHA256("message", "key").toString(); // "6e9ef29b75fffc5b7ab...76917343065f58ed4a"
+
+```
+
+<h4 id='hmac-md5'>HMAC-MD5</h4>
+
+```js
+var hashedWord = JsCrypto.HmacMD5("message", "key");
+hashedWord.toString(); // "4e4748e62b463521f6775fbf921234b5"
+hashedWord.toString(JsCrypto.Base64); // "TkdI5itGNSH2d1+/khI0tQ=="
+
+// Binary message can be hashed.
+var message = new JsCrypto.Word32Array([0x6d657373, 0x61676500], 7); // Binary representation of "message"
+var hashedWord = JsCrypto.HmacMD5(message, "key");
+hashedWord.toString(); // "4e4748e62b463521f6775fbf921234b5"
+
+// Key also can be a binary
+var message = new JsCrypto.Word32Array([0x6d657373, 0x61676500], 7); // Binary representation of "message"
+var key = new JsCrypto.Word32Array([0x6b657900], 3); // Binary representation of "key"
+var hashedWord = JsCrypto.HmacMD5(message, key);
+hashedWord.toString(); // "4e4748e62b463521f6775fbf921234b5"
+
+// Gradual update
+var hmacMD5 = new JsCrypto.Hmac(new JsCrypto.MD5(), "key");
+hmacMD5.update("me");
+hmacMD5.update("ss");
+hmacMD5.update("ag");
+var w = hmacMD5.finalize("e");
+w.toString(); // "4e4748e62b463521f6775fbf921234b5"
+```
+
+<h4 id='hmac-sha224'>HMAC-SHA224</h4>
+
+```js
+var hashedWord = JsCrypto.HmacSHA224("message", "key");
+hashedWord.toString(); // "a0b5eecae3f74f0561a8da6f389f78f1a3895c8c183c31c1756d7925"
+hashedWord.toString(JsCrypto.Base64); // "oLXuyuP3TwVhqNpvOJ948aOJXIwYPDHBdW15JQ=="
+
+// Binary message can be hashed as well as HMAC-MD5. See HMAC-MD5 example above.
+// Key also can be a binary as well as HMAC-MD5. See HMAC-MD5 example above.
+// Can Gradual update as well as HMAC-MD5. See HMAC-MD5 example above.
+```
+
+<h4 id='hmac-sha256'>HMAC-SHA256</h4>
+
+```js
+var hashedWord = JsCrypto.HmacSHA256("message", "key");
+hashedWord.toString(); // "6e9ef29b75fffc5b7abae527d58fdadb2fe42e7219011976917343065f58ed4a"
+hashedWord.toString(JsCrypto.Base64); // "bp7ym3X//Ft6uuUn1Y/a2y/kLnIZARl2kXNDBl9Y7Uo="
+
+// Binary message can be hashed as well as HMAC-MD5. See HMAC-MD5 example above.
+// Key also can be a binary as well as HMAC-MD5. See HMAC-MD5 example above.
+// Can Gradual update as well as HMAC-MD5. See HMAC-MD5 example above.
+```
+
+<h4 id='hmac-sha384'>HMAC-SHA384</h4>
+
+```js
+var hashedWord = JsCrypto.HmacSHA384("message", "key");
+hashedWord.toString(); // "0fd3ae3237be98c64a075...544b9062c773b2d86f"
+hashedWord.toString(JsCrypto.Base64); // "D9OuMje+m...EuQYsdzsthv"
+
+// Binary message can be hashed as well as HMAC-MD5. See HMAC-MD5 example above.
+// Key also can be a binary as well as HMAC-MD5. See HMAC-MD5 example above.
+// Can Gradual update as well as HMAC-MD5. See HMAC-MD5 example above.
+```
+
+<h4 id='hmac-sha512'>HMAC-SHA512</h4>
+
+```js
+var hashedWord = JsCrypto.HmacSHA512("message", "key");
+hashedWord.toString(); // ""e477384d7ca2...16810fa367e98"
+hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA=="
+
+// Binary message can be hashed as well as HMAC-MD5. See HMAC-MD5 example above.
+// Key also can be a binary as well as HMAC-MD5. See HMAC-MD5 example above.
+// Can Gradual update as well as HMAC-MD5. See HMAC-MD5 example above.
 ```
 
 ### Word

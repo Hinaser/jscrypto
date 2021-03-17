@@ -1,99 +1,3 @@
-# jscrypto
-![Build](https://github.com/Hinaser/jscrypto/actions/workflows/test.yml/badge.svg?)
-
-[crypto-js](https://github.com/brix/crypto-js) enhancement for modern js environments.
-
-- Loadable from ES6/CommonJS/Typescript/Browser runtimes.
-- Written in Typescript with many type declarations.
-- Reduced bundle size when using webpack v4.  
-  - When bundling only SHA256 module, the webpack-ed js file might be less than 6kb,  
-    while bundled size with `crypto-js` might be larger than 100kb because webpack v4 cannot eliminate dead codes efficiently.
-  - For webpack v5, bundle size with `crypto-js` can be greatly reduced by enhanced tree-shaking.
-    However, sometimes library requiring `crypto-js` doesn't run in commonJS environments like AWS lambda,  
-    or local node runtime environment for it fails to load crypto module from node environment.
-
-## Install
-
-```
-npm install jscrypto
-# or
-yarn add jscrypto
-```
-
-## Usage
-### CommonJS Environment (Node.js environment like node CLI, AWS Lambda, etc)
-```js
-// Load whole library modules.
-const JsCrypto = require("jscrypto");
-console.log(JsCrypto.SHA256.hash("test").toString());
-
-// or load only necessary modules (Recommended for faster loading and reduced size)
-const {SHA256} = require("jscrypto/SHA256");
-console.log(SHA256.hash("test").toString());
-```
-
-### ES6 Environment (i.e. Creating app/library with webpack/react-scripts or some es6-compatible bundlers)
-**Be sure to load the module from `jscrypto/es6`.**  
-This can greatly reduce bundle size by bundlers tree-shaking ability. 
-Don't forget to add `/es6` following `jscrypto`
-```ecmascript 6
-// Load whole library modules.
-import JsCrypto from "jscrypto/es6";
-console.log(JsCrypto.SHA256.hash("test").toString());
-...
-import {SHA256} from "jscrypto/es6/SHA256"; // Recommended
-console.log(SHA256.hash("test").toString());
-```
-
-**For webpack v5**  
-Please add `{"crypto": "crypto"}` entry to `resolve.fallback` in `webpack.config.js` to suppress warning from webpack v5. 
-```
-module.exports = {
-  ...
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-    fallback: {"crypto": "crypto"} // <- Please add this entry to your webpack.config.js
-  },
-  ...
-}
-```
-
-### Typescript Environment
-**Be sure to load the module from `jscrypto/es6`.**
-```ecmascript 6
-// Load whole library modules.
-import * as JsCrypto from "jscrypto/es6";
-console.log(JsCrypto.SHA256.hash("test").toString());
-...
-import {SHA256} from "jscrypto/es6/SHA256"; // Recommended
-console.log(SHA256.hash("test").toString());
-```
-
-**For webpack v5**  
-Please add `{"crypto": false}` entry to `resolve.fallback` in `webpack.config.js` to suppress warning from webpack v5.
-```
-module.exports = {
-  ...
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-    fallback: {"crypto": "false"} // <- Please add this entry to your webpack.config.js
-  },
-  ...
-}
-```
-
-### Browser
-Copy js files/directories under `/dist` dir into somewhere browser can access.  
-Then directly load js file into `<script>` tag.
-```html
-<script src="dist/index.js"></script> <!-- All modules are loaded into browser -->
-<script src="dist/SHA256.js"></script><!-- Only SHA256 module is loaded into browser -->
-<script type="text/javascript">
-  // This will output: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-  console.log(JsCrypto.SHA256.hash("test").toString());
-</script>
-```
-
 ## API
 `jscrypto` supports crypto modules as well as `cryptojs`.
 
@@ -104,7 +8,7 @@ Then directly load js file into `<script>` tag.
 
 ### *Basic structure*
 **Word** [`Word32Array`](#word32array), [`Word64Array`](#word64array)  
-**Encoder** [`Base64`](#base64), [`Hex`](#hex), [`Latin1`](#latin1), [`Utf8`](#utf8), [`Utf16`](#utf16)  
+**Encoder** [`Base64`](#base64), [`Hex`](#hex), [`Latin1`](#latin1), [`Utf8`](#utf8), [`Utf16`](#utf16)
 
 ### *Misc*
 **Stream Cipher** [`Rabbits`](API.md#rabbits), [`RC4`](API.md#rC4), [`RC4Drop`](API.md#rC4Drop)  
@@ -538,4 +442,116 @@ w2.nSigBytes; // 8
   JsCrypto.Utf16.parse("あい").toString(); // "30423044"
 ```
 
-Continue to [API.md](API.md)
+### Stream Cipher
+<h4 id='rabbits'>Rabbits</h4>
+
+```js
+
+```
+
+<h4 id='rc4'>RC4</h4>
+
+```js
+
+```
+
+<h4 id='rc4drop'>RC4Drop</h4>
+
+```js
+
+```
+
+### Key Derive Function
+<h4 id='opensslkdf'>OpenSSLKDF</h4>
+
+```js
+
+```
+
+<h4 id='evpkdf'>EvpKDF</h4>
+
+```js
+
+```
+
+<h4 id='pbkdf2'>PBKDF2</h4>
+
+```js
+
+```
+
+
+### Block Cipher mode
+<h4 id='cbc'>CBC</h4>
+
+```js
+
+```
+
+<h4 id='cfb'>CFB</h4>
+
+```js
+
+```
+
+<h4 id='ctr'>CTR</h4>
+
+```js
+
+```
+
+<h4 id='ecb'>ECB</h4>
+
+```js
+
+```
+
+<h4 id='ofb'>OFB</h4>
+
+```js
+
+```
+
+### Block Padding
+<h4 id='ansix923'>AnsiX923</h4>
+
+```js
+
+```
+
+<h4 id='iso10126'>ISO10126</h4>
+
+```js
+
+```
+
+<h4 id='iso97971'>ISO97971</h4>
+
+```js
+
+```
+
+<h4 id='nopadding'>NoPadding</h4>
+
+```js
+
+```
+
+<h4 id='pkcs7'>Pkcs7</h4>
+
+```js
+
+```
+
+<h4 id='zero'>Zero</h4>
+
+```js
+
+```
+
+### Formatter
+<h4 id='opensslformatter'>OpenSSLFormatter</h4>
+
+```js
+
+```

@@ -104,7 +104,7 @@ Then directly load js file into `<script>` tag.
 
 ### *Basic structure*
 **Word** [`Word32Array`](#word32array), [`Word64Array`](#word64array)  
-**Encoder** [`Base64`](#base64), [`Hex`](#hex), [`Latin1`](#latin1), [`Utf8`](#utf8), [`Utf16`](#utf16)  
+**Encoder** [`Base64`](#base64), [`Hex`](#hex), [`Latin1`](#latin1), [`Utf8`](#utf8), [`Utf16`](#utf16)
 
 ### *Misc*
 **Stream Cipher** [`Rabbits`](API.md#rabbits), [`RC4`](API.md#rC4), [`RC4Drop`](API.md#rC4Drop)  
@@ -135,17 +135,20 @@ JsCrypt.SHA256.hash(w);
 
 ```js
 // MD.hash(string)
-var hashedWord = JsCrypto.MD5.hash("abc"); // Return value of 'hash' is Word32Array
+// Return value of 'hash' is Word32Array
+var hashedWord = JsCrypto.MD5.hash("abc");
 hashedWord.toString(); // "900150983cd24fb0d6963f7d28e17f72"
 hashedWord.toString(JsCrypto.Hex); // "900150983cd24fb0d6963f7d28e17f72"
 hashedWord.toString(JsCrypto.Base64); // "kAFQmDzST7DWlj99KOF/cg=="
 
 // Binary words can be hashed as well.
-var w = new JsCrypto.Word32Array([0x61626300], 3); // binary representation of "abc"
+// binary representation of "abc"
+var w = new JsCrypto.Word32Array([0x61626300], 3);
 var hashedWord = JsCrypto.MD5.hash(w);
 hashedWord.toString(); // "900150983cd24fb0d6963f7d28e17f72"
 
-var w2 = new JsCrypto.Word32Array([0x61626364]); // binary representation of "abcd"
+// binary representation of "abcd"
+var w2 = new JsCrypto.Word32Array([0x61626364]);
 var hashedWord = JsCrypto.MD5.hash(w2);
 hashedWord.toString(); // "e2fc714c4727ee9395f324cd2e7f331f"
 
@@ -273,13 +276,16 @@ hashedWord.toString(); // "4e4748e62b463521f6775fbf921234b5"
 hashedWord.toString(JsCrypto.Base64); // "TkdI5itGNSH2d1+/khI0tQ=="
 
 // Binary message can be hashed.
-var message = new JsCrypto.Word32Array([0x6d657373, 0x61676500], 7); // Binary representation of "message"
+// Binary representation of "message"
+var message = new JsCrypto.Word32Array([0x6d657373, 0x61676500], 7);
 var hashedWord = JsCrypto.HmacMD5(message, "key");
 hashedWord.toString(); // "4e4748e62b463521f6775fbf921234b5"
 
 // Key also can be a binary
-var message = new JsCrypto.Word32Array([0x6d657373, 0x61676500], 7); // Binary representation of "message"
-var key = new JsCrypto.Word32Array([0x6b657900], 3); // Binary representation of "key"
+// Binary representation of "message"
+var message = new JsCrypto.Word32Array([0x6d657373, 0x61676500], 7);
+// Binary representation of "key"
+var key = new JsCrypto.Word32Array([0x6b657900], 3);
 var hashedWord = JsCrypto.HmacMD5(message, key);
 hashedWord.toString(); // "4e4748e62b463521f6775fbf921234b5"
 
@@ -348,28 +354,35 @@ hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA==
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var encryptedDataObj = JsCrypto.AES.encrypt("message", "key"); // Default block cipher mode is CBC, pad is Pkcs7.
-var encryptedData = encryptedDataObj.toString(); // Random base64 string which contains encrypted message and 'random' salt.
-var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key"); // Binary data is returned as Word32Array. 
-decryptedData.toString(JsCrypto.Utf8); // Specify encoding and you get "message" 
+// Default block cipher mode is CBC, pad is Pkcs7.
+var encryptedDataObj = JsCrypto.AES.encrypt("message", "key");
+// Random base64 string which contains encrypted message and 'random' salt.
+var encryptedData = encryptedDataObj.toString();
+// Binary data is returned as Word32Array.
+var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
+// Specify encoding and you get "message"
+decryptedData.toString(JsCrypto.Utf8); 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string with pre-defined salt.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var salt = new JsCrypto.Word32Array([0x00112233, 0x44556677]); // Or JsCrypto.Hex.parse("0011223344556677")
 var encryptedDataObj = JsCrypto.AES.encrypt("message", "key", {salt: salt});
-var encryptedData = encryptedDataObj.toString(); // Always "U2FsdGVkX1/X4t3MKrqHN8aVLgI2BvY5ZlW7QDJX9OM=" because of a fixed salt.
-var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key"); // Binary data is returned as Word32Array. 
-decryptedData.toString(JsCrypto.Utf8); // Specify encoding and you get "message"
+// Always "U2FsdGVkX1/X4t3MKrqHN8aVLgI2BvY5ZlW7QDJX9OM=" because of a fixed salt.
+var encryptedData = encryptedDataObj.toString();
+// Binary data is returned as Word32Array.
+var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
+// Specify encoding and you get "message"
+decryptedData.toString(JsCrypto.Utf8);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // When you want to store/copy encrypted data somewhere, be sure to have 'stringified' data.
 // Don't save 'encryptedDataObj' below, because this contains encryption key itself.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Always 'stringify' this 'encryptedDataObj' then port it anywhere.
 var encryptedDataObj = JsCrypto.AES.encrypt("message", "key");
-// Always 'stringify' above 'encryptedDataObj' then port it anywhere.
-// 'stringified' data has only encrypted message and salt.
-var encryptedData = encryptedDataObj.toString(); // Base64 string containing encrypted data and salt
+// Retrun value of 'toString()' is a Base64 string containing only encrypted data and salt
+var encryptedData = encryptedDataObj.toString();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt not only a string but also binary data(ArrayBuffer, Uint8Array, etc)
@@ -382,13 +395,16 @@ reader.onload = function(e){
   const binaryWord = new Word32Array(arrayBuffer);
   const encryptedData = JsCrypto.AES.encrypt(binaryWord, "password").toString();
   
-  // Store it like localStorage
+  // Store it to localStorage, etc.
   localStorage.setItem("secretFile", encryptedData);
   
   // You can decrypt it like below
-  const decryptedData = JsCrypto.AES.decrypt(encryptedData, "password"); // Returned value is Word32Array
-  const decryptedFile = decryptedData.toUint8Array(); // Word32Array can be turned to Uint8Array.
-  const decryptedFileArrayBuffer = decryptedFile.buffer; // You can then convert it to ArrayBuffer;
+  // Returned value is Word32Array
+  const decryptedData = JsCrypto.AES.decrypt(encryptedData, "password");
+  // Word32Array can be turned to Uint8Array.
+  const decryptedFile = decryptedData.toUint8Array();
+  // You can then convert it to ArrayBuffer;
+  const decryptedFileArrayBuffer = decryptedFile.buffer;
 };
 reader.readAsArrayBuffer(file);
 ```
@@ -399,10 +415,14 @@ reader.readAsArrayBuffer(file);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var encryptedDataObj = JsCrypto.DES.encrypt("message", "key"); // Default block cipher mode is CBC, pad is Pkcs7.
-var encryptedData = encryptedDataObj.toString(); // Random base64 string which contains encrypted message and 'random' salt.
-var decryptedData = JsCrypto.DES.decrypt(encryptedData, "key"); // Binary data is returned as Word32Array. 
-decryptedData.toString(JsCrypto.Utf8); // Specify encoding and you get "message"
+// Default block cipher mode is CBC, pad is Pkcs7.
+var encryptedDataObj = JsCrypto.DES.encrypt("message", "key");
+// Random base64 string which contains encrypted message and 'random' salt.
+var encryptedData = encryptedDataObj.toString();
+// Binary data is returned as Word32Array.
+var decryptedData = JsCrypto.DES.decrypt(encryptedData, "key");
+// Specify encoding and you get "message"
+decryptedData.toString(JsCrypto.Utf8);
 
 // For additinal feature, please see AES example and replace 'AES' to 'DES'.
 ```
@@ -413,10 +433,14 @@ decryptedData.toString(JsCrypto.Utf8); // Specify encoding and you get "message"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var encryptedDataObj = JsCrypto.DES3.encrypt("message", "key"); // Default block cipher mode is CBC, pad is Pkcs7.
-var encryptedData = encryptedDataObj.toString(); // Random base64 string which contains encrypted message and 'random' salt.
-var decryptedData = JsCrypto.DES3.decrypt(encryptedData, "key"); // Binary data is returned as Word32Array. 
-decryptedData.toString(JsCrypto.Utf8); // Specify encoding and you get "message"
+// Default block cipher mode is CBC, pad is Pkcs7.
+var encryptedDataObj = JsCrypto.DES3.encrypt("message", "key");
+// Random base64 string which contains encrypted message and 'random' salt.
+var encryptedData = encryptedDataObj.toString();
+// Binary data is returned as Word32Array.
+var decryptedData = JsCrypto.DES3.decrypt(encryptedData, "key");
+// Specify encoding and you get "message"
+decryptedData.toString(JsCrypto.Utf8);
 
 // For additinal feature, please see AES example and replace 'AES' to 'DES3'.
 ```
@@ -428,11 +452,17 @@ The basic instance holding binary value.
 ```js
 // Example of Word32Array constructor.
 // Given 'new Word32Array(A, B)',  A: array of 32bit word, B: the number of significant bytes.
-var abcdefgh = new JsCrypto.Word32Array([0x61626364, 0x65666768]); // Binary representation of "abcdefgh"
-var abcdefg = new JsCrypto.Word32Array([0x61626364, 0x65666768], 7); // Binary representation of "abcdefg"
-var abcdef = new JsCrypto.Word32Array([0x61626364, 0x65666768], 6); // Binary representation of "abcdef"
-var abcd = new JsCrypto.Word32Array([0x61626364, 0x65666768], 4); // Binary representation of "abcd"
-var abcd2 = new JsCrypto.Word32Array([0x61626364]); // This also represents "abcd"
+
+// Binary representation of "abcdefgh"
+var abcdefgh = new JsCrypto.Word32Array([0x61626364, 0x65666768]);
+// Binary representation of "abcdefg"
+var abcdefg = new JsCrypto.Word32Array([0x61626364, 0x65666768], 7);
+// Binary representation of "abcdef"
+var abcdef = new JsCrypto.Word32Array([0x61626364, 0x65666768], 6);
+// Binary representation of "abcd"
+var abcd = new JsCrypto.Word32Array([0x61626364, 0x65666768], 4);
+// This also represents "abcd"
+var abcd2 = new JsCrypto.Word32Array([0x61626364]);
 
 // Example of stringify
 var w = new JsCrypto.Word32Array([0x1234567, 0x89abcdef]);
@@ -442,9 +472,12 @@ w.toString(JsCrypto.Hex); // "0123456789abcdef"
 w.toString(JsCrypto.Base64); // "ASNFZ4mrze8="
 
 // Word32Array can be genereated from parser.
-JsCrypto.Hex.parse("0123456789abcdef"); // The same as 'new Word32Array([0x01234567, 0x89abcdef])'
-JsCrypto.Base64.parse("ASNFZ4mrze8="); // The same as 'new Word32Array([0x01234567, 0x89abcdef])'
-JsCrypto.Utf8.parse("abcd"); // The same as 'new Word32Array([0x61626364])'
+// The same as 'new Word32Array([0x01234567, 0x89abcdef])'
+JsCrypto.Hex.parse("0123456789abcdef");
+// The same as 'new Word32Array([0x01234567, 0x89abcdef])'
+JsCrypto.Base64.parse("ASNFZ4mrze8=");
+// The same as 'new Word32Array([0x61626364])'
+JsCrypto.Utf8.parse("abcd");
 ```
 
 <h4 id='word64array'>Word64Array</h4>
@@ -536,6 +569,120 @@ w2.nSigBytes; // 8
   // Utf16.parse
   JsCrypto.Utf16.parse("あい"); // Word32Array. 0x30423044
   JsCrypto.Utf16.parse("あい").toString(); // "30423044"
+```
+
+### Stream Cipher
+<h4 id='rabbits'>Rabbits</h4>
+
+```js
+
+```
+
+<h4 id='rc4'>RC4</h4>
+
+```js
+
+```
+
+<h4 id='rc4drop'>RC4Drop</h4>
+
+```js
+
+```
+
+### Key Derive Function
+<h4 id='opensslkdf'>OpenSSLKDF</h4>
+
+```js
+
+```
+
+<h4 id='evpkdf'>EvpKDF</h4>
+
+```js
+
+```
+
+<h4 id='pbkdf2'>PBKDF2</h4>
+
+```js
+
+```
+
+
+### Block Cipher mode
+<h4 id='cbc'>CBC</h4>
+
+```js
+
+```
+
+<h4 id='cfb'>CFB</h4>
+
+```js
+
+```
+
+<h4 id='ctr'>CTR</h4>
+
+```js
+
+```
+
+<h4 id='ecb'>ECB</h4>
+
+```js
+
+```
+
+<h4 id='ofb'>OFB</h4>
+
+```js
+
+```
+
+### Block Padding
+<h4 id='ansix923'>AnsiX923</h4>
+
+```js
+
+```
+
+<h4 id='iso10126'>ISO10126</h4>
+
+```js
+
+```
+
+<h4 id='iso97971'>ISO97971</h4>
+
+```js
+
+```
+
+<h4 id='nopadding'>NoPadding</h4>
+
+```js
+
+```
+
+<h4 id='pkcs7'>Pkcs7</h4>
+
+```js
+
+```
+
+<h4 id='zero'>Zero</h4>
+
+```js
+
+```
+
+### Formatter
+<h4 id='opensslformatter'>OpenSSLFormatter</h4>
+
+```js
+
 ```
 
 Continue to [API.md](API.md)

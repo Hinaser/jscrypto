@@ -4,15 +4,19 @@ import {
   SerializableCipher,
   SerializableCipherProps,
 } from "./SerializableCipher";
-import type {KDF as KDFType} from "./kdf/type";
+import type {KDF as KDFType, KDFProps} from "./kdf/type";
 import {OpenSSLKDF} from "./kdf/OpenSSLKDF";
 import type {Word32Array} from "../../Word32Array";
 import {CipherParams} from "./CipherParams";
 import {OpenSSLFormatter} from "./formatter/OpenSSLFormatter";
 import type {Cipher as BaseCipher} from "./Cipher";
+import type {Hasher} from "../Hasher";
 
 export interface PasswordBasedCipherProps extends SerializableCipherProps {
   KDF: KDFType;
+  salt: Word32Array;
+  Hasher: typeof Hasher;
+  iterations: number;
 }
 
 export const PasswordBasedCipher: ISerializableCipher<string> = {
@@ -34,12 +38,19 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
     password: string,
     props?: Partial<PasswordBasedCipherProps>,
   ){
-    const p = props ? {...props} : {};
+    const cipherProps = props ? {...props} : {};
     const KDF = props && props.KDF ? props.KDF : OpenSSLKDF;
-    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
+    const kdfProps: Partial<KDFProps> = {};
+    if(props && props.Hasher){
+      kdfProps.Hasher = props.Hasher;
+    }
+    if(props && props.iterations){
+      kdfProps.iterations = props.iterations;
+    }
+    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherProps.salt, kdfProps);
     
-    p.iv = derivedParams.iv;
-    const cipherParams = SerializableCipher.encrypt(Cipher, message, derivedParams.key, p);
+    cipherProps.iv = derivedParams.iv;
+    const cipherParams = SerializableCipher.encrypt(Cipher, message, derivedParams.key, cipherProps);
     
     return new CipherParams({
       ...cipherParams,
@@ -81,7 +92,7 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
     const KDF = p.KDF ? p.KDF : OpenSSLKDF;
     const formatter = p.formatter ? p.formatter : OpenSSLFormatter;
     const cipherParamsObj = parseCipherText(cipherParams, formatter);
-    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
+    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherParamsObj.salt);
     
     p.iv = derivedParams.iv;
     return SerializableCipher.decrypt(Cipher, cipherParamsObj, derivedParams.key, p);

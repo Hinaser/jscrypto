@@ -2,8 +2,9 @@ const expect = require("expect.js");
 const {
   Word32Array,
   Hex,
-  mode: {ECB},
-  pad: {Noop},
+  Utf8,
+  mode: {ECB, CBC},
+  pad: {NoPadding, Pkcs7},
   SHA256,
   SerializableCipher,
   PasswordBasedCipher,
@@ -15,21 +16,21 @@ describe("aes", function(){
     const expectedResult = "69c4e0d86a7b0430d8cdb78070b4c55a";
     const message = Hex.parse("00112233445566778899aabbccddeeff");
     const key = Hex.parse("000102030405060708090a0b0c0d0e0f");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(AES.encrypt(message, key, props).cipherText.toString()).to.be(expectedResult);
   });
   it("test encrypt key size 192", function(){
     const expectedResult = "dda97ca4864cdfe06eaf70a0ec0d7191";
     const message = Hex.parse("00112233445566778899aabbccddeeff");
     const key = Hex.parse("000102030405060708090a0b0c0d0e0f1011121314151617");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(AES.encrypt(message, key, props).cipherText.toString()).to.be(expectedResult);
   });
   it("test encrypt key size 256", function(){
     const expectedResult = "8ea2b7ca516745bfeafc49904b496089";
     const message = Hex.parse("00112233445566778899aabbccddeeff");
     const key = Hex.parse("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(AES.encrypt(message, key, props).cipherText.toString()).to.be(expectedResult);
   });
   
@@ -37,28 +38,36 @@ describe("aes", function(){
     const expectedResult = "00112233445566778899aabbccddeeff";
     const encryptedMessage = Hex.parse("69c4e0d86a7b0430d8cdb78070b4c55a");
     const key = Hex.parse("000102030405060708090a0b0c0d0e0f");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(AES.decrypt({cipherText: encryptedMessage}, key, props).toString()).to.be(expectedResult);
   });
   it("test decrypt key size 192", function(){
     const expectedResult = "00112233445566778899aabbccddeeff";
     const encryptedMessage = Hex.parse("dda97ca4864cdfe06eaf70a0ec0d7191");
     const key = Hex.parse("000102030405060708090a0b0c0d0e0f1011121314151617");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(AES.decrypt({cipherText: encryptedMessage}, key, props).toString()).to.be(expectedResult);
   });
   it("test decrypt key size 256", function(){
     const expectedResult = "00112233445566778899aabbccddeeff";
     const encryptedMessage = Hex.parse("8ea2b7ca516745bfeafc49904b496089");
     const key = Hex.parse("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(AES.decrypt({cipherText: encryptedMessage}, key, props).toString()).to.be(expectedResult);
+  });
+  
+  it("test encrypt/decrypt string", function(){
+    const message = "message";
+    const key = "key";
+    
+    const encryptedData = AES.encrypt(message, key).toString();
+    expect(AES.decrypt(encryptedData, key).toString(Utf8)).to.be(message);
   });
   
   it("test multi part", function(){
     const expectedResult = "69c4e0d86a7b0430d8cdb78070b4c55a";
     const key = Hex.parse("000102030405060708090a0b0c0d0e0f");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     const aes = AES.createEncryptor(key, props);
   
     const ciphertext1 = aes.process(Hex.parse('001122334455'));
@@ -100,14 +109,14 @@ describe("aes", function(){
     };
   
     // Test
-    expect(AES.encrypt("Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: Noop}).cipherText.toString())
-      .to.be(AES.createEncryptor(SHA256.hash("Jefe"), {mode: ECB, padding: Noop}).finalize("Hi There").toString());
+    expect(AES.encrypt("Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: NoPadding}).cipherText.toString())
+      .to.be(AES.createEncryptor(SHA256.hash("Jefe"), {mode: ECB, padding: NoPadding}).finalize("Hi There").toString());
     
-    expect(AES.encrypt("Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: Noop}).toString())
-      .to.be(SerializableCipher.encrypt(AES, "Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: Noop}).toString());
+    expect(AES.encrypt("Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: NoPadding}).toString())
+      .to.be(SerializableCipher.encrypt(AES, "Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: NoPadding}).toString());
     
-    expect(AES.encrypt("Hi There", "Jefe", {mode: ECB, padding: Noop}).toString())
-      .to.be(PasswordBasedCipher.encrypt(AES, "Hi There", "Jefe", {mode: ECB, padding: Noop}).toString());
+    expect(AES.encrypt("Hi There", "Jefe", {mode: ECB, padding: NoPadding}).toString())
+      .to.be(PasswordBasedCipher.encrypt(AES, "Hi There", "Jefe", {mode: ECB, padding: NoPadding}).toString());
   
     // Restore random method
     Word32Array.random = random;

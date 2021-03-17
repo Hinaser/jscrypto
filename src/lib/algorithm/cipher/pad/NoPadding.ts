@@ -7,24 +7,24 @@ import type {Pad} from "./type";
  * @param {Word32Array} data The data to pad.
  * @param {number} blockSize The multiple that the data should be padded to.
  * @example
- *   Noop.pad(wordArray, 4);
+ *   NoPadding.pad(wordArray, 4);
  */
 function pad(data: Word32Array, blockSize: number){
-  // Noop
+  // NoPadding
 }
 
 /**
- * Unpads data that had been padded with Noop strategy.
+ * Unpads data that had been padded with NoPadding strategy.
  *
  * @param {Word32Array} data The data to unpad.
  * @example
- *   Noop.unpad(wordArray);
+ *   NoPadding.unpad(wordArray);
  */
 function unpad(data: Word32Array){
-  // Noop
+  // NoPadding
 }
 
-export const Noop: Pad = {
+export const NoPadding: Pad = {
   pad,
   unpad,
 };

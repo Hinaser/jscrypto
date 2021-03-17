@@ -16,11 +16,18 @@ export const PasswordBasedCipher = {
      *   var params = PasswordBasedCipher.encrypt(AES, message, 'password', { format: OpenSSLFormatter });
      */
     encrypt(Cipher, message, password, props) {
-        const p = props ? Object.assign({}, props) : {};
+        const cipherProps = props ? Object.assign({}, props) : {};
         const KDF = props && props.KDF ? props.KDF : OpenSSLKDF;
-        const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
-        p.iv = derivedParams.iv;
-        const cipherParams = SerializableCipher.encrypt(Cipher, message, derivedParams.key, p);
+        const kdfProps = {};
+        if (props && props.Hasher) {
+            kdfProps.Hasher = props.Hasher;
+        }
+        if (props && props.iterations) {
+            kdfProps.iterations = props.iterations;
+        }
+        const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherProps.salt, kdfProps);
+        cipherProps.iv = derivedParams.iv;
+        const cipherParams = SerializableCipher.encrypt(Cipher, message, derivedParams.key, cipherProps);
         return new CipherParams(Object.assign(Object.assign({}, cipherParams), { key: derivedParams.key, iv: derivedParams.iv, salt: derivedParams.salt }));
     },
     /**
@@ -50,7 +57,7 @@ export const PasswordBasedCipher = {
         const KDF = p.KDF ? p.KDF : OpenSSLKDF;
         const formatter = p.formatter ? p.formatter : OpenSSLFormatter;
         const cipherParamsObj = parseCipherText(cipherParams, formatter);
-        const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize);
+        const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherParamsObj.salt);
         p.iv = derivedParams.iv;
         return SerializableCipher.decrypt(Cipher, cipherParamsObj, derivedParams.key, p);
     }

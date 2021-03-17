@@ -173,7 +173,7 @@ export class Word32Array {
   public static random(nBytes: number){
     const words: number[] = [];
     
-    for(let i=0;i<nBytes;i++){
+    for(let i=0;i<nBytes;i+=4){
       words.push(random());
     }
     

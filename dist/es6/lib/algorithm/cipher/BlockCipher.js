@@ -1,12 +1,12 @@
 import { Cipher } from "./Cipher";
-import { ECB } from "./mode/ECB";
-import { Noop } from "./pad/Noop";
+import { CBC } from "./mode/CBC";
+import { Pkcs7 } from "./pad/Pkcs7";
 export class BlockCipher extends Cipher {
     constructor(props) {
         super(props);
         this._blockSize = 128 / 32;
-        this._Mode = ECB;
-        this._padding = Noop;
+        this._Mode = CBC;
+        this._padding = Pkcs7;
         this._props = props;
         this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
         this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;

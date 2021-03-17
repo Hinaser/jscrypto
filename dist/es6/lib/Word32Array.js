@@ -7,17 +7,50 @@ export class Word32Array {
     /**
      * Initializes a newly created word array.
      *
+     * ByteArray Support thanks to
+     * https://github.com/entronad/crypto-es/blob/master/lib/core.js
+     * MIT License Copyright(c) LIN Chen
+     *
      * @param {Array} words (Optional) An array of 32-bit words.
      * @param {number} nSignificantBytes (Optional) The number of significant bytes in the words.
-     *
      * @example
-     *   var wordArray = new WordArray();
-     *   var wordArray = new WordArray([0x00010203, 0x04050607]);
-     *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
+     *   var wordArray = new Word32Array();
+     *   var wordArray = new Word32Array([0x00010203, 0x04050607]);
+     *   var wordArray = new Word32Array([0x00010203, 0x04050607], 6);
+     *
      */
     constructor(words, nSignificantBytes) {
-        this._words = words || [];
-        this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
+        if (Array.isArray(words) || !words) {
+            this._words = words || [];
+            this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
+            return;
+        }
+        let uint8Array;
+        if (words instanceof ArrayBuffer) {
+            uint8Array = new Uint8Array(words);
+        }
+        else if (words instanceof Int8Array
+            || words instanceof Uint8ClampedArray
+            || words instanceof Int16Array
+            || words instanceof Uint16Array
+            || words instanceof Int32Array
+            || words instanceof Uint32Array
+            || words instanceof Float32Array
+            || words instanceof Float64Array) {
+            uint8Array = new Uint8Array(words.buffer, words.byteOffset, words.byteLength);
+        }
+        if (!uint8Array) {
+            this._words = [];
+            this._nSignificantBytes = 0;
+            return;
+        }
+        const byteLen = uint8Array.byteLength;
+        const w = [];
+        for (let i = 0; i < byteLen; i++) {
+            w[i >>> 2] |= uint8Array[i] << (24 - (i % 4) * 8);
+        }
+        this._words = w;
+        this._nSignificantBytes = byteLen;
     }
     get nSigBytes() {
         return this._nSignificantBytes;
@@ -113,7 +146,7 @@ export class Word32Array {
      */
     static random(nBytes) {
         const words = [];
-        for (let i = 0; i < nBytes; i++) {
+        for (let i = 0; i < nBytes; i += 4) {
             words.push(random());
         }
         return new Word32Array(words, nBytes);

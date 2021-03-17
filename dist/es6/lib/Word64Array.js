@@ -16,13 +16,13 @@ export class Word64Array {
     /**
      * Initializes a newly created word array.
      *
-     * @param {Array} words (Optional) An array of 32-bit words.
+     * @param {Array} words (Optional) An array of 64-bit words.
      * @param {number} nSignificantBytes (Optional) The number of significant bytes in the words.
      *
      * @example
-     *   var wordArray = new WordArray();
-     *   var wordArray = new WordArray([0x00010203, 0x04050607]);
-     *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
+     *   var wordArray = new Word64Array();
+     *   var wordArray = new Word64Array([new Word64(0x00010203, 0x04050607)]);
+     *   var wordArray = new Word46Array([new Word64(0x00010203, 0x04050607)], 6);
      */
     constructor(words, nSignificantBytes) {
         this._words = words || [];

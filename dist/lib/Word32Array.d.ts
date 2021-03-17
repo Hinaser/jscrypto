@@ -1,4 +1,5 @@
 import type { IEncoder } from "./type";
+declare type ByteArray = ArrayBuffer | Uint8Array | Int8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 /**
  * An array of 32bit words
  */
@@ -8,15 +9,19 @@ export declare class Word32Array {
     /**
      * Initializes a newly created word array.
      *
+     * ByteArray Support thanks to
+     * https://github.com/entronad/crypto-es/blob/master/lib/core.js
+     * MIT License Copyright(c) LIN Chen
+     *
      * @param {Array} words (Optional) An array of 32-bit words.
      * @param {number} nSignificantBytes (Optional) The number of significant bytes in the words.
-     *
      * @example
-     *   var wordArray = new WordArray();
-     *   var wordArray = new WordArray([0x00010203, 0x04050607]);
-     *   var wordArray = new WordArray([0x00010203, 0x04050607], 6);
+     *   var wordArray = new Word32Array();
+     *   var wordArray = new Word32Array([0x00010203, 0x04050607]);
+     *   var wordArray = new Word32Array([0x00010203, 0x04050607], 6);
+     *
      */
-    constructor(words?: number[], nSignificantBytes?: number);
+    constructor(words?: number[] | ByteArray, nSignificantBytes?: number);
     get nSigBytes(): number;
     /**
      * Set significant bytes
@@ -74,3 +79,4 @@ export declare class Word32Array {
      */
     static random(nBytes: number): Word32Array;
 }
+export {};

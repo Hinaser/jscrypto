@@ -3,7 +3,7 @@ const {
   Word32Array,
   Hex,
   mode: {ECB},
-  pad: {Noop},
+  pad: {NoPadding},
   SHA256,
   SerializableCipher,
   PasswordBasedCipher,
@@ -15,21 +15,21 @@ describe("des3", function(){
     const expectedResult = "95a8d72813daa94d";
     const message = Hex.parse("0000000000000000");
     const key = Hex.parse("800101010101010180010101010101018001010101010101");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(DES3.encrypt(message, key, props).cipherText.toString()).to.be(expectedResult);
   });
   it("test encrypt 2", function(){
     const expectedResult = "869efd7f9f265a09";
     const message = Hex.parse("0000000000000000");
     const key = Hex.parse("010101010101010201010101010101020101010101010102");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(DES3.encrypt(message, key, props).cipherText.toString()).to.be(expectedResult);
   });
   it("test encrypt 3", function(){
     const expectedResult = "95f8a5e5dd31d900";
     const message = Hex.parse("8000000000000000");
     const key = Hex.parse("010101010101010101010101010101010101010101010101");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(DES3.encrypt(message, key, props).cipherText.toString()).to.be(expectedResult);
   });
   
@@ -37,35 +37,35 @@ describe("des3", function(){
     const expectedResult = "166b40b44aba4bd6";
     const encryptedMessage = Hex.parse("0000000000000001");
     const key = Hex.parse("010101010101010101010101010101010101010101010101");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(DES3.decrypt({cipherText: encryptedMessage}, key, props).toString()).to.be(expectedResult);
   });
   it("test decrypt 1", function(){
     const expectedResult = "0000000000000000";
     const encryptedMessage = Hex.parse("95a8d72813daa94d");
     const key = Hex.parse("800101010101010180010101010101018001010101010101");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(DES3.decrypt({cipherText: encryptedMessage}, key, props).toString()).to.be(expectedResult);
   });
   it("test decrypt 2", function(){
     const expectedResult = "0000000000000000";
     const encryptedMessage = Hex.parse("869efd7f9f265a09");
     const key = Hex.parse("010101010101010201010101010101020101010101010102");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(DES3.decrypt({cipherText: encryptedMessage}, key, props).toString()).to.be(expectedResult);
   });
   it("test decrypt 3", function(){
     const expectedResult = "8000000000000000";
     const encryptedMessage = Hex.parse("95f8a5e5dd31d900");
     const key = Hex.parse("010101010101010101010101010101010101010101010101");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(DES3.decrypt({cipherText: encryptedMessage}, key, props).toString()).to.be(expectedResult);
   });
   it("test decrypt 4", function(){
     const expectedResult = "0000000000000001";
     const encryptedMessage = Hex.parse("166b40b44aba4bd6");
     const key = Hex.parse("010101010101010101010101010101010101010101010101");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     expect(DES3.decrypt({cipherText: encryptedMessage}, key, props).toString()).to.be(expectedResult);
   });
   
@@ -73,10 +73,10 @@ describe("des3", function(){
     const expectedResult = DES3.encrypt(
       Hex.parse("00112233445566778899aabbccddeeff"),
       Hex.parse("000102030405060708090a0b0c0d0e0f1011121314151617"),
-      {mode: ECB, padding: Noop},
+      {mode: ECB, padding: NoPadding},
     ).cipherText.toString();
     const key = Hex.parse("000102030405060708090a0b0c0d0e0f1011121314151617");
-    const props = {mode: ECB, padding: Noop};
+    const props = {mode: ECB, padding: NoPadding};
     const des3 = DES3.createEncryptor(key, props);
     
     const ciphertext1 = des3.process(Hex.parse('001122334455'));
@@ -151,14 +151,14 @@ describe("des3", function(){
     };
     
     // Test
-    expect(DES3.encrypt("Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: Noop}).cipherText.toString())
-      .to.be(DES3.createEncryptor(SHA256.hash("Jefe"), {mode: ECB, padding: Noop}).finalize("Hi There").toString());
+    expect(DES3.encrypt("Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: NoPadding}).cipherText.toString())
+      .to.be(DES3.createEncryptor(SHA256.hash("Jefe"), {mode: ECB, padding: NoPadding}).finalize("Hi There").toString());
     
-    expect(DES3.encrypt("Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: Noop}).toString())
-      .to.be(SerializableCipher.encrypt(DES3, "Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: Noop}).toString());
+    expect(DES3.encrypt("Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: NoPadding}).toString())
+      .to.be(SerializableCipher.encrypt(DES3, "Hi There", SHA256.hash("Jefe"), {mode: ECB, padding: NoPadding}).toString());
     
-    expect(DES3.encrypt("Hi There", "Jefe", {mode: ECB, padding: Noop}).toString())
-      .to.be(PasswordBasedCipher.encrypt(DES3, "Hi There", "Jefe", {mode: ECB, padding: Noop}).toString());
+    expect(DES3.encrypt("Hi There", "Jefe", {mode: ECB, padding: NoPadding}).toString())
+      .to.be(PasswordBasedCipher.encrypt(DES3, "Hi There", "Jefe", {mode: ECB, padding: NoPadding}).toString());
     
     // Restore random method
     Word32Array.random = random;

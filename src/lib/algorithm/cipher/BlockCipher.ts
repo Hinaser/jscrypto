@@ -1,8 +1,8 @@
 import {Cipher, CipherProps, PropsWithKey} from "./Cipher";
 import type {BlockCipherMode, BlockCipherModeProps} from "./mode/BlockCipherMode";
+import {CBC} from "./mode/CBC";
 import type {Pad} from "./pad/type";
-import {ECB} from "./mode/ECB";
-import {Noop} from "./pad/Noop";
+import {Pkcs7} from "./pad/Pkcs7";
 import type {Word32Array} from "../../Word32Array";
 
 export interface BlockCipherProps extends CipherProps {
@@ -13,9 +13,9 @@ export interface BlockCipherProps extends CipherProps {
 export class BlockCipher extends Cipher {
   protected _props: PropsWithKey<BlockCipherProps>;
   protected _blockSize = 128/32;
-  protected _Mode: typeof BlockCipherMode = ECB;
+  protected _Mode: typeof BlockCipherMode = CBC;
   protected _mode?: BlockCipherMode;
-  protected _padding: Pad = Noop;
+  protected _padding: Pad = Pkcs7;
   protected _modeCreator?: (props: BlockCipherModeProps) => BlockCipherMode;
   
   /**

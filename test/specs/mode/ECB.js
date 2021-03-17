@@ -1,7 +1,7 @@
 const expect = require("expect.js");
 const {Word32Array} = require("../../../test/build/lib");
 const {ECB} = require("../../../test/build/mode/ECB");
-const {Noop} = require("../../../test/build/pad/Noop");
+const {NoPadding} = require("../../../test/build/pad/NoPadding");
 const {AES} = require("../../../test/build/AES");
 
 describe("mode/ECB", function(){
@@ -21,15 +21,15 @@ describe("mode/ECB", function(){
     aes.encryptBlock(expected.words, 4);
     
     // Compute actual
-    const actual = AES.encrypt(data.message, data.key, { iv: data.iv, mode: ECB, padding: Noop }).cipherText;
+    const actual = AES.encrypt(data.message, data.key, { iv: data.iv, mode: ECB, padding: NoPadding }).cipherText;
     
     // Test
     expect(actual.toString()).to.be(expected.toString());
   });
   
   it("test decryptor", function(){
-    const encrypted = AES.encrypt(data.message, data.key, { iv: data.iv, mode: ECB, padding: Noop });
-    const decrypted = AES.decrypt(encrypted, data.key, { iv: data.iv, mode: ECB, padding: Noop });
+    const encrypted = AES.encrypt(data.message, data.key, { iv: data.iv, mode: ECB, padding: NoPadding });
+    const decrypted = AES.decrypt(encrypted, data.key, { iv: data.iv, mode: ECB, padding: NoPadding });
     
     expect(decrypted.toString()).to.be(data.message.toString());
   });

@@ -38,6 +38,6 @@ export declare const pad: {
     ISO10126: import("./lib/algorithm/cipher/pad/type").Pad;
     ISO97971: import("./lib/algorithm/cipher/pad/type").Pad;
     Pkcs7: import("./lib/algorithm/cipher/pad/type").Pad;
-    Noop: import("./lib/algorithm/cipher/pad/type").Pad;
+    NoPadding: import("./lib/algorithm/cipher/pad/type").Pad;
     Zero: import("./lib/algorithm/cipher/pad/type").Pad;
 };

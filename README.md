@@ -110,7 +110,7 @@ Then directly load js file into `<script>` tag.
 **Stream Cipher** [`Rabbits`](#rabbits), [`RC4`](#rC4), [`RC4Drop`](#rC4Drop)  
 **Key Derive Function** [`OpenSSLKDF`](#openSSLKDF), [`EvpKDF`](#evpKDF), [`PBKDF2`](#pBKDF2)  
 **Block Cipher mode** [`CBC`](#cBC), [`CFB`](#cFB), [`CTR`](#cTR), [`ECB`](#eCB), [`OFB`](#oFB)  
-**Block Padding** [`AnsiX923`](#ansiX923), [`ISO10126`](#iSO10126), [`ISO97971`](#iSO97971), [`Noop`](#noop), [`Pkcs7`](#pkcs7), [`Zero`](#zero)  
+**Block Padding** [`AnsiX923`](#ansiX923), [`ISO10126`](#iSO10126), [`ISO97971`](#iSO97971), [`NoPadding`](#nopadding), [`Pkcs7`](#pkcs7), [`Zero`](#zero)  
 **Formatter** [`OpenSSLFormatter`](#openSSLFormatter)
 
 ---
@@ -338,6 +338,43 @@ hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA==
 // Binary message can be hashed as well as HMAC-MD5. See HMAC-MD5 example above.
 // Key also can be a binary as well as HMAC-MD5. See HMAC-MD5 example above.
 // Can Gradual update as well as HMAC-MD5. See HMAC-MD5 example above.
+```
+
+### Block Cipher
+
+<h4 id="aes">AES</h4>
+
+```js
+// Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
+var encryptedDataObj = JsCrypto.AES.encrypt("message", "key"); // Default block cipher mode is CBC, pad is Pkcs7.
+var encryptedData = encryptedData.toString(); // Random base64 string which contains encrypted message and 'random' salt.
+var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key"); // Binary data is returned as Word32Array. 
+decryptedData.toString(JsCrypto.Utf8); // Specify encoding and you get "message" 
+
+// Encrypt/Decrypt string with pre-defined salt.
+var salt = new JsCrypto.Word32Array([0x00112233, 0x44556677]); // Or JsCrypto.Hex.parse("0011223344556677")
+var encryptedDataObj = JsCrypto.AES.encrypt("message", "key", {salt: salt});
+var encryptedData = encryptedData.toString(); // Always "U2FsdGVkX1/X4t3MKrqHN8aVLgI2BvY5ZlW7QDJX9OM=" because of a fixed salt.
+var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key"); // Binary data is returned as Word32Array. 
+decryptedData.toString(JsCrypto.Utf8); // Specify encoding and you get "message"
+
+// When you want to store/copy encrypted data somewhere, be sure to have `stringified` data.
+// Don't save 'encryptedDataObj' below, because this contains encryption key itself.
+var encryptedDataObj = JsCrypto.AES.encrypt("message", "key");
+// Always 'stringify' above 'encryptedDataObj' then port it anywhere.
+// 'stringified' data has only encrypted message and salt.
+var encryptedData = encryptedData.toString();
+
+// Encrypt not only a string but also binary data(ArrayBuffer, Uint8Array, etc)
+const fileEl = document.querySelector("input[type='file']");
+const file = fileEl.files[0];
+const reader = new FileReader();
+reader.onload = function(e){
+  const arrayBuffer = reader.result;
+  const binaryWord = new Word32Array(arrayBuffer);
+  const encryptedData = JsCrypto.AES.encrypt(binaryWord, "password").toString();
+};
+reader.readAsArrayBuffer(file);
 ```
 
 ### Word

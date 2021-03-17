@@ -21,7 +21,7 @@ export declare class Word32Array {
      *   var wordArray = new Word32Array([0x00010203, 0x04050607], 6);
      *
      */
-    constructor(words?: number[] | ByteArray, nSignificantBytes?: number);
+    constructor(words?: number[] | ByteArray | unknown, nSignificantBytes?: number);
     get nSigBytes(): number;
     /**
      * Set significant bytes
@@ -44,6 +44,15 @@ export declare class Word32Array {
      *   var string = wordArray.toString(Utf8);
      */
     toString(encoder?: IEncoder): string;
+    /**
+     * Converts this 32bit word array to Uint8Array
+     *
+     * @return {Uint8Array} Unsigned int 8bit array
+     * @example
+     *   var word = new Word32Array([0x00102030]);
+     *   var uint8 = word.toUint8Array(); // Uint8Array(4) [ 0, 16, 32, 48 ]
+     */
+    toUint8Array(): Uint8Array;
     /**
      * Concatenates a word array to this word array.
      *

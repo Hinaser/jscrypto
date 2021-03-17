@@ -27,9 +27,9 @@ export class Word32Array {
    *   var wordArray = new Word32Array([0x00010203, 0x04050607], 6);
    *  
    */
-  public constructor(words?: number[]|ByteArray, nSignificantBytes?: number) {
+  public constructor(words?: number[]|ByteArray|unknown, nSignificantBytes?: number) {
     if(Array.isArray(words) || !words){
-      this._words = words || [];
+      this._words = Array.isArray(words) ? words : [];
       this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
       return;
     }
@@ -39,7 +39,8 @@ export class Word32Array {
       uint8Array = new Uint8Array(words);
     }
     else if(
-      words instanceof Int8Array
+      words instanceof Uint8Array
+      || words instanceof Int8Array
       || words instanceof Uint8ClampedArray
       || words instanceof Int16Array
       || words instanceof Uint16Array
@@ -49,6 +50,9 @@ export class Word32Array {
       || words instanceof Float64Array
     ){
       uint8Array = new Uint8Array(words.buffer, words.byteOffset, words.byteLength);
+    }
+    else{
+      throw new Error("Invalid argument");
     }
     
     if(!uint8Array){
@@ -102,6 +106,26 @@ export class Word32Array {
       return Hex.stringify(this);
     }
     return encoder.stringify(this);
+  }
+  
+  /**
+   * Converts this 32bit word array to Uint8Array
+   * 
+   * @return {Uint8Array} Unsigned int 8bit array
+   * @example
+   *   var word = new Word32Array([0x00102030]);
+   *   var uint8 = word.toUint8Array(); // Uint8Array(4) [ 0, 16, 32, 48 ]
+   */
+  public toUint8Array(){
+    const words = this._words;
+    const nB = this._nSignificantBytes;
+    const uint8Array = new Uint8Array(nB);
+    
+    for(let i=0;i<nB;i++){
+      uint8Array[i] = (words[i>>>2] >>> (24 - (i%4) * 8)) & 0xff;
+    }
+    
+    return uint8Array;
   }
   
   /**

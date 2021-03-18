@@ -29,6 +29,9 @@ export const Hex = {
      */
     parse(hexStr) {
         const Len = hexStr.length;
+        if (Len % 2 !== 0) {
+            throw new Error("Hex string count must be even");
+        }
         const words = [];
         for (let i = 0; i < Len; i += 2) {
             words[i >>> 3] |= parseInt(hexStr.substr(i, 2), 16) << (24 - (i % 8) * 4);

@@ -12,7 +12,7 @@
 
 ### *Misc*
 **Stream Cipher** [`Rabbits`](API.md#rabbits), [`RC4`](API.md#rC4), [`RC4Drop`](API.md#rC4Drop)  
-**Key Derive Function** [`OpenSSLKDF`](API.md#openSSLKDF), [`EvpKDF`](API.md#evpKDF), [`PBKDF2`](API.md#pBKDF2)  
+**Key Derivation Function** [`OpenSSLKDF`](API.md#openSSLKDF), [`EvpKDF`](API.md#evpKDF), [`PBKDF2`](API.md#pBKDF2)  
 **Block Cipher mode** [`CBC`](API.md#cBC), [`CFB`](API.md#cFB), [`CTR`](API.md#cTR), [`ECB`](API.md#eCB), [`OFB`](API.md#oFB)  
 **Block Padding** [`AnsiX923`](API.md#ansiX923), [`ISO10126`](API.md#iSO10126), [`ISO97971`](API.md#iSO97971), [`NoPadding`](API.md#nopadding), [`Pkcs7`](API.md#pkcs7), [`Zero`](API.md#zero)  
 **Formatter** [`OpenSSLFormatter`](API.md#openSSLFormatter)
@@ -309,6 +309,9 @@ reader.onload = function(e){
 reader.readAsArrayBuffer(file);
 ```
 
+JsCrypto supports AES-128, AES-192, AES-256.  
+When you supply encryption key as a string password, it automatically generates 256bit key for encryption. (AES-256).
+
 <h4 id="des">DES</h4>
 
 ```js
@@ -457,7 +460,7 @@ JsCrypto.Utf8.parse("あa").toString(); // "e3818261"
 <h4 id='utf16'>UTF-16</h4>
 
 ```js
-  var w = new JsCrypto.Word32Array([0x30423044]); // 0x3042 = あ, 0x3044 = い in UTF-16
+var w = new JsCrypto.Word32Array([0x30423044]); // 0x3042 = あ, 0x3044 = い in UTF-16
 
 // Utf16.stringify
 JsCrypto.Utf16.stringify(w); // "あい"
@@ -473,38 +476,70 @@ JsCrypto.Utf16.parse("あい").toString(); // "30423044"
 <h4 id='rabbits'>Rabbits</h4>
 
 ```js
-
+// Encrypt
+var message = JsCrypto.Hex.parse("00000000000000000000000000000000");
+var key = JsCrypto.Hex.parse("00000000000000000000000000000000");
+var encrypted = JsCrypto.Rabbit.encrypt(message, key).toString(); // "AvdKHCZFa/Xs1qU28FRXsQ=="
+// Decrypt
+var word = JsCrypto.Rabbit.decrypt(encrypted, key);
+word.toString(); // "00000000000000000000000000000000"
 ```
 
 <h4 id='rc4'>RC4</h4>
 
 ```js
-
+// Encrypt
+var message = JsCrypto.Hex.parse("0000000000000000"); // word32array
+var key = JsCrypto.Hex.parse("0123456789abcdef"); // word32array
+var encrypted = JsCrypto.RC4.encrypt(message, key).toString(); // "AvdKHCZFa/Xs1qU28FRXsQ=="
+// Decrypt
+var word = JsCrypto.RC4.decrypt(encrypted, key);
+word.toString(); // "0000000000000000"
 ```
 
 <h4 id='rc4drop'>RC4Drop</h4>
 
 ```js
-
+// Encrypt
+var encrypted = JsCrypto.RC4Drop.encrypt("Message", "Secret Passphrase", { drop: 3072/4 });
+// Decrypt
+var decrypted = JsCrypto.RC4Drop.decrypt(encrypted, "Secret Passphrase", { drop: 3072/4 });
+decrypted.toString(JsCrypto.Utf8); // "Message"
 ```
 
-### Key Derive Function
+### Key Derivation Function
 <h4 id='opensslkdf'>OpenSSLKDF</h4>
 
-```js
+String password cannot be used to crypto modules as it is.  
+It is automatically converted to a byte array in a crypto module by key derivation function.  
+You can generate binary key with Key Derivation Function by yourself, as described here.
 
+```js
+// OpenSSLKDF returns both key/iv.
+var keySize = 256/32;
+var ivSize = 128/32;
+var salt = JsCrypto.Hex.parse("0a9d8620cf7219f1");
+var derivedParams = JsCrypto.OpenSSLKDF.execute("password", keySize, ivSize, salt);
+
+derivedParams.key.toString(); // "50f32e0ec9408e02ff42364a52aac95c3694fc027256c6f488bf84b8e60effcd";
+derivedParams.iv.toString(); // "81381e39b94fd692dff7e2239a298cb6";
+derivedParams.salt.toString(); // "0a9d8620cf7219f1"
 ```
 
 <h4 id='evpkdf'>EvpKDF</h4>
 
 ```js
-
+// Generate 192bit key
+// Return value is Word32Array.
+var key = EvpKDF.getKey("password", "saltsalt", {keySize: 192/32});
 ```
 
 <h4 id='pbkdf2'>PBKDF2</h4>
 
 ```js
-
+// Generate 256bit key with 1200 iterations.
+// Return value is Word32Array.
+var key = PBKDF2.getKey("password", "saltsalt", {keySize: 256/32, iterations: 1200});
 ```
 
 

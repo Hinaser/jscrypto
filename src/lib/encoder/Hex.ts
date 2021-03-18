@@ -34,6 +34,9 @@ export const Hex: IEncoder = {
    */
   parse(hexStr: string){
     const Len = hexStr.length;
+    if(Len % 2 !== 0){
+      throw new Error("Hex string count must be even");
+    }
     const words: number[] = [];
     
     for(let i=0;i<Len;i+=2){

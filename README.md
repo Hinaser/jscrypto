@@ -45,19 +45,6 @@ import {SHA256} from "jscrypto/es6/SHA256"; // Recommended
 console.log(SHA256.hash("test").toString());
 ```
 
-**For webpack v5**  
-Please add `{"crypto": "crypto"}` entry to `resolve.fallback` in `webpack.config.js` to suppress warning from webpack v5. 
-```
-module.exports = {
-  ...
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-    fallback: {"crypto": "crypto"} // <- Please add this entry to your webpack.config.js
-  },
-  ...
-}
-```
-
 ### Typescript Environment
 **Be sure to load the module from `jscrypto/es6`.**
 ```ecmascript 6
@@ -67,19 +54,6 @@ console.log(JsCrypto.SHA256.hash("test").toString());
 ...
 import {SHA256} from "jscrypto/es6/SHA256"; // Recommended
 console.log(SHA256.hash("test").toString());
-```
-
-**For webpack v5**  
-Please add `{"crypto": false}` entry to `resolve.fallback` in `webpack.config.js` to suppress warning from webpack v5.
-```
-module.exports = {
-  ...
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-    fallback: {"crypto": "false"} // <- Please add this entry to your webpack.config.js
-  },
-  ...
-}
 ```
 
 ### Browser
@@ -404,6 +378,9 @@ reader.onload = function(e){
 };
 reader.readAsArrayBuffer(file);
 ```
+
+JsCrypto supports AES-128, AES-192, AES-256.  
+When you supply encryption key as a string password, it automatically generates 256bit key for encryption. (AES-256).  
 
 <h4 id="des">DES</h4>
 

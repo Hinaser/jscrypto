@@ -355,25 +355,21 @@ hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA==
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Default block cipher mode is CBC, pad is Pkcs7.
-var encryptedDataObj = JsCrypto.AES.encrypt("message", "key");
 // Random base64 string which contains encrypted message and 'random' salt.
-var encryptedData = encryptedDataObj.toString();
+var encryptedData = JsCrypto.AES.encrypt("message", "key").toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
-// Specify encoding and you get "message"
-decryptedData.toString(JsCrypto.Utf8); 
+decryptedData.toString(JsCrypto.Utf8); // "message"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string with pre-defined salt.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var salt = new JsCrypto.Word32Array([0x00112233, 0x44556677]); // Or JsCrypto.Hex.parse("0011223344556677")
-var encryptedDataObj = JsCrypto.AES.encrypt("message", "key", {salt: salt});
 // Always "U2FsdGVkX1/X4t3MKrqHN8aVLgI2BvY5ZlW7QDJX9OM=" because of a fixed salt.
-var encryptedData = encryptedDataObj.toString();
+var encryptedData = JsCrypto.AES.encrypt("message", "key", {salt: salt}).toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
-// Specify encoding and you get "message"
-decryptedData.toString(JsCrypto.Utf8);
+decryptedData.toString(JsCrypto.Utf8); // "message"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // When you want to store/copy encrypted data somewhere, be sure to have 'stringified' data.
@@ -381,7 +377,7 @@ decryptedData.toString(JsCrypto.Utf8);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Always 'stringify' this 'encryptedDataObj' then port it anywhere.
 var encryptedDataObj = JsCrypto.AES.encrypt("message", "key");
-// Retrun value of 'toString()' is a Base64 string containing only encrypted data and salt
+// Return value of 'toString()' is a Base64 string containing only encrypted data and salt
 var encryptedData = encryptedDataObj.toString();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -416,9 +412,8 @@ reader.readAsArrayBuffer(file);
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Default block cipher mode is CBC, pad is Pkcs7.
-var encryptedDataObj = JsCrypto.DES.encrypt("message", "key");
 // Random base64 string which contains encrypted message and 'random' salt.
-var encryptedData = encryptedDataObj.toString();
+var encryptedData = JsCrypto.DES.encrypt("message", "key").toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.DES.decrypt(encryptedData, "key");
 // Specify encoding and you get "message"
@@ -434,9 +429,8 @@ decryptedData.toString(JsCrypto.Utf8);
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Default block cipher mode is CBC, pad is Pkcs7.
-var encryptedDataObj = JsCrypto.DES3.encrypt("message", "key");
 // Random base64 string which contains encrypted message and 'random' salt.
-var encryptedData = encryptedDataObj.toString();
+var encryptedData = JsCrypto.DES3.encrypt("message", "key").toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.DES3.decrypt(encryptedData, "key");
 // Specify encoding and you get "message"
@@ -569,120 +563,6 @@ w2.nSigBytes; // 8
   // Utf16.parse
   JsCrypto.Utf16.parse("あい"); // Word32Array. 0x30423044
   JsCrypto.Utf16.parse("あい").toString(); // "30423044"
-```
-
-### Stream Cipher
-<h4 id='rabbits'>Rabbits</h4>
-
-```js
-
-```
-
-<h4 id='rc4'>RC4</h4>
-
-```js
-
-```
-
-<h4 id='rc4drop'>RC4Drop</h4>
-
-```js
-
-```
-
-### Key Derive Function
-<h4 id='opensslkdf'>OpenSSLKDF</h4>
-
-```js
-
-```
-
-<h4 id='evpkdf'>EvpKDF</h4>
-
-```js
-
-```
-
-<h4 id='pbkdf2'>PBKDF2</h4>
-
-```js
-
-```
-
-
-### Block Cipher mode
-<h4 id='cbc'>CBC</h4>
-
-```js
-
-```
-
-<h4 id='cfb'>CFB</h4>
-
-```js
-
-```
-
-<h4 id='ctr'>CTR</h4>
-
-```js
-
-```
-
-<h4 id='ecb'>ECB</h4>
-
-```js
-
-```
-
-<h4 id='ofb'>OFB</h4>
-
-```js
-
-```
-
-### Block Padding
-<h4 id='ansix923'>AnsiX923</h4>
-
-```js
-
-```
-
-<h4 id='iso10126'>ISO10126</h4>
-
-```js
-
-```
-
-<h4 id='iso97971'>ISO97971</h4>
-
-```js
-
-```
-
-<h4 id='nopadding'>NoPadding</h4>
-
-```js
-
-```
-
-<h4 id='pkcs7'>Pkcs7</h4>
-
-```js
-
-```
-
-<h4 id='zero'>Zero</h4>
-
-```js
-
-```
-
-### Formatter
-<h4 id='opensslformatter'>OpenSSLFormatter</h4>
-
-```js
-
 ```
 
 Continue to [API.md](API.md)

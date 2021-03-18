@@ -14,6 +14,8 @@ const copyFileToPublish = (fileName) => {
 };
 
 copyFileToPublish("README.md");
+copyFileToPublish("API.md");
+copyFileToPublish("REFERENCE.md");
 copyFileToPublish("LICENSE");
 copyFileToPublish("CHANGELOG");
 

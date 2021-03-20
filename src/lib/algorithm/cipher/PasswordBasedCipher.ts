@@ -4,7 +4,7 @@ import {
   SerializableCipher,
   SerializableCipherProps,
 } from "./SerializableCipher";
-import type {KDF as KDFType, KDFProps} from "./kdf/type";
+import type {KDF as KDFType, KDFProps, BaseKDFModule} from "./kdf/type";
 import {OpenSSLKDF} from "./kdf/OpenSSLKDF";
 import type {Word32Array} from "../../Word32Array";
 import {CipherParams} from "./CipherParams";
@@ -13,10 +13,11 @@ import type {Cipher as BaseCipher} from "./Cipher";
 import type {Hasher} from "../Hasher";
 
 export interface PasswordBasedCipherProps extends SerializableCipherProps {
-  KDF: KDFType;
   salt: Word32Array;
-  Hasher: typeof Hasher;
-  iterations: number;
+  KDF: KDFType;
+  kdfModule: typeof BaseKDFModule;
+  kdfHasher: typeof Hasher;
+  kdfIterations: number;
 }
 
 export const PasswordBasedCipher: ISerializableCipher<string> = {
@@ -41,11 +42,14 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
     const cipherProps = props ? {...props} : {};
     const KDF = props && props.KDF ? props.KDF : OpenSSLKDF;
     const kdfProps: Partial<KDFProps> = {};
-    if(props && props.Hasher){
-      kdfProps.Hasher = props.Hasher;
+    if(props && props.kdfHasher){
+      kdfProps.kdfHasher = props.kdfHasher;
     }
-    if(props && props.iterations){
-      kdfProps.iterations = props.iterations;
+    if(props && props.kdfIterations){
+      kdfProps.kdfIterations = props.kdfIterations;
+    }
+    if(props && props.kdfModule){
+      kdfProps.kdfModule = props.kdfModule;
     }
     const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherProps.salt, kdfProps);
     
@@ -92,7 +96,18 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
     const KDF = p.KDF ? p.KDF : OpenSSLKDF;
     const formatter = p.formatter ? p.formatter : OpenSSLFormatter;
     const cipherParamsObj = parseCipherText(cipherParams, formatter);
-    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherParamsObj.salt);
+    const kdfProps: Partial<KDFProps> = {};
+    if(props && props.kdfHasher){
+      kdfProps.kdfHasher = props.kdfHasher;
+    }
+    if(props && props.kdfIterations){
+      kdfProps.kdfIterations = props.kdfIterations;
+    }
+    if(props && props.kdfModule){
+      kdfProps.kdfModule = props.kdfModule;
+    }
+    
+    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherParamsObj.salt, kdfProps);
     
     p.iv = derivedParams.iv;
     return SerializableCipher.decrypt(Cipher, cipherParamsObj, derivedParams.key, p);

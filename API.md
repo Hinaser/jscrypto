@@ -516,8 +516,8 @@ You can generate binary key with Key Derivation Function by yourself, as describ
 
 ```js
 // OpenSSLKDF returns both key/iv.
-var keySize = 256/32;
-var ivSize = 128/32;
+var keySize = 256/32; // 256bit -> 8 words
+var ivSize = 128/32; // 128bit -> 4 words
 var salt = JsCrypto.Hex.parse("0a9d8620cf7219f1");
 var derivedParams = JsCrypto.OpenSSLKDF.execute("password", keySize, ivSize, salt);
 
@@ -530,14 +530,17 @@ derivedParams.salt.toString(); // "0a9d8620cf7219f1"
 
 ```js
 // Generate 192bit key
+// https://www.openssl.org/docs/man1.1.1/man3/EVP_BytesToKey.html
 // Return value is Word32Array.
-var key = EvpKDF.getKey("password", "saltsalt", {keySize: 192/32});
+var keySize = 192/32; // 192bit -> 6 words
+var key = EvpKDF.getKey("password", "saltsalt", {keySize: keySize});
 ```
 
 <h4 id='pbkdf2'>PBKDF2</h4>
 
 ```js
 // Generate 256bit key with 1200 iterations.
+// Password-Based Key Derivation Function 2 algorithm.
 // Return value is Word32Array.
 var key = PBKDF2.getKey("password", "saltsalt", {keySize: 256/32, iterations: 1200});
 ```
@@ -546,32 +549,95 @@ var key = PBKDF2.getKey("password", "saltsalt", {keySize: 256/32, iterations: 12
 ### Block Cipher mode
 <h4 id='cbc'>CBC</h4>
 
+[Cipher Block Chaining](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC))  
+**\*CBC requires encrypting data size to be padded to multiple of block size.** (Default block size is 128bits = 16bytes = 4words).
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes. Padding is required.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var CBC = JsCrypto.mode.CBC;
+var Pkcs7 = JsCrypto.pad.Pkcs7; // Don't use 'JsCrypto.NoPadding' unless message size is multiple of 4 words.
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+decrypted.toString(JsCrypto.Utf8); // "message"
+
+// If encrypting data is multiple of 16bytes, padding is not required.
+var message = JsCrypto.Utf8.parse("encrypt--message"); // 16bytes. NoPadding is allowed.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
+
+var CBC = JsCrypto.mode.CBC;
+var Pkcs7 = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+decrypted.toString(JsCrypto.Utf8); // "encrypt--message"
 ```
 
 <h4 id='cfb'>CFB</h4>
 
+[Cipher Feedback](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_feedback_(CFB))  
+Unlike CBC, padding is not required.
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var CFB = JsCrypto.mode.CFB;
+var NoPadding = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CFB, padding: NoPadding });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CFB, padding: NoPadding });
+decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 <h4 id='ctr'>CTR</h4>
 
+[Counter](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_(CTR))  
+This CTR mode does not require data to be padded.
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var CTR = JsCrypto.mode.CTR;
+var NoPadding = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CTR, padding: NoPadding });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CTR, padding: NoPadding });
+decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 <h4 id='ecb'>ECB</h4>
 
+[Electronic Code Block](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_(ECB))  
+The simplest of the encryption modes. **Padding is required as well as CBC**  
+Because ECB encrypts identical plaintext blocks into identical ciphertext blocks, it does not hide data patterns well.  
+ECB is not recommended for use in cryptographic protocols
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes. Padding is required.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var ECB = JsCrypto.mode.ECB;
+var Pkcs7 = JsCrypto.pad.Pkcs7; // Don't use 'JsCrypto.NoPadding' unless message size is multiple of 4 words.
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: ECB, padding: Pkcs7 });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: ECB, padding: Pkcs7 });
+decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 <h4 id='ofb'>OFB</h4>
 
+[Output Feedback](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_(OFB))  
+OFB does not require encrypting data to be padded.
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var OFB = JsCrypto.mode.OFB;
+var NoPadding = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: OFB, padding: NoPadding });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: OFB, padding: NoPadding });
+decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 ### Block Padding

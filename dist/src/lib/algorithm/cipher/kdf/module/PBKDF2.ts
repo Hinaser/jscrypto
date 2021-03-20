@@ -1,5 +1,5 @@
 import type {Hasher} from "../../../Hasher";
-import {SHA1} from "../../../../../SHA1";
+import {SHA256} from "../../../../../SHA256";
 import {Hmac} from "../../../../../Hmac";
 import {Word32Array} from "../../../../Word32Array";
 import {BaseKDFModule, BaseKDFModuleProps} from "../type";
@@ -16,8 +16,8 @@ export interface PBKDF2Props extends BaseKDFModuleProps {
  */
 export class PBKDF2 extends BaseKDFModule<PBKDF2Props> {
   protected _keySize: number = 128/32;
-  protected _Hasher: typeof Hasher = SHA1;
-  protected _iterations: number = 1;
+  protected _Hasher: typeof Hasher = SHA256;
+  protected _iterations: number = 10000;
   
   public constructor(props?: Partial<PBKDF2Props>) {
     super(props);

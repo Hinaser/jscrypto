@@ -1,4 +1,4 @@
-import { SHA1 } from "../../../../../SHA1";
+import { SHA256 } from "../../../../../SHA256";
 import { Hmac } from "../../../../../Hmac";
 import { Word32Array } from "../../../../Word32Array";
 import { BaseKDFModule } from "../type";
@@ -13,8 +13,8 @@ export class PBKDF2 extends BaseKDFModule {
     constructor(props) {
         super(props);
         this._keySize = 128 / 32;
-        this._Hasher = SHA1;
-        this._iterations = 1;
+        this._Hasher = SHA256;
+        this._iterations = 10000;
         if (props) {
             this._keySize = typeof props.keySize !== "undefined" ? props.keySize : this._keySize;
             this._Hasher = typeof props.Hasher !== "undefined" ? props.Hasher : this._Hasher;

@@ -1,6 +1,6 @@
 import { Word32Array } from "../../../Word32Array";
 import { CipherParams } from "../CipherParams";
-import { EvpKDF } from "./module/EvpKDF";
+import { PBKDF2 } from "./module/PBKDF2";
 /**
  * Derives a key and IV from a password.
  *
@@ -19,7 +19,7 @@ export const OpenSSLKDF = {
         if (!salt) {
             salt = Word32Array.random(64 / 8);
         }
-        const KDFModule = props && props.kdfModule || EvpKDF;
+        const KDFModule = props && props.kdfModule || PBKDF2;
         const kdfProps = props ? { Hasher: props.kdfHasher, iterations: props.kdfIterations } : {};
         // Derive key and IV
         const key = KDFModule.getKey(password, salt, Object.assign(Object.assign({}, kdfProps), { keySize: keySize + ivSize }));

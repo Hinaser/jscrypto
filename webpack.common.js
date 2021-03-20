@@ -103,6 +103,22 @@ exports.encoderModuleOutput = (isProd) => {
   };
 };
 
+exports.formatterModuleEntry = () => {
+  return {
+    OpenSSLFormatter: "./src/formatter/OpenSSLFormatter.ts",
+  };
+};
+
+exports.formatterModuleOutput = (isProd) => {
+  return {
+    path: isProd ? path.resolve(__dirname, "dist", "formatter") : path.resolve(__dirname, "test", "build", "formatter"),
+    filename: "[name].js",
+    library: ["JsCrypto", "formatter"],
+    libraryTarget: "umd",
+    globalObject: "this",
+  };
+};
+
 
 
 exports.baseConfig = (isProd) => {

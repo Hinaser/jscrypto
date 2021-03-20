@@ -295,7 +295,7 @@ const file = fileElement.files[0];
 const reader = new FileReader();
 reader.onload = function(e){
   const arrayBuffer = reader.result;
-  const binaryWord = new Word32Array(arrayBuffer);
+  const binaryWord = new JsCrypto.Word32Array(arrayBuffer);
   const encryptedData = JsCrypto.AES.encrypt(binaryWord, "password").toString();
 
   // Store it to localStorage, etc.
@@ -689,9 +689,9 @@ JsCrypto.pad.AnsiX923.pad(data, 2); // Padding to 2words * 4bytes/words = 8bytes
 // true
 data.toString(); // aabbcc0000000005
 
-// ^: Bytes added by padding. Last byte represents number of bytes added.
-//                                   ^^    ^^^^^^^^
 // new JsCrypto.Word32Array([0xaabbcc00, 0x00000005])
+//                                   ^^    ^^^^^^^^
+// ^: Bytes added by padding. Last byte represents number of bytes added.
 // 
 // AnsiX923 requires padding value to be zero. (https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.paddingmode?view=net-5.0)
 // Note that IBM said padding value is to be random. (https://www.ibm.com/support/knowledgecenter/en/linuxonibm/com.ibm.linux.z.wskc.doc/wskc_c_l0wskc58.html)
@@ -798,12 +798,15 @@ var kdfSalt = JsCrypto.Hex.parse("daefe2565e3c4680");
 var aesProps = {mode, padding, kdfModule, kdfSalt, kdfHasher, kdfIterations};
 
 var cipherParams = JsCrypto.AES.encrypt("message", "password", aesProps);
-cipherParams.toString(); // "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
+// Gets "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
+JsCrypto.formatter.OpenSSLFormatter.stringify(cipherParams);
+// Or
+cipherParams.toString();
 
-// Or Simply
+// You can omit default parameters.
 var cipherParams = JsCrypto.AES.encrypt("message", "password", {kdfSalt: JsCrypto.Hex.parse("daefe2565e3c4680")});
 cipherParams.toString(); // "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
-// Above options are all defaults except for kdfSalt so you can omit them if you want to use default options.
+// Above options are all default values except for kdfSalt so you can omit them if you want to use default values.
 // Warning: DO NOT specify kdfSalt unless you need to do it.
 ```
 

@@ -8,6 +8,8 @@ const {
   padModuleOutput,
   encoderModuleEntry,
   encoderModuleOutput,
+  formatterModuleEntry,
+  formatterModuleOutput,
 } = require("./webpack.common");
 
 module.exports = [
@@ -30,5 +32,10 @@ module.exports = [
     ...baseConfig(),
     entry: {...encoderModuleEntry()},
     output: {...encoderModuleOutput()},
+  },
+  {
+    ...baseConfig(),
+    entry: {...formatterModuleEntry()},
+    output: {...formatterModuleOutput()},
   },
 ];

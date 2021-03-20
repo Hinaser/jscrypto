@@ -41,3 +41,6 @@ export declare const pad: {
     NoPadding: import("./lib/algorithm/cipher/pad/type").Pad;
     Zero: import("./lib/algorithm/cipher/pad/type").Pad;
 };
+export declare const formatter: {
+    OpenSSLFormatter: import("./lib/algorithm/cipher/formatter/type").Formatter;
+};

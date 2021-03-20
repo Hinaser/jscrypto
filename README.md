@@ -364,7 +364,7 @@ const file = fileElement.files[0];
 const reader = new FileReader();
 reader.onload = function(e){
   const arrayBuffer = reader.result;
-  const binaryWord = new Word32Array(arrayBuffer);
+  const binaryWord = new JsCrypto.Word32Array(arrayBuffer);
   const encryptedData = JsCrypto.AES.encrypt(binaryWord, "password").toString();
 
   // Store it to localStorage, etc.

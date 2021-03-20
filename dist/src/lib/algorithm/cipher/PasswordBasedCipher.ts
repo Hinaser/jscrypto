@@ -13,8 +13,8 @@ import type {Cipher as BaseCipher} from "./Cipher";
 import type {Hasher} from "../Hasher";
 
 export interface PasswordBasedCipherProps extends SerializableCipherProps {
-  salt: Word32Array;
   KDF: KDFType;
+  kdfSalt: Word32Array; // 64bit. word32Array. 8words.
   kdfModule: typeof BaseKDFModule;
   kdfHasher: typeof Hasher;
   kdfIterations: number;
@@ -51,7 +51,7 @@ export const PasswordBasedCipher: ISerializableCipher<string> = {
     if(props && props.kdfModule){
       kdfProps.kdfModule = props.kdfModule;
     }
-    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherProps.salt, kdfProps);
+    const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherProps.kdfSalt, kdfProps);
     
     cipherProps.iv = derivedParams.iv;
     const cipherParams = SerializableCipher.encrypt(Cipher, message, derivedParams.key, cipherProps);

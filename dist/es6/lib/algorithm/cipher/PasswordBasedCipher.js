@@ -28,7 +28,7 @@ export const PasswordBasedCipher = {
         if (props && props.kdfModule) {
             kdfProps.kdfModule = props.kdfModule;
         }
-        const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherProps.salt, kdfProps);
+        const derivedParams = KDF.execute(password, Cipher.keySize, Cipher.ivSize, cipherProps.kdfSalt, kdfProps);
         cipherProps.iv = derivedParams.iv;
         const cipherParams = SerializableCipher.encrypt(Cipher, message, derivedParams.key, cipherProps);
         return new CipherParams(Object.assign(Object.assign({}, cipherParams), { key: derivedParams.key, iv: derivedParams.iv, salt: derivedParams.salt }));

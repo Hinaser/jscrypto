@@ -61,7 +61,6 @@ Copy js files/directories under `/dist` dir into somewhere browser can access.
 Then directly load js file into `<script>` tag.
 ```html
 <script src="dist/index.js"></script> <!-- All modules are loaded into browser -->
-<script src="dist/SHA256.js"></script><!-- Only SHA256 module is loaded into browser -->
 <script type="text/javascript">
   // This will output: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
   console.log(JsCrypto.SHA256.hash("test").toString());

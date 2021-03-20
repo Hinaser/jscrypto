@@ -7,6 +7,7 @@ import type { Hasher } from "../Hasher";
 export interface BlockCipherProps extends CipherProps {
     mode: typeof BlockCipherMode;
     padding: Pad;
+    kdfSalt: Word32Array;
     kdfModule: typeof BaseKDFModule;
     kdfHasher: typeof Hasher;
     kdfIterations: number;

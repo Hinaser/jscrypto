@@ -331,7 +331,7 @@ Default padding: `Pkcs7`
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Default block cipher mode is CBC, pad is Pkcs7.
-// Random base64 string which contains encrypted message and 'random' salt.
+// Random base64 string which contains encrypted message and 'random' salt for kdf.
 var encryptedData = JsCrypto.AES.encrypt("message", "key").toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
@@ -340,9 +340,9 @@ decryptedData.toString(JsCrypto.Utf8); // "message"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string with pre-defined salt.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var salt = new JsCrypto.Word32Array([0x00112233, 0x44556677]); // Or JsCrypto.Hex.parse("0011223344556677")
-// Always "U2FsdGVkX1/X4t3MKrqHN8aVLgI2BvY5ZlW7QDJX9OM=" because of a fixed salt.
-var encryptedData = JsCrypto.AES.encrypt("message", "key", {salt: salt}).toString();
+var kdfSalt = new JsCrypto.Word32Array([0x00112233, 0x44556677]); // Or JsCrypto.Hex.parse("0011223344556677")
+// Always "U2FsdGVkX18AESIzRFVmd+3hOI70l41o+yU+1uOzOzo=" because salt for kdf is fixed.
+var encryptedData = JsCrypto.AES.encrypt("message", "key", {kdfSalt: kdfSalt}).toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
 decryptedData.toString(JsCrypto.Utf8); // "message"
@@ -353,7 +353,7 @@ decryptedData.toString(JsCrypto.Utf8); // "message"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Always 'stringify' this 'encryptedDataObj' then port it anywhere.
 var encryptedDataObj = JsCrypto.AES.encrypt("message", "key");
-// Return value of 'toString()' is a Base64 string containing only encrypted data and salt
+// Return value of 'toString()' is a Base64 string containing only encrypted data and kdf salt
 var encryptedData = encryptedDataObj.toString();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -366,10 +366,10 @@ reader.onload = function(e){
   const arrayBuffer = reader.result;
   const binaryWord = new Word32Array(arrayBuffer);
   const encryptedData = JsCrypto.AES.encrypt(binaryWord, "password").toString();
-  
+
   // Store it to localStorage, etc.
   localStorage.setItem("secretFile", encryptedData);
-  
+
   // You can decrypt it like below
   // Returned value is Word32Array
   const decryptedData = JsCrypto.AES.decrypt(encryptedData, "password");

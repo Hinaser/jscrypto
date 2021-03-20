@@ -262,7 +262,7 @@ Default padding: `Pkcs7`
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Default block cipher mode is CBC, pad is Pkcs7.
-// Random base64 string which contains encrypted message and 'random' salt.
+// Random base64 string which contains encrypted message and 'random' salt for kdf.
 var encryptedData = JsCrypto.AES.encrypt("message", "key").toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
@@ -271,9 +271,9 @@ decryptedData.toString(JsCrypto.Utf8); // "message"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string with pre-defined salt.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var salt = new JsCrypto.Word32Array([0x00112233, 0x44556677]); // Or JsCrypto.Hex.parse("0011223344556677")
-// Always "U2FsdGVkX1/X4t3MKrqHN8aVLgI2BvY5ZlW7QDJX9OM=" because of a fixed salt.
-var encryptedData = JsCrypto.AES.encrypt("message", "key", {salt: salt}).toString();
+var kdfSalt = new JsCrypto.Word32Array([0x00112233, 0x44556677]); // Or JsCrypto.Hex.parse("0011223344556677")
+// Always "U2FsdGVkX18AESIzRFVmd+3hOI70l41o+yU+1uOzOzo=" because salt for kdf is fixed.
+var encryptedData = JsCrypto.AES.encrypt("message", "key", {kdfSalt: kdfSalt}).toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
 decryptedData.toString(JsCrypto.Utf8); // "message"
@@ -284,7 +284,7 @@ decryptedData.toString(JsCrypto.Utf8); // "message"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Always 'stringify' this 'encryptedDataObj' then port it anywhere.
 var encryptedDataObj = JsCrypto.AES.encrypt("message", "key");
-// Return value of 'toString()' is a Base64 string containing only encrypted data and salt
+// Return value of 'toString()' is a Base64 string containing only encrypted data and kdf salt
 var encryptedData = encryptedDataObj.toString();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -761,15 +761,45 @@ data.toString(); // aabbccddee
 ### Formatter
 <h4 id='opensslformatter'>OpenSSLFormatter</h4>
 
-Converts a cipher params object to an OpenSSL-compatible string which contains salt and encrypted data.
+Converts a cipher params object to an OpenSSL-compatible string which contains encrypted data and kdf salt.
 
 Encrypt by JsCrypto
 ```js
-var cipherParams = JsCrypto.AES.encrypt("message", "password");
-cipherParams.toString(); // "U2FsdGVkX1+zGIH4sgp6shiQR6R96KR8TWmbx7+EuXk=". OpenSSL compatible format.
+var mode = JsCrypto.mode.CBC;
+var padding = JsCrypto.pad.Pkcs7;
+var kdfModule = JsCrypto.PBKDF2;
+var kdfSalt = JsCrypto.Hex.parse("daefe2565e3c4680");
+var kdfHasher = JsCrypto.SHA256;
+var kdfIterations = 10000;
+var aesProps = {mode, padding, kdfModule, kdfSalt, kdfHasher, kdfIterations};
+
+var cipherParams = JsCrypto.AES.encrypt("message", "password", aesProps);
+cipherParams.toString(); // "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
 ```
 
-Decrypt by OpenSSL
+Equivalent in OpenSSL (OpenSSL 1.1.1f)
+```shell
+echo -n "message" | openssl enc -e -aes-256-cbc -pass pass:password -base64 -pbkdf2 -S daefe2565e3c4680 -iter 10000
+# Output: U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=
+```
+
+Decrypt by JsCrypto
 ```js
-var decrypted = JsCrypto.AES.decrypt(openSSLEncrypted, "password");
+var mode = JsCrypto.mode.CBC;
+var padding = JsCrypto.pad.Pkcs7;
+var kdfModule = JsCrypto.PBKDF2;
+var kdfSalt = JsCrypto.Hex.parse("daefe2565e3c4680");
+var kdfHasher = JsCrypto.SHA256;
+var kdfIterations = 10000;
+var aesProps = {mode, padding, kdfModule, kdfSalt, kdfHasher, kdfIterations};
+
+var encryptedData = "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=";
+var decrypted = JsCrypto.AES.decrypt(encryptedData, "password", aesProps);
+decrypted.toString(JsCrypto.Utf8); // "message"
+```
+
+In OpenSSL
+```shell
+echo "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=" | openssl enc -d -aes-256-cbc -pass pass:password -base64 -pbkdf2 -S daefe2565e3c4680 -iter 10000
+# Output: message (Without newline)
 ```

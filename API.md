@@ -604,9 +604,9 @@ var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e
 var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
 var CBC = JsCrypto.mode.CBC;
-var Pkcs7 = JsCrypto.pad.NoPadding;
-var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CBC, padding: Pkcs7 });
-var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+var NoPadding = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CBC, padding: NoPadding });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CBC, padding: NoPadding });
 decrypted.toString(JsCrypto.Utf8); // "encrypt--message"
 ```
 
@@ -799,6 +799,12 @@ var aesProps = {mode, padding, kdfModule, kdfSalt, kdfHasher, kdfIterations};
 
 var cipherParams = JsCrypto.AES.encrypt("message", "password", aesProps);
 cipherParams.toString(); // "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
+
+// Or Simply
+var cipherParams = JsCrypto.AES.encrypt("message", "password", {kdfSalt: JsCrypto.Hex.parse("daefe2565e3c4680")});
+cipherParams.toString(); // "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
+// Above options are all defaults except for kdfSalt so you can omit them if you want to use default options.
+// Warning: DO NOT specify kdfSalt unless you need to do it.
 ```
 
 Equivalent in OpenSSL (OpenSSL 1.1.1f)

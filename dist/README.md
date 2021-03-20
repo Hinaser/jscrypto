@@ -324,6 +324,9 @@ hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA==
 
 <h4 id="aes">AES</h4>
 
+Default block cipher mode: `CBC`  
+Default padding: `Pkcs7`
+
 ```js
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
@@ -384,6 +387,9 @@ When you supply encryption key as a string password, it automatically generates 
 
 <h4 id="des">DES</h4>
 
+Default block cipher mode: `CBC`  
+Default padding: `Pkcs7`
+
 ```js
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
@@ -400,6 +406,9 @@ decryptedData.toString(JsCrypto.Utf8);
 ```
 
 <h4 id="des3">Triple-DES</h4>
+
+Default block cipher mode: `CBC`  
+Default padding: `Pkcs7`
 
 ```js
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

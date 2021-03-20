@@ -4,10 +4,15 @@ import {CBC} from "./mode/CBC";
 import type {Pad} from "./pad/type";
 import {Pkcs7} from "./pad/Pkcs7";
 import type {Word32Array} from "../../Word32Array";
+import type {BaseKDFModule} from "./kdf/type";
+import type {Hasher} from "../Hasher";
 
 export interface BlockCipherProps extends CipherProps {
   mode: typeof BlockCipherMode;
   padding: Pad;
+  kdfModule: typeof BaseKDFModule;
+  kdfHasher: typeof Hasher;
+  kdfIterations: number;
 }
 
 export class BlockCipher extends Cipher {

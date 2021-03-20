@@ -9,9 +9,9 @@ export interface KDFParams extends Pick<CipherParams, "toString"> {
 }
 
 export interface KDFProps {
-  KDF: typeof BaseKDFModule;
-  Hasher: typeof Hasher;
-  iterations: number;
+  kdfModule: typeof BaseKDFModule;
+  kdfHasher: typeof Hasher;
+  kdfIterations: number;
 }
 
 export interface KDF {
@@ -30,7 +30,7 @@ export interface BaseKDFModuleProps {
   iterations: number;
 }
 
-export class BaseKDFModule<P extends BaseKDFModuleProps> {
+export class BaseKDFModule<P extends BaseKDFModuleProps = BaseKDFModuleProps> {
   protected _props?: Partial<P>;
   
   public constructor(props?: Partial<P>) {

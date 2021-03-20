@@ -19,8 +19,8 @@ export const OpenSSLKDF = {
         if (!salt) {
             salt = Word32Array.random(64 / 8);
         }
-        const KDFModule = props && props.KDF || EvpKDF;
-        const kdfProps = props ? { Hasher: props.Hasher, iterations: props.iterations } : {};
+        const KDFModule = props && props.kdfModule || EvpKDF;
+        const kdfProps = props ? { Hasher: props.kdfHasher, iterations: props.kdfIterations } : {};
         // Derive key and IV
         const key = KDFModule.getKey(password, salt, Object.assign(Object.assign({}, kdfProps), { keySize: keySize + ivSize }));
         // Separate key and IV

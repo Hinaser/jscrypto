@@ -7,9 +7,9 @@ export interface KDFParams extends Pick<CipherParams, "toString"> {
     salt: Word32Array;
 }
 export interface KDFProps {
-    KDF: typeof BaseKDFModule;
-    Hasher: typeof Hasher;
-    iterations: number;
+    kdfModule: typeof BaseKDFModule;
+    kdfHasher: typeof Hasher;
+    kdfIterations: number;
 }
 export interface KDF {
     execute: (password: Word32Array | string, keySize: number, ivSize: number, salt?: Word32Array, props?: Partial<KDFProps>) => KDFParams;
@@ -19,7 +19,7 @@ export interface BaseKDFModuleProps {
     Hasher: typeof Hasher;
     iterations: number;
 }
-export declare class BaseKDFModule<P extends BaseKDFModuleProps> {
+export declare class BaseKDFModule<P extends BaseKDFModuleProps = BaseKDFModuleProps> {
     protected _props?: Partial<P>;
     constructor(props?: Partial<P>);
     compute(password: Word32Array | string, salt: Word32Array | string): Word32Array;

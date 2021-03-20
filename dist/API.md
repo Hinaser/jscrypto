@@ -254,6 +254,9 @@ hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA==
 
 <h4 id="aes">AES</h4>
 
+Default block cipher mode: `CBC`  
+Default padding: `Pkcs7`
+
 ```js
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
@@ -314,6 +317,10 @@ When you supply encryption key as a string password, it automatically generates 
 
 <h4 id="des">DES</h4>
 
+
+Default block cipher mode: `CBC`  
+Default padding: `Pkcs7`
+
 ```js
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
@@ -330,6 +337,10 @@ decryptedData.toString(JsCrypto.Utf8);
 ```
 
 <h4 id="des3">Triple-DES</h4>
+
+
+Default block cipher mode: `CBC`  
+Default padding: `Pkcs7`
 
 ```js
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -516,8 +527,8 @@ You can generate binary key with Key Derivation Function by yourself, as describ
 
 ```js
 // OpenSSLKDF returns both key/iv.
-var keySize = 256/32;
-var ivSize = 128/32;
+var keySize = 256/32; // 256bit -> 8 words
+var ivSize = 128/32; // 128bit -> 4 words
 var salt = JsCrypto.Hex.parse("0a9d8620cf7219f1");
 var derivedParams = JsCrypto.OpenSSLKDF.execute("password", keySize, ivSize, salt);
 
@@ -530,14 +541,17 @@ derivedParams.salt.toString(); // "0a9d8620cf7219f1"
 
 ```js
 // Generate 192bit key
+// https://www.openssl.org/docs/man1.1.1/man3/EVP_BytesToKey.html
 // Return value is Word32Array.
-var key = EvpKDF.getKey("password", "saltsalt", {keySize: 192/32});
+var keySize = 192/32; // 192bit -> 6 words
+var key = EvpKDF.getKey("password", "saltsalt", {keySize: keySize});
 ```
 
 <h4 id='pbkdf2'>PBKDF2</h4>
 
 ```js
 // Generate 256bit key with 1200 iterations.
+// Password-Based Key Derivation Function 2 algorithm.
 // Return value is Word32Array.
 var key = PBKDF2.getKey("password", "saltsalt", {keySize: 256/32, iterations: 1200});
 ```
@@ -546,74 +560,216 @@ var key = PBKDF2.getKey("password", "saltsalt", {keySize: 256/32, iterations: 12
 ### Block Cipher mode
 <h4 id='cbc'>CBC</h4>
 
+[Cipher Block Chaining](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC))  
+**\*CBC requires encrypting data size to be padded to multiple of block size.** (Default block size is 128bits = 16bytes = 4words).  
+This is the default Block cipher mode for AES/DES/Triple-DES.
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes. Padding is required.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var CBC = JsCrypto.mode.CBC;
+var Pkcs7 = JsCrypto.pad.Pkcs7; // Don't use 'JsCrypto.NoPadding' unless message size is multiple of 4 words.
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+decrypted.toString(JsCrypto.Utf8); // "message"
+
+// If encrypting data is multiple of 16bytes, padding is not required.
+var message = JsCrypto.Utf8.parse("encrypt--message"); // 16bytes. NoPadding is allowed.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
+
+var CBC = JsCrypto.mode.CBC;
+var Pkcs7 = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CBC, padding: Pkcs7 });
+decrypted.toString(JsCrypto.Utf8); // "encrypt--message"
 ```
 
 <h4 id='cfb'>CFB</h4>
 
+[Cipher Feedback](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_feedback_(CFB))  
+Unlike CBC, padding is not required.
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var CFB = JsCrypto.mode.CFB;
+var NoPadding = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CFB, padding: NoPadding });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CFB, padding: NoPadding });
+decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 <h4 id='ctr'>CTR</h4>
 
+[Counter](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_(CTR))  
+This CTR mode does not require data to be padded.
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var CTR = JsCrypto.mode.CTR;
+var NoPadding = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: CTR, padding: NoPadding });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: CTR, padding: NoPadding });
+decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 <h4 id='ecb'>ECB</h4>
 
+[Electronic Code Block](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_(ECB))  
+The simplest of the encryption modes. **Padding is required as well as CBC**  
+Because ECB encrypts identical plaintext blocks into identical ciphertext blocks, it does not hide data patterns well.  
+ECB is not recommended for use in cryptographic protocols
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes. Padding is required.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var ECB = JsCrypto.mode.ECB;
+var Pkcs7 = JsCrypto.pad.Pkcs7; // Don't use 'JsCrypto.NoPadding' unless message size is multiple of 4 words.
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: ECB, padding: Pkcs7 });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: ECB, padding: Pkcs7 });
+decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 <h4 id='ofb'>OFB</h4>
 
+[Output Feedback](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_(OFB))  
+OFB does not require encrypting data to be padded.
 ```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0x3c3d3e3f]);
 
+var OFB = JsCrypto.mode.OFB;
+var NoPadding = JsCrypto.pad.NoPadding;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: OFB, padding: NoPadding });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: OFB, padding: NoPadding });
+decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 ### Block Padding
 <h4 id='ansix923'>AnsiX923</h4>
 
-```js
+Add 0 and number of bytes added.
 
+```js
+var data = new JsCrypto.Word32Array([0xaabbcc00], 3); // 3bytes
+// pad(data, blockSizeInWords)
+JsCrypto.pad.AnsiX923.pad(data, 2); // Padding to 2words * 4bytes/words = 8bytes
+
+// true
+data.toString(); // aabbcc0000000005
+
+// ^: Bytes added by padding. Last byte represents number of bytes added.
+//                                   ^^    ^^^^^^^^
+// new JsCrypto.Word32Array([0xaabbcc00, 0x00000005])
+// 
+// AnsiX923 requires padding value to be zero. (https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.paddingmode?view=net-5.0)
+// Note that IBM said padding value is to be random. (https://www.ibm.com/support/knowledgecenter/en/linuxonibm/com.ibm.linux.z.wskc.doc/wskc_c_l0wskc58.html)
+
+JsCrypto.pad.AnsiX923.unpad(data);
+// true
+data.toString(); // aabbcc
 ```
 
 <h4 id='iso10126'>ISO10126</h4>
 
-```js
+Add random bytes and number of bytes added.
 
+```js
+var data = new JsCrypto.Word32Array([0xaabbcc00], 3);
+// pad(data, blockSizeInWords)
+JsCrypto.pad.ISO10126.pad(data, 2);
+// Padding strategy is almost the same with ANSIX9.23. The difference is padded value.
+// Padded values in AnsiX9.23 is 0 while ISO10126 is random. 
+
+data.toString(); // aabbccf6b9304505, where f6b9304505 is added. Last byte(5) means 5 bytes have been added. Other padded values are random.
+
+JsCrypto.pad.ISO10126.unpad(data);
+// true
+data.toString(); // aabbcc
 ```
 
 <h4 id='iso97971'>ISO97971</h4>
 
+Add 0x80 and 0s.
+
 ```js
+var data = new JsCrypto.Word32Array([0xaabbccdd, 0xee000000], 5);
+// pad(data, blockSizeInWords)
+JsCrypto.pad.ISO97971.pad(data, 2);
+
+data.toString(); // aabbccddee800000, where 800000 is added. Always add 0x80 and following 0 until last byte.
+
+JsCrypto.pad.ISO97971.unpad(data);
+// true
+data.toString(); // aabbccddee
 
 ```
 
 <h4 id='nopadding'>NoPadding</h4>
 
+As name says, it pretends to pad.
 ```js
+var data = new JsCrypto.Word32Array([0xaabbccdd, 0xee000000], 5);
+// pad(data, blockSizeInWords)
+JsCrypto.pad.NoPadding.pad(data, 2);
 
+data.toString(); // aabbccddee. Not padding at all.
+
+JsCrypto.pad.NoPadding.unpad(data);
+// true
+data.toString(); // aabbccddee
 ```
 
 <h4 id='pkcs7'>Pkcs7</h4>
 
+The value of each added byte is the number of bytes that are added
 ```js
+var data = new JsCrypto.Word32Array([0xaabbccdd, 0xee000000], 5);
+// pad(data, blockSizeInWords)
+JsCrypto.pad.Pkcs7.pad(data, 2);
 
+data.toString(); // aabbccddee030303
+
+JsCrypto.pad.Pkcs7.unpad(data);
+// true
+data.toString(); // aabbccddee
 ```
 
 <h4 id='zero'>Zero</h4>
 
+The value of each added byte is 0.  
+Note Zero padding may not be reversible if the original file ends with one or more zero bytes.
 ```js
+var data = new JsCrypto.Word32Array([0xaabbccdd, 0xee000000], 5);
+// pad(data, blockSizeInWords)
+JsCrypto.pad.Zero.pad(data, 2);
 
+data.toString(); // aabbccddee000000
+
+JsCrypto.pad.Zero.unpad(data);
+// true
+data.toString(); // aabbccddee
 ```
 
 ### Formatter
 <h4 id='opensslformatter'>OpenSSLFormatter</h4>
 
-```js
+Converts a cipher params object to an OpenSSL-compatible string which contains salt and encrypted data.
 
+Encrypt by JsCrypto
+```js
+var cipherParams = JsCrypto.AES.encrypt("message", "password");
+cipherParams.toString(); // "U2FsdGVkX1+zGIH4sgp6shiQR6R96KR8TWmbx7+EuXk=". OpenSSL compatible format.
+```
+
+Decrypt by OpenSSL
+```js
+var decrypted = JsCrypto.AES.decrypt(openSSLEncrypted, "password");
 ```

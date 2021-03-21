@@ -1,3 +1,5 @@
+import {isIE} from "./browser";
+
 interface WindowEx extends Window {
   /**
    * Native (experimental IE 11) crypto from window (Browser)
@@ -15,6 +17,12 @@ function makeRandFunction(): () => number {
   if (typeof window !== "undefined") {
     const c = window.crypto || window.msCrypto;
     if (!c) {
+      if(isIE("<", 11)){
+        console.warn("IE <= 10 uses insecure random generator. Please consider to use IE11 or another modern browser");
+        return function rand(){
+          return Math.floor(Math.random() * 512) % 256;
+        };
+      }
       throw new Error("Crypto module not found");
     }
     return function rand(){

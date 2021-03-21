@@ -3,6 +3,7 @@
 
 [crypto-js](https://github.com/brix/crypto-js) enhancement for modern js environments.
 
+- Works in Chrome/Firefox/Edge and IE11
 - Loadable from ES6/CommonJS/Typescript/Browser runtimes.
 - Written in Typescript with many type declarations.
 - Reduced bundle size when using webpack v4.  

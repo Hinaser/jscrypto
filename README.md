@@ -3,6 +3,8 @@
 
 [crypto-js](https://github.com/brix/crypto-js) enhancement for modern js environments.
 
+- Works in Chrome/Firefox/Edge/IE11 and even IE10/9.
+  - Please keep in mind that IE10/9 uses insecure random generator. Use it at your own risk.
 - Loadable from ES6/CommonJS/Typescript/Browser runtimes.
 - Written in Typescript with many type declarations.
 - Reduced bundle size when using webpack v4.  

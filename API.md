@@ -816,7 +816,7 @@ echo -n "message" | openssl enc -e -aes-256-cbc -pass pass:password -base64 -pbk
 # Output: U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=
 
 # or simply
-echo -n "message" | openssl enc -e -aes256-cbc -pass pass:password -base64 -S daefe2565e3c4680
+echo -n "message" | openssl enc -e -aes-256-cbc -pass pass:password -base64 -S daefe2565e3c4680
 # pbkdf2 and iterations:10000 is the default value in OpenSSL 1.1.1f
 ```
 

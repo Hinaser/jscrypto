@@ -11,6 +11,25 @@
   - For webpack v5, bundle size with `crypto-js` can be greatly reduced by enhanced tree-shaking.
     However, sometimes library requiring `crypto-js` doesn't run in commonJS environments like AWS lambda,  
     or local node runtime environment for it fails to load crypto module from node environment.
+- Default parameters for Block cipher (AES/DES/Triple-DES) is tuned to be OpenSSL(1.1.1f) compatible. 
+  ```js
+  encryptedData = JsCrypto.AES.encrypt("message", "secret phrase").toString();
+  ```
+  is equivalent in OpenSSL (1.1.1f) to
+  ```shell
+  echo -n "message" | openssl enc -e -aes-256-cbc -pass pass:"secret phrase" -base64 -pbkdf2
+  # Note: Because of a random salt, everytime it produces different base64 string. But it is OK for decryption.
+  ```
+  
+  Encrypted data can be decrypted by
+  ```js
+  JsCrypto.AES.decrypt(encryptedData, "secret phrase").toString(JsCrypto.Utf8); // "message"
+  ```
+  or in OpenSSL
+  ```shell
+  echo "U2FsdGVkX1..." | openssl enc -d -aes-256-cbc -pass pass:"secret phrase" -base64 -pbkdf2
+  # U2FsdGVkX1... is the output from either JsCrypto/OpenSSL encryption code/command.
+  ```
 
 ## Install
 

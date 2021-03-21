@@ -1,0 +1,50 @@
+name: Test
+on:
+  push:
+    branches:
+      - '*'
+      - '!master'
+  pull_request:
+    branches:
+      - '*'
+      - '!master'
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+ 
+      - name: Setup Node 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Make build dir for testing
+        run: mkdir -p ./test/build
+
+      - name: Get yarn version
+        run: echo "yarn_version=$(yarn -v)" >> $GITHUB_ENV
+
+      - name: Get yarn(v1) cache directory path
+        if: startsWith(env.yarn_version, '1')
+        run: echo "cache_dir=$(yarn cache dir)" >> $GITHUB_ENV
+
+      - name: Get yarn(v2) cache directory path
+        if: startsWith(env.yarn_version, '2')
+        run: echo "cache_dir=$(yarn config get cacheFolder)"
+
+      - name: Cache Node.js modules
+        id: yarn-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.cache_dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - run: yarn build
+      - run: yarn test

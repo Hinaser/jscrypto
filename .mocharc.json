@@ -1,0 +1,5 @@
+{
+  "require": "./test/setup",
+  "ui": "bdd",
+  "recursive": true
+}

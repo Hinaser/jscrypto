@@ -1,0 +1,14 @@
+{
+  "name": "jscrypto",
+  "version": "0.0.0",
+  "main": "./index.js",
+  "author": "Izumi Hoshino <rindo.hinase@gmail.com>",
+  "license": "MIT",
+  "description": "",
+  "homepage": "https://hinaser.github.io/jscrypto/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hinaser/jscrypto.git"
+  },
+  "bugs": "https://github.com/Hinaser/jscrypto/issues"
+}

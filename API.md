@@ -551,14 +551,17 @@ You can generate binary key with Key Derivation Function by yourself, as describ
 
 ```js
 // OpenSSLKDF returns both key/iv.
-var keySize = 256/32; // 256bit -> 8 words
-var ivSize = 128/32; // 128bit -> 4 words
+var keySize = 256/32; // 256bit -> 32byte -> 8words
+var ivSize = 128/32; // 128bit -> 16byte -> 4words
 var salt = JsCrypto.Hex.parse("0a9d8620cf7219f1");
 var derivedParams = JsCrypto.OpenSSLKDF.execute("password", keySize, ivSize, salt);
 
-derivedParams.key.toString(); // "50f32e0ec9408e02ff42364a52aac95c3694fc027256c6f488bf84b8e60effcd";
-derivedParams.iv.toString(); // "81381e39b94fd692dff7e2239a298cb6";
-derivedParams.salt.toString(); // "0a9d8620cf7219f1"
+// "50f32e0ec9408e02ff42364a52aac95c3694fc027256c6f488bf84b8e60effcd";
+derivedParams.key.toString();
+// "81381e39b94fd692dff7e2239a298cb6";
+derivedParams.iv.toString();
+// "0a9d8620cf7219f1"
+derivedParams.salt.toString();
 ```
 
 <h4 id='evpkdf'>EvpKDF</h4>
@@ -789,12 +792,18 @@ Converts a cipher params object to an OpenSSL-compatible string which contains e
 
 Encrypt by JsCrypto
 ```js
-var mode = JsCrypto.mode.CBC; // CBC/ECB/CTR/OFB/CFB is the options
-var padding = JsCrypto.pad.Pkcs7; // AnsiX923/ISO10126/ISO97971/Pkcs7/NoPadding/Zero is the options
-var kdfModule = JsCrypto.PBKDF2; // PBKDF2/EvpKDF is the options
-var kdfHasher = JsCrypto.SHA256; // MD5/SHA1/SHA3/SHA225/SHA256/SHA384/SHA512/RIPEMD160 is the options
-var kdfIterations = 10000; // 10000 is the default value. You can omit this.
-var kdfSalt = JsCrypto.Hex.parse("daefe2565e3c4680"); // For testing purpose only. DO NOT USE salt unless you need it.
+// CBC/ECB/CTR/OFB/CFB is the options
+var mode = JsCrypto.mode.CBC;
+// AnsiX923/ISO10126/ISO97971/Pkcs7/NoPadding/Zero is the options
+var padding = JsCrypto.pad.Pkcs7;
+// AnsiX923/ISO10126/ISO97971/Pkcs7/NoPadding/Zero is the options
+var kdfModule = JsCrypto.PBKDF2;
+// MD5/SHA1/SHA3/SHA225/SHA256/SHA384/SHA512/RIPEMD160 is the options
+var kdfHasher = JsCrypto.SHA256;
+// 10000 is the default value. You can omit this.
+var kdfIterations = 10000;
+// For testing purpose only. DO NOT USE salt unless you need it.
+var kdfSalt = JsCrypto.Hex.parse("daefe2565e3c4680");
 var aesProps = {mode, padding, kdfModule, kdfSalt, kdfHasher, kdfIterations};
 
 var cipherParams = JsCrypto.AES.encrypt("message", "password", aesProps);
@@ -805,7 +814,8 @@ cipherParams.toString();
 
 // You can omit default parameters.
 var cipherParams = JsCrypto.AES.encrypt("message", "password", {kdfSalt: JsCrypto.Hex.parse("daefe2565e3c4680")});
-cipherParams.toString(); // "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
+// "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
+cipherParams.toString();
 // Above options are all default values except for kdfSalt so you can omit them if you want to use default values.
 // Warning: DO NOT specify kdfSalt unless you need to do it.
 ```

@@ -8,7 +8,7 @@ export interface DES3Props extends BlockCipherProps {
 export declare class DES3 extends BlockCipher {
     static readonly keySize: number;
     static readonly ivSize: number;
-    protected static readonly _blockSize: number;
+    protected _blockSize: number;
     protected _des1: DES;
     protected _des2: DES;
     protected _des3: DES;

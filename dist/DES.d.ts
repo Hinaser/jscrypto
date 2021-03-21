@@ -7,7 +7,7 @@ export interface DESProps extends BlockCipherProps {
 export declare class DES extends BlockCipher {
     static readonly keySize: number;
     static readonly ivSize: number;
-    protected static readonly _blockSize: number;
+    protected _blockSize: number;
     _props: PropsWithKey<DESProps>;
     protected _subKeys: number[][];
     protected _invSubKeys: number[][];

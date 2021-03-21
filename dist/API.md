@@ -794,12 +794,12 @@ var padding = JsCrypto.pad.Pkcs7; // AnsiX923/ISO10126/ISO97971/Pkcs7/NoPadding/
 var kdfModule = JsCrypto.PBKDF2; // PBKDF2/EvpKDF is the options
 var kdfHasher = JsCrypto.SHA256; // MD5/SHA1/SHA3/SHA225/SHA256/SHA384/SHA512/RIPEMD160 is the options
 var kdfIterations = 10000; // 10000 is the default value. You can omit this.
-var kdfSalt = JsCrypto.Hex.parse("daefe2565e3c4680");
+var kdfSalt = JsCrypto.Hex.parse("daefe2565e3c4680"); // For testing purpose only. DO NOT USE salt unless you need it.
 var aesProps = {mode, padding, kdfModule, kdfSalt, kdfHasher, kdfIterations};
 
 var cipherParams = JsCrypto.AES.encrypt("message", "password", aesProps);
 // Gets "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format.
-JsCrypto.OpenSSLFormatter.stringify(cipherParams);
+JsCrypto.formatter.OpenSSLFormatter.stringify(cipherParams);
 // Or
 cipherParams.toString();
 

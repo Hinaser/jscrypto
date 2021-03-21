@@ -11,7 +11,7 @@ export interface DES3Props extends BlockCipherProps {}
 export class DES3 extends BlockCipher {
   public static readonly keySize = 192/32;
   public static readonly ivSize = 64/32;
-  protected static readonly _blockSize = 64/32;
+  protected _blockSize = 64/32;
   protected _des1: DES;
   protected _des2: DES;
   protected _des3: DES;

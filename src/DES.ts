@@ -574,7 +574,7 @@ export interface DESProps extends BlockCipherProps {}
 export class DES extends BlockCipher {
   public static readonly keySize = 64/32;
   public static readonly ivSize = 64/32;
-  protected static readonly _blockSize = 64/32;
+  protected _blockSize = 64/32;
   
   public _props: PropsWithKey<DESProps>;
   protected _subKeys: number[][] = [];

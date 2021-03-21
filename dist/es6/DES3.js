@@ -7,6 +7,7 @@ import { PasswordBasedCipher } from "./lib/algorithm/cipher/PasswordBasedCipher"
 export class DES3 extends BlockCipher {
     constructor(props) {
         super(props);
+        this._blockSize = 64 / 32;
         this._props = props;
         const TripleDES = this._get3DES();
         // Create DES instances
@@ -108,4 +109,3 @@ export class DES3 extends BlockCipher {
 }
 DES3.keySize = 192 / 32;
 DES3.ivSize = 64 / 32;
-DES3._blockSize = 64 / 32;

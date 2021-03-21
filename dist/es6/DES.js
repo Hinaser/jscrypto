@@ -564,6 +564,7 @@ const SBOX_MASK = [
 export class DES extends BlockCipher {
     constructor(props) {
         super(props);
+        this._blockSize = 64 / 32;
         this._subKeys = [];
         this._invSubKeys = [];
         this._lBlock = 0;
@@ -724,4 +725,3 @@ export class DES extends BlockCipher {
 }
 DES.keySize = 64 / 32;
 DES.ivSize = 64 / 32;
-DES._blockSize = 64 / 32;

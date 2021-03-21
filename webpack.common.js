@@ -148,6 +148,7 @@ exports.baseConfig = (isProd) => {
     resolve: {
       extensions: [".tsx", ".ts", ".js"],
     },
+    target: isProd ? ["es5"] : undefined,
     optimization: isProd ? {
       minimizer: [
         new TerserPlugin({

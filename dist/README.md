@@ -11,6 +11,26 @@
   - For webpack v5, bundle size with `crypto-js` can be greatly reduced by enhanced tree-shaking.
     However, sometimes library requiring `crypto-js` doesn't run in commonJS environments like AWS lambda,  
     or local node runtime environment for it fails to load crypto module from node environment.
+- Default parameters for Block cipher (AES/DES/Triple-DES) is tuned to be OpenSSL(1.1.1f) compatible. 
+  ```js
+  encryptedData = JsCrypto.AES.encrypt("message", "secret phrase").toString();
+  ```
+  is equivalent in OpenSSL (1.1.1f) to
+  ```shell
+  echo -n "message" | openssl enc -e -aes-256-cbc -pass pass:"secret phrase" -base64 -pbkdf2
+  # Note: Because of a random salt, everytime it produces different base64 string.
+  # But it is OK for decryption.
+  ```
+  
+  Encrypted data can be decrypted by
+  ```js
+  JsCrypto.AES.decrypt(encryptedData, "secret phrase").toString(JsCrypto.Utf8); // "message"
+  ```
+  or in OpenSSL
+  ```shell
+  echo "U2FsdGVkX1..." | openssl enc -d -aes-256-cbc -pass pass:"secret phrase" -base64 -pbkdf2
+  # U2FsdGVkX1... is the output from either JsCrypto/OpenSSL encryption code/command.
+  ```
 
 ## Install
 
@@ -131,7 +151,8 @@ md5.update("a");
 md5.update("b");
 md5.update("c");
 var hashedWord = md5.finalize();
-hashedWord.toString(); // The same as Jscrypto.MD5.hash("abc").toString(); "900150983cd24fb0d6963f7d28e17f72"
+// The same as Jscrypto.MD5.hash("abc").toString(); "900150983cd24fb0d6963f7d28e17f72"
+hashedWord.toString();
 ```
 
 <h4 id='sha1'>SHA1</h4>
@@ -352,6 +373,7 @@ decryptedData.toString(JsCrypto.Utf8); // "message"
 // Don't save 'encryptedDataObj' below, because this contains encryption key itself.
 ////////////////////////////////////////////////////////////////////////////////////////
 // Always 'stringify' this 'encryptedDataObj' then port it anywhere.
+// DO NOT use JSON.stringify. Please call 'toString()' to get string representation of encrypted data.
 var encryptedDataObj = JsCrypto.AES.encrypt("message", "key");
 // Return value of 'toString()' is a Base64 string containing only encrypted data and kdf salt
 var encryptedData = encryptedDataObj.toString();
@@ -393,12 +415,13 @@ var kdfModule = JsCrypto.PBKDF2;
 var kdfHasher = JsCrypto.SHA256;
 // 10000 is the default value.
 var kdfIterations = 10000;
-// Salt used in key derivation. If omitted, salt is randomly chosen. Random generation is strongly recommended.
+// Salt used in key derivation. If omitted, salt is randomly chosen.
+// DO NOT use salt unless you need to do it.
 var kdfSalt = JsCrypto.Hex.parse("daefe2565e3c4680");
 var aesProps = {mode, padding, kdfModule, kdfSalt, kdfHasher, kdfIterations};
 
 var cipherParams = JsCrypto.AES.encrypt("message", "password", aesProps);
-// Gets "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". OpenSSL compatible format. See detail in OpenSSLFormatter section.
+// Gets "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=". See detail in OpenSSLFormatter section.
 var encryptedData = cipherParams.toString();
 
 var decrypted = JsCrypto.AES.decrypt(encryptedData, "password", aesProps);

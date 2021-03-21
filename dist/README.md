@@ -1,9 +1,12 @@
 # jscrypto
+[![npm version](https://badge.fury.io/js/jscrypto.svg)](https://badge.fury.io/js/jscrypto)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Build](https://github.com/Hinaser/jscrypto/actions/workflows/test.yml/badge.svg?)
 
 [crypto-js](https://github.com/brix/crypto-js) enhancement for modern js environments.
 
-- Works in Chrome/Firefox/Edge and IE11
+- Works in modern browsers and **IE9/10/11**.
+  - Please keep in mind that IE9/10 uses insecure random generator. Use it at your own risk.
 - Loadable from ES6/CommonJS/Typescript/Browser runtimes.
 - Written in Typescript with many type declarations.
 - Reduced bundle size when using webpack v4.  

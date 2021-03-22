@@ -14,6 +14,15 @@
   <script src="dist/Hex.js"></script>
   var word = JsCrypto.Hex.parse("00112233");
   ```
+- Fixed an issue where loading multiple modules in browser only preserves the last module.
+   ```html
+  <script src="dist/AES.js"></script>
+  <script src="dist/DES.js"></script>
+  // OK
+  var word1 = JsCrypto.DES.encrypt("message", "key");
+  // ERROR
+  var word2 = JsCrypto.AES.encrypt("message", "key");
+   ```
 
 ## [0.0.0] - 2021-03-21
 Initial release.

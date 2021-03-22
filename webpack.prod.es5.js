@@ -6,8 +6,6 @@ const {
   modeModuleOutput,
   padModuleEntry,
   padModuleOutput,
-  encoderModuleEntry,
-  encoderModuleOutput,
   formatterModuleEntry,
   formatterModuleOutput,
 } = require("./webpack.common");
@@ -27,11 +25,6 @@ module.exports = [
     ...baseConfig("production"),
     entry: {...padModuleEntry()},
     output: {...padModuleOutput("production")},
-  },
-  {
-    ...baseConfig("production"),
-    entry: {...encoderModuleEntry()},
-    output: {...encoderModuleOutput("production")},
   },
   {
     ...baseConfig("production"),

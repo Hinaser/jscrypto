@@ -5,16 +5,11 @@
 
 [crypto-js](https://github.com/brix/crypto-js) enhancement for modern js environments.
 
-- Works in modern browsers and **IE9/10/11**.
-  - Please keep in mind that IE9/10 uses insecure random generator. Use it at your own risk.
+- Works in modern browsers and **IE9/10/11**.  
+  (IE9/10 uses insecure random generator. Use it at your own risk.)
 - Loadable from ES6/CommonJS/Typescript/Browser runtimes.
 - Written in Typescript with many type declarations.
-- Reduced bundle size when using webpack v4.  
-  - When bundling only SHA256 module, the webpack-ed js file might be less than 6kb,  
-    while bundled size with `crypto-js` might be larger than 100kb because webpack v4 cannot eliminate dead codes efficiently.
-  - For webpack v5, bundle size with `crypto-js` can be greatly reduced by enhanced tree-shaking.
-    However, sometimes library requiring `crypto-js` doesn't run in commonJS environments like AWS lambda,  
-    or local node runtime environment for it fails to load crypto module from node environment.
+- When bundling only SHA256 module, the webpack-ed js file can be less than 6kb.  
 - Default parameters for Block cipher (AES/DES/Triple-DES) is tuned to be OpenSSL(1.1.1f) compatible. 
   ```js
   encryptedData = JsCrypto.AES.encrypt("message", "secret phrase").toString();
@@ -85,6 +80,12 @@ Copy js files/directories under `/dist` dir into somewhere browser can access.
 Then directly load js file into `<script>` tag.
 ```html
 <script src="dist/index.js"></script> <!-- All modules are loaded into browser -->
+<script type="text/javascript">
+  // This will output: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+  console.log(JsCrypto.SHA256.hash("test").toString());
+</script>
+<!-- OR -->
+<script src="dist/SHA256.js"></script> <!-- Single module loading is lightweight and faster. -->
 <script type="text/javascript">
   // This will output: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
   console.log(JsCrypto.SHA256.hash("test").toString());

@@ -29,6 +29,11 @@ exports.mainEntry = () => {
     Rabbit: "./src/Rabbit.ts",
     RC4: "./src/RC4.ts",
     RC4Drop: "./src/RC4Drop.ts",
+    Base64: "./src/Base64.ts",
+    Hex: "./src/Hex.ts",
+    Latin1: "./src/Latin1.ts",
+    Utf8: "./src/Utf8.ts",
+    Utf16: "./src/Utf16.ts",
   };
 };
 
@@ -78,26 +83,6 @@ exports.padModuleOutput = (isProd) => {
     path: isProd ? path.resolve(__dirname, "dist", "pad") : path.resolve(__dirname, "test", "build", "pad"),
     filename: "[name].js",
     library: ["JsCrypto", "pad"],
-    libraryTarget: "umd",
-    globalObject: "this",
-  };
-};
-
-exports.encoderModuleEntry = () => {
-  return {
-    Base64: "./src/encoder/Base64.ts",
-    Hex: "./src/encoder/Hex.ts",
-    Latin1: "./src/encoder/Latin1.ts",
-    Utf8: "./src/encoder/Utf8.ts",
-    Utf16: "./src/encoder/Utf16.ts",
-  };
-};
-
-exports.encoderModuleOutput = (isProd) => {
-  return {
-    path: isProd ? path.resolve(__dirname, "dist", "encoder") : path.resolve(__dirname, "test", "build", "encoder"),
-    filename: "[name].js",
-    library: ["JsCrypto", "encoder"],
     libraryTarget: "umd",
     globalObject: "this",
   };

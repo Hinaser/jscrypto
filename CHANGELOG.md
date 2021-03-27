@@ -1,4 +1,4 @@
-## [0.0.1]
+## [0.0.1] - 2021-03-23
 ### Fixed
 - Fixed an issue where encoder/kdf modules have the different loading path.  
   ```html

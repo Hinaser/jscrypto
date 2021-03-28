@@ -6,7 +6,7 @@
 [crypto-js](https://github.com/brix/crypto-js) enhancement for modern js environments.
 
 - Works in modern browsers and **IE9/10/11**.  
-  \*IE9/10 uses weak random generator on block/stream cipher encryption with string password. Use it at your own risk.  
+  \*IE9/10 uses weak random generator on cipher encryption with string password. Use it at your own risk.  
   \*If only using decryption or hash/hmac, weak random generator does not cause any trouble.
 - Loadable with ES6/CommonJS/Typescript/Browser runtimes.
 - Written in Typescript with rich type declarations.

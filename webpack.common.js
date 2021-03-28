@@ -17,6 +17,7 @@ exports.mainEntry = () => {
     SHA3: "./src/SHA3.ts",
     MD5: "./src/MD5.ts",
     Hmac: "./src/Hmac.ts",
+    HmacSHA1: "./src/HmacSHA1.ts",
     HmacSHA224: "./src/HmacSHA224.ts",
     HmacSHA256: "./src/HmacSHA256.ts",
     HmacSHA384: "./src/HmacSHA384.ts",

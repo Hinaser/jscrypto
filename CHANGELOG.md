@@ -1,4 +1,4 @@
-## [Unreleased]
+## [0.0.2] - 2021-03-28
 ### Changed
 - Removed typescript source file from npm package to reduce package size.
 - Word32Array can be initialized/cloned by `new Word32Array(anotherWord32Array)`.
@@ -36,6 +36,6 @@
 Initial release.
 
 <!-- [Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.0.2...v0.0.3 -->
-[Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.0.1...v0.0.2
+[0.0.2]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.2
 [0.0.1]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.1
 [0.0.0]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.0

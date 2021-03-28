@@ -35,6 +35,9 @@
     "tsc": "tsc --project tsconfig.es5.json --emitDeclarationOnly --declaration --declarationDir ./dist --allowJS false",
     "postinstall": "patch-package"
   },
+  "bin": {
+    "jscrypto": "bin/cli.js"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",

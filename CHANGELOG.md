@@ -4,7 +4,7 @@
 - Word32Array can be initialized/cloned by `new Word32Array(anotherWord32Array)`.
 
 ### Fixed
-- Added missing kdf modules(`jscrypto/EvpKDF`, `jscrypto/PBKDF2`).
+- Added missing kdf modules(`jscrypto/EvpKDF`, `jscrypto/PBKDF2`, `jscrypto/OpenSSLKDF`).
 
 ## [0.0.1] - 2021-03-23
 ### Fixed

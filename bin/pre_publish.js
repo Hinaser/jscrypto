@@ -16,7 +16,6 @@ copyFileToPublish("README.md");
 copyFileToPublish("API.md");
 copyFileToPublish("REFERENCE.md");
 copyFileToPublish("LICENSE");
-copyFileToPublish("CHANGELOG");
 
 if(typeof packageJson.dependencies !== "undefined") delete packageJson.dependencies;
 if(typeof packageJson.devDependencies !== "undefined") delete packageJson.devDependencies;

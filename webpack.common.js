@@ -29,6 +29,7 @@ exports.mainEntry = () => {
     Rabbit: "./src/Rabbit.ts",
     RC4: "./src/RC4.ts",
     RC4Drop: "./src/RC4Drop.ts",
+    OpenSSLKDF: "./src/OpenSSLKDF",
     EvpKDF: "./src/EvpKDF.ts",
     PBKDF2: "./src/PBKDF2.ts",
     Base64: "./src/Base64.ts",

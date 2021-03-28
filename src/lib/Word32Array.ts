@@ -22,43 +22,52 @@ export class Word32Array {
    * @param {Array} words (Optional) An array of 32-bit words.
    * @param {number} nSignificantBytes (Optional) The number of significant bytes in the words.
    * @example
-   *   var wordArray = new Word32Array();
-   *   var wordArray = new Word32Array([0x00010203, 0x04050607]);
-   *   var wordArray = new Word32Array([0x00010203, 0x04050607], 6);
-   *  
+   *   var words = new Word32Array();
+   *   var words = new Word32Array([0x00010203, 0x04050607]);
+   *   var words = new Word32Array([0x00010203, 0x04050607], 6);
+   *   // Cloning wordArray can be done like below.
+   *   var clone = (new Word32Array([0x00010203, 0x04050607])).clone();
+   *   // or
+   *   var clone = new Word32Array(new Word32Array([0x00010203, 0x04050607]));
    */
-  public constructor(words?: number[]|ByteArray|unknown, nSignificantBytes?: number) {
+  public constructor(words?: number[]|Word32Array|ByteArray|unknown, nSignificantBytes?: number) {
     if(Array.isArray(words) || !words){
       this._words = Array.isArray(words) ? words : [];
       this._nSignificantBytes = typeof nSignificantBytes === "number" ? nSignificantBytes : this._words.length * 4;
       return;
     }
+    else if(words instanceof Word32Array){
+      this._words = words.words.slice();
+      this._nSignificantBytes = words.nSigBytes;
+      return;
+    }
   
     let uint8Array: Uint8Array|undefined;
-    if(words instanceof ArrayBuffer){
-      uint8Array = new Uint8Array(words);
+    // IE9 does not implement TypedArray. So catch exception for that case.
+    try{
+      if(words instanceof ArrayBuffer){
+        uint8Array = new Uint8Array(words);
+      }
+      else if(
+        words instanceof Uint8Array
+        || words instanceof Int8Array
+        || words instanceof Uint8ClampedArray
+        || words instanceof Int16Array
+        || words instanceof Uint16Array
+        || words instanceof Int32Array
+        || words instanceof Uint32Array
+        || words instanceof Float32Array
+        || words instanceof Float64Array
+      ){
+        uint8Array = new Uint8Array(words.buffer, words.byteOffset, words.byteLength);
+      }
     }
-    else if(
-      words instanceof Uint8Array
-      || words instanceof Int8Array
-      || words instanceof Uint8ClampedArray
-      || words instanceof Int16Array
-      || words instanceof Uint16Array
-      || words instanceof Int32Array
-      || words instanceof Uint32Array
-      || words instanceof Float32Array
-      || words instanceof Float64Array
-    ){
-      uint8Array = new Uint8Array(words.buffer, words.byteOffset, words.byteLength);
-    }
-    else{
+    catch(e){
       throw new Error("Invalid argument");
     }
     
     if(!uint8Array){
-      this._words = [];
-      this._nSignificantBytes = 0;
-      return;
+      throw new Error("Invalid argument");
     }
     
     const byteLen = uint8Array.byteLength;

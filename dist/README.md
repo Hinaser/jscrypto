@@ -6,9 +6,10 @@
 [crypto-js](https://github.com/brix/crypto-js) enhancement for modern js environments.
 
 - Works in modern browsers and **IE9/10/11**.  
-  (IE9/10 uses insecure random generator. Use it at your own risk.)
-- Loadable from ES6/CommonJS/Typescript/Browser runtimes.
-- Written in Typescript with many type declarations.
+  \*IE9/10 uses weak random generator on cipher encryption with string password. Use it at your own risk.  
+  \*If only using decryption or hash/hmac, weak random generator does not cause any trouble.
+- Loadable with ES6/CommonJS/Typescript/Browser runtimes.
+- Written in Typescript with rich type declarations.
 - When bundling only SHA256 module, the webpack-ed js file can be less than 6kb.  
 - Default parameters for Block cipher (AES/DES/Triple-DES) is tuned to be OpenSSL(1.1.1f) compatible. 
   ```js
@@ -91,6 +92,20 @@ Then directly load js file into `<script>` tag.
   console.log(JsCrypto.SHA256.hash("test").toString());
 </script>
 ```
+
+## FAQ
+#### Failed to import jscrypto in Typescript environment.
+
+In most cases, your `tsconfig.json` is configured not to load npm module from `node_modules` folder.  
+Check your `tsconfig.js` to be:
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "Node"
+  }
+}
+```
+
 
 ## API
 `jscrypto` supports crypto modules as well as `cryptojs`.

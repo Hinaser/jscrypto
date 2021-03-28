@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs");
-const ncp = require("ncp");
 const packageJson = require("../package.json");
 
 const distDir = path.join(__dirname, "..", "dist");
@@ -17,16 +16,9 @@ copyFileToPublish("README.md");
 copyFileToPublish("API.md");
 copyFileToPublish("REFERENCE.md");
 copyFileToPublish("LICENSE");
-copyFileToPublish("CHANGELOG");
 
 if(typeof packageJson.dependencies !== "undefined") delete packageJson.dependencies;
 if(typeof packageJson.devDependencies !== "undefined") delete packageJson.devDependencies;
 if(typeof packageJson.scripts !== "undefined") delete packageJson.scripts;
 
 fs.writeFileSync(path.join(distDir, "package.json"), JSON.stringify(packageJson, null, 2));
-
-const distSrcDir = path.join(distDir, "src");
-if(fs.existsSync(distSrcDir)){
-  fs.rmdirSync(distSrcDir, {recursive: true});
-}
-ncp(path.join(__dirname, "..", "src"), distSrcDir);

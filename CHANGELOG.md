@@ -1,6 +1,7 @@
 ## [Unreleased]
 ### Changed
 - Removed typescript source file from npm package to reduce package size.
+- Word32Array can be initialized/cloned by `new Word32Array(anotherWord32Array)`.
 
 ### Fixed
 - Added missing kdf modules(`jscrypto/EvpKDF`, `jscrypto/PBKDF2`).

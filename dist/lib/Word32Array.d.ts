@@ -16,12 +16,15 @@ export declare class Word32Array {
      * @param {Array} words (Optional) An array of 32-bit words.
      * @param {number} nSignificantBytes (Optional) The number of significant bytes in the words.
      * @example
-     *   var wordArray = new Word32Array();
-     *   var wordArray = new Word32Array([0x00010203, 0x04050607]);
-     *   var wordArray = new Word32Array([0x00010203, 0x04050607], 6);
-     *
+     *   var words = new Word32Array();
+     *   var words = new Word32Array([0x00010203, 0x04050607]);
+     *   var words = new Word32Array([0x00010203, 0x04050607], 6);
+     *   // Cloning wordArray can be done like below.
+     *   var clone = (new Word32Array([0x00010203, 0x04050607])).clone();
+     *   // or
+     *   var clone = new Word32Array(new Word32Array([0x00010203, 0x04050607]));
      */
-    constructor(words?: number[] | ByteArray | unknown, nSignificantBytes?: number);
+    constructor(words?: number[] | Word32Array | ByteArray | unknown, nSignificantBytes?: number);
     get nSigBytes(): number;
     /**
      * Set significant bytes

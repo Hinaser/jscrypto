@@ -17,8 +17,7 @@ const exeCommand = "npx jscrypto"// process.argv.slice(0, 2).join(" ");
 const manJsCrypto = [
   `Usage: ${exeCommand} <command> [command options]\n`,
   "\n",
-  "  <command>: hash|hmac|cipher",
-  "\n",
+  "  <command>: hash|hmac|cipher\n",
   "  hash: " + hashCommands.join(", ") + "\n",
   "  hmac: " + hmacCommands.join(", ") + "\n",
   "  cipher: " + cipherCommands.join(", ") + "\n",
@@ -68,12 +67,13 @@ const manJsCryptoCipher = [
   "    -kdfIter: 10000 ... kdf iteration count\n",
   "    -kdfHasher: sha256 ... kdf hasher\n",
   "  example: \n",
-  "    #Encrypt\n",
+  "    #Encrypt (Output would not be the same because of a random salt, but can be decrypted with the same key)\n",
   "    npx jscrypto aes enc test key\n",
   "    npx jscrypto aes enc 74657374 6b6579 -msg hex -key hex\n",
   "    npx jscrypto aes enc dGVzdA== a2V5 -msg base64 -key base64\n",
   "    #Decrypt\n",
   "    npx jscrypto aes dec U2FsdGVkX1+W6wX5log/mrFlAhT5jNsTOwnmDgT3IvI= key -out utf8\n",
+  "    npx jscrypto aes dec kWUil8tXMP07N/yPs90hvQ== 6b6579 -key hex -out hex\n",
 ].join("");
 
 const man = [
@@ -665,9 +665,11 @@ function doCipher(){
   
   if(encType === "enc"){
     result = Cipher.encrypt(message, key, {mode, padding, kdfModule, kdfIterations, kdfHasher});
+    console.log("enc", message.toString(), key.toString(), options, );
   }
   else{
     result = Cipher.decrypt(message, key, {mode, padding, kdfModule, kdfIterations, kdfHasher});
+    console.log("dec", message.toString(), key.toString(), options);
   }
   
   let output;

@@ -2,6 +2,9 @@
 ### Changed
 - Removed typescript source file from npm package to reduce package size.
 
+### Fixed
+- Added missing kdf modules(`jscrypto/EvpKDF`, `jscrypto/PBKDF2`).
+
 ## [0.0.1] - 2021-03-23
 ### Fixed
 - Fixed an issue where encoder/kdf modules have the different loading path.  

@@ -7,7 +7,7 @@
   <command>: hash|hmac|cipher
   hash: md5, sha1, sha3, sha224, sha256, sha384, sha512, ripemd160
   hmac: hmac-md5, hmac-sha1, hmac-sha224, hmac-sha256, hmac-sha384, hmac-sha512
-  cipher: aes, des, des3, rc4, rc4drop
+  cipher: aes, des, des3, rc4
 
   
   jscrypto <hash> message [-in hex|base64|string] [-out hex|base64]

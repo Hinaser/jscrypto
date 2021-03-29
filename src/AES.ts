@@ -274,6 +274,10 @@ export class AES extends BlockCipher {
     if(typeof key === "string"){
       return PasswordBasedCipher.encrypt(AES, message, key, props);
     }
+    
+    if(key.nSigBytes % 4 !== 0){
+      throw new Error("Key size must be multiple of 32bit/4byte/1word");
+    }
     return SerializableCipher.encrypt(AES, message, key, props);
   }
   
@@ -289,6 +293,10 @@ export class AES extends BlockCipher {
   public static decrypt(cipherParams: CipherParams|string, key: Word32Array|string, props?: Partial<AESProps>){
     if(typeof key === "string"){
       return PasswordBasedCipher.decrypt(AES, cipherParams, key, props);
+    }
+  
+    if(key.nSigBytes % 4 !== 0){
+      throw new Error("Key size must be multiple of 32bit/4byte/1word");
     }
     return SerializableCipher.decrypt(AES, cipherParams, key, props);
   }

@@ -9,7 +9,7 @@ const hmacCommands = [
 ];
 
 const cipherCommands = [
-  "aes", "des", "des3", "rc4", "rc4drop"
+  "aes", "des", "des3", "rc4"
 ];
 
 const exeCommand = "npx jscrypto"// process.argv.slice(0, 2).join(" ");
@@ -563,10 +563,28 @@ function doCipher(){
     
     const {Hex} = require("../dist/Hex");
     key = Hex.parse(keyArg);
+    
+    if(command === "aes" && key.nSigBytes % 4 !== 0){
+      console.error("ERROR: Key size for AES must be multiple of 32bit/4byte/1word");
+      process.exit(1);
+    }
+    else if(command === "des3" && ![8,16].includes(key.nSigBytes) && key.nSigBytes < 24){
+      console.error("ERROR: 3DES requires the key length to be 64, 128, 192 or >192 bits.");
+      process.exit(1);
+    }
   }
   else if(options.key.toLowerCase() === "base64"){
     const {Base64} = require("../dist/Base64");
     key = Base64.parse(keyArg);
+  
+    if(command === "aes" && key.nSigBytes % 4 !== 0){
+      console.error("ERROR: Key size for AES must be multiple of 32bit/4byte/1word");
+      process.exit(1);
+    }
+    else if(command === "des3" && ![8,16].includes(key.nSigBytes) && key.nSigBytes < 24){
+      console.error("ERROR: 3DES requires the key length to be 64, 128, 192 or >192 bits.");
+      process.exit(1);
+    }
   }
   else{
     console.error("ERROR: unknown -key value");

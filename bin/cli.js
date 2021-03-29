@@ -24,11 +24,11 @@ const manJsCrypto = [
 ].join("");
 
 const manJsCryptoHash = [
-  `${exeCommand} <hash> message [-in hex|base64|utf8] [-out hex|base64|utf8]\n`,
+  `${exeCommand} <hash> message [-msg hex|base64|utf8] [-out hex|base64|utf8]\n`,
   "\n",
   `  <hash>: ${hashCommands.join(", ")}\n`,
   "  default:\n",
-  "    -in: utf8 ... recognize message as utf-8 string\n",
+  "    -msg: utf8 ... recognize message as utf-8 string\n",
   "    -out: hex ... output hashed binary as hex string\n",
   "  example: \n",
   "    #Output of below 3 examples are the same\n",
@@ -38,7 +38,7 @@ const manJsCryptoHash = [
 ].join("");
 
 const manJsCryptoHmac = [
-  `${exeCommand} <hmac> message key [msg hex|base64|utf8] [-key hex|base64|utf8] [-out hex|base64|utf8]\n`,
+  `${exeCommand} <hmac> message key [-msg hex|base64|utf8] [-key hex|base64|utf8] [-out hex|base64|utf8]\n`,
   "\n",
   `  <hmac>: ${hmacCommands.join(", ")}\n`,
   "  default:\n",
@@ -61,19 +61,20 @@ const manJsCryptoCipher = [
   "    -msg: utf8 ... recognize message as utf-8 string\n",
   "    -key: utf8 ... recognize key as utf-8 string\n",
   "    -out: hex ... for decryption only. output hashed binary as hex string\n",
-  "    -mode: cbc ... Code block chaining as block cipher mode\n",
+  "    -mode: cbc ... Cipher block chaining as block cipher mode\n",
   "    -pad: pkcs7 ... Pkcs7 padding as block padding\n",
   "    -kdf: pbkdf2 ... PBKDF2 as key derivation function\n",
   "    -kdfIter: 10000 ... kdf iteration count\n",
   "    -kdfHasher: sha256 ... kdf hasher\n",
   "  example: \n",
   "    #Encrypt (Output would not be the same because of a random salt, but can be decrypted with the same key)\n",
-  "    npx jscrypto aes enc test key\n",
-  "    npx jscrypto aes enc 74657374 6b6579 -msg hex -key hex\n",
-  "    npx jscrypto aes enc dGVzdA== a2V5 -msg base64 -key base64\n",
+  "    npx jscrypto aes enc test password\n",
+  "    npx jscrypto aes enc 74657374 70617373776f7264 -msg hex -key hex\n",
+  "    npx jscrypto aes enc dGVzdA== cGFzc3dvcmQ= -msg base64 -key base64\n",
   "    #Decrypt\n",
-  "    npx jscrypto aes dec U2FsdGVkX1+W6wX5log/mrFlAhT5jNsTOwnmDgT3IvI= key -out utf8\n",
-  "    npx jscrypto aes dec kWUil8tXMP07N/yPs90hvQ== 6b6579 -key hex -out hex\n",
+  "    npx jscrypto aes dec U2FsdGVkX19Kf/wItWMuaTrQYV3OljA3Cr9WPMhC6Tk= password -out utf8\n",
+  "    npx jscrypto aes dec A2pYDd/3oeENsRFGA1Y0Mg== 70617373776f7264 -key hex -out utf8\n",
+  "    npx jscrypto aes dec A2pYDd/3oeENsRFGA1Y0Mg== cGFzc3dvcmQ= -key base64 -out utf8\n",
 ].join("");
 
 const man = [
@@ -113,7 +114,7 @@ function doHash(){
   const messageArg = args[1];
   const optionArgs = args.slice(2);
   const options = {
-    in: "utf8",
+    msg: "utf8",
     out: "hex",
   };
   
@@ -121,14 +122,14 @@ function doHash(){
     for(let i=0;i<optionArgs.length;i++){
       const o1 = optionArgs[i];
       const o2 = optionArgs[i+1];
-      if(o1 === "-in"){
+      if(o1 === "-msg"){
         if(!["hex", "base64", "utf8"].includes(o2)){
           console.error("ERROR: Unknown -in value");
           console.error("");
           console.log(manJsCryptoHash);
           process.exit(1);
         }
-        options.in = o2;
+        options.msg = o2;
         i += 1;
       }
       else if(o1 === "-out"){
@@ -168,10 +169,10 @@ function doHash(){
   }
   
   let message;
-  if(options.in.toLowerCase() === "utf8"){
+  if(options.msg.toLowerCase() === "utf8"){
     message = messageArg;
   }
-  else if(options.in.toLowerCase() === "hex"){
+  else if(options.msg.toLowerCase() === "hex"){
     if(!/^[0-9a-fA-F]+$/.test(messageArg)){
       console.error("ERROR: Invalid Hex input");
       process.exit(1);
@@ -184,7 +185,7 @@ function doHash(){
     const {Hex} = require("../dist/Hex"); 
     message = Hex.parse(messageArg);
   }
-  else if(options.in.toLowerCase() === "base64"){
+  else if(options.msg.toLowerCase() === "base64"){
     const {Base64} = require("../dist/Base64");
     message = Base64.parse(messageArg);
   }
@@ -665,11 +666,9 @@ function doCipher(){
   
   if(encType === "enc"){
     result = Cipher.encrypt(message, key, {mode, padding, kdfModule, kdfIterations, kdfHasher});
-    console.log("enc", message.toString(), key.toString(), options, );
   }
   else{
     result = Cipher.decrypt(message, key, {mode, padding, kdfModule, kdfIterations, kdfHasher});
-    console.log("dec", message.toString(), key.toString(), options);
   }
   
   let output;

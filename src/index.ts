@@ -19,6 +19,7 @@ export {PasswordBasedCipher} from "./lib/algorithm/cipher/PasswordBasedCipher";
 
 export {Hmac} from "./Hmac";
 export {HmacMD5} from "./HmacMD5";
+export {HmacSHA1} from "./HmacSHA1";
 export {HmacSHA224} from "./HmacSHA224";
 export {HmacSHA256} from "./HmacSHA256";
 export {HmacSHA384} from "./HmacSHA384";

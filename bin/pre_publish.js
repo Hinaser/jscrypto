@@ -22,3 +22,12 @@ if(typeof packageJson.devDependencies !== "undefined") delete packageJson.devDep
 if(typeof packageJson.scripts !== "undefined") delete packageJson.scripts;
 
 fs.writeFileSync(path.join(distDir, "package.json"), JSON.stringify(packageJson, null, 2));
+
+const srcBinFile = path.join(__dirname, "..", "bin", "cli.js");
+const distBinDir = path.join(distDir, "bin");
+const distBinFile = path.join(distDir, "bin", "cli.js");
+if(fs.existsSync(distBinDir)){
+  fs.rmdirSync(distBinDir, {recursive: true});
+}
+fs.mkdirSync(distBinDir);
+fs.copyFileSync(srcBinFile, distBinFile);

@@ -1,6 +1,6 @@
 {
   "name": "jscrypto",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "main": "./index.js",
   "author": "Izumi Hoshino <rindo.hinase@gmail.com>",
   "license": "MIT",
@@ -34,6 +34,9 @@
     "build:es6": "tsc --project tsconfig.json --allowJS false --declaration --declarationDir ./dist/es6",
     "tsc": "tsc --project tsconfig.es5.json --emitDeclarationOnly --declaration --declarationDir ./dist --allowJS false",
     "postinstall": "patch-package"
+  },
+  "bin": {
+    "jscrypto": "bin/cli.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.1.0",

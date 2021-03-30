@@ -260,6 +260,7 @@ Default padding: `Pkcs7`
 ```js
 ////////////////////////////////////////////////////////////////////////////////////////
 // Encrypt/Decrypt string without specifying salt. (Salt is randomly chosen at runtime)
+// *Salt is used to convert string password to binary key.
 ////////////////////////////////////////////////////////////////////////////////////////
 // Default block cipher mode is CBC, pad is Pkcs7.
 // Random base64 string which contains encrypted message and 'random' salt for kdf.
@@ -269,13 +270,24 @@ var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
 decryptedData.toString(JsCrypto.Utf8); // "message"
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Encrypt/Decrypt string with pre-defined salt.
+// Encrypt/Decrypt string with pre-defined kdf salt.
 ////////////////////////////////////////////////////////////////////////////////////////
 var kdfSalt = new JsCrypto.Word32Array([0x00112233, 0x44556677]); // Or JsCrypto.Hex.parse("0011223344556677")
 // Always "U2FsdGVkX18AESIzRFVmd1MuEw84PQjNhlcGD3AQzJg=" because salt for kdf is fixed.
 var encryptedData = JsCrypto.AES.encrypt("message", "key", {kdfSalt: kdfSalt}).toString();
 // Binary data is returned as Word32Array.
 var decryptedData = JsCrypto.AES.decrypt(encryptedData, "key");
+decryptedData.toString(JsCrypto.Utf8); // "message"
+
+////////////////////////////////////////////////////////////////////////////////////////
+// Encrypt/Decrypt string with binary key.
+////////////////////////////////////////////////////////////////////////////////////////
+// key lenght must be multiple of 32bit=4byte=1word. (32/64/96/128/160/192/224/256bit key supported for AES)
+var key = JsCrypto.Hex.parse("00112233445566778899aabbccddeeff"); // 16byte = 128bit key
+// Always "dwhN2ILLN9QJD+BQr0kcsw==" because of a fixed key.
+var encryptedData = JsCrypto.AES.encrypt("message", key).toString();
+// Binary data is returned as Word32Array.
+var decryptedData = JsCrypto.AES.decrypt(encryptedData, key);
 decryptedData.toString(JsCrypto.Utf8); // "message"
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -365,6 +377,9 @@ decryptedData.toString(JsCrypto.Utf8);
 
 Default block cipher mode: `CBC`  
 Default padding: `Pkcs7`
+
+Triple-DES requires the key length to be 64, 128, 192 or >192bit.  
+If string key is provided, it is automaically converted to 192bit key by key derivation function.
 
 ```js
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

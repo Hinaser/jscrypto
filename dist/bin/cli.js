@@ -15,9 +15,8 @@ const cipherCommands = [
 const exeCommand = "npx jscrypto"// process.argv.slice(0, 2).join(" ");
 
 const manJsCrypto = [
-  `Usage: ${exeCommand} <command> [command options]\n`,
+  `Usage: ${exeCommand} <hash|hmac|cipher> [command options]\n`,
   "\n",
-  "  <command>: hash|hmac|cipher\n",
   "  hash: " + hashCommands.join(", ") + "\n",
   "  hmac: " + hmacCommands.join(", ") + "\n",
   "  cipher: " + cipherCommands.join(", ") + "\n",
@@ -83,6 +82,10 @@ const man = [
   manJsCryptoHmac,
   manJsCryptoCipher,
 ].join("\n\n");
+
+// const resolve = (file) => `../dist/${file}`; // Use if you git clone this project and want to debug cli.js
+const path = require("path");
+const resolve = (file) => path.join("..", file);
 
 const args = process.argv.slice(2);
 
@@ -153,14 +156,14 @@ function doHash(){
   
   let Hasher;
   switch (command.toLowerCase()){
-    case "md5": Hasher = require("../dist/MD5").MD5; break;
-    case "sha1": Hasher = require("../dist/SHA1").SHA1; break;
-    case "sha3": Hasher = require("../dist/SHA3").SHA3; break;
-    case "sha224": Hasher = require("../dist/SHA224").SHA224; break;
-    case "sha256": Hasher = require("../dist/SHA256").SHA256; break;
-    case "sha384": Hasher = require("../dist/SHA384").SHA384; break;
-    case "sha512": Hasher = require("../dist/SHA512").SHA512; break;
-    case "ripemd160": Hasher = require("../dist/RIPEMD160").RIPEMD160; break;
+    case "md5": Hasher = require(resolve("MD5")).MD5; break;
+    case "sha1": Hasher = require(resolve("SHA1")).SHA1; break;
+    case "sha3": Hasher = require(resolve("SHA3")).SHA3; break;
+    case "sha224": Hasher = require(resolve("SHA224")).SHA224; break;
+    case "sha256": Hasher = require(resolve("SHA256")).SHA256; break;
+    case "sha384": Hasher = require(resolve("SHA384")).SHA384; break;
+    case "sha512": Hasher = require(resolve("SHA512")).SHA512; break;
+    case "ripemd160": Hasher = require(resolve("RIPEMD160")).RIPEMD160; break;
     default:
       console.error("ERROR: Unknown hash");
       console.error("");
@@ -182,11 +185,11 @@ function doHash(){
       process.exit(1);
     }
     
-    const {Hex} = require("../dist/Hex"); 
+    const {Hex} = require(resolve("Hex")); 
     message = Hex.parse(messageArg);
   }
   else if(options.msg.toLowerCase() === "base64"){
-    const {Base64} = require("../dist/Base64");
+    const {Base64} = require(resolve("Base64"));
     message = Base64.parse(messageArg);
   }
   else{
@@ -196,13 +199,13 @@ function doHash(){
   
   let outputEncoding;
   if(options.out.toLowerCase() === "hex"){
-    outputEncoding = require("../dist/Hex").Hex;
+    outputEncoding = require(resolve("Hex")).Hex;
   }
   else if(options.out.toLowerCase() === "base64"){
-    outputEncoding = require("../dist/Base64").Base64;
+    outputEncoding = require(resolve("Base64")).Base64;
   }
   else if(options.out.toLowerCase() === "utf8"){
-    outputEncoding = require("../dist/Utf8").Utf8;
+    outputEncoding = require(resolve("Utf8")).Utf8;
   }
   else{
     console.error("ERROR: unknown -out value");
@@ -283,12 +286,12 @@ function doHmac(){
   
   let Hasher;
   switch (command.replace(/-/g, "").toLowerCase()){
-    case "hmacmd5": Hasher = require("../dist/HmacMD5").HmacMD5; break;
-    case "hmacsha1": Hasher = require("../dist/HmacSHA1").HmacSHA1; break;
-    case "hmacsha224": Hasher = require("../dist/HmacSHA224").HmacSHA224; break;
-    case "hmacsha256": Hasher = require("../dist/HmacSHA256").HmacSHA256; break;
-    case "hmacsha384": Hasher = require("../dist/HmacSHA384").HmacSHA384; break;
-    case "hmacsha512": Hasher = require("../dist/HmacSHA512").HmacSHA512; break;
+    case "hmacmd5": Hasher = require(resolve("HmacMD5")).HmacMD5; break;
+    case "hmacsha1": Hasher = require(resolve("HmacSHA1")).HmacSHA1; break;
+    case "hmacsha224": Hasher = require(resolve("HmacSHA224")).HmacSHA224; break;
+    case "hmacsha256": Hasher = require(resolve("HmacSHA256")).HmacSHA256; break;
+    case "hmacsha384": Hasher = require(resolve("HmacSHA384")).HmacSHA384; break;
+    case "hmacsha512": Hasher = require(resolve("HmacSHA512")).HmacSHA512; break;
     default:
       console.error("ERROR: Unknown hmac hasher");
       console.error("");
@@ -310,11 +313,11 @@ function doHmac(){
       process.exit(1);
     }
     
-    const {Hex} = require("../dist/Hex");
+    const {Hex} = require(resolve("Hex"));
     message = Hex.parse(messageArg);
   }
   else if(options.msg.toLowerCase() === "base64"){
-    const {Base64} = require("../dist/Base64");
+    const {Base64} = require(resolve("Base64"));
     message = Base64.parse(messageArg);
   }
   else{
@@ -336,11 +339,11 @@ function doHmac(){
       process.exit(1);
     }
     
-    const {Hex} = require("../dist/Hex");
+    const {Hex} = require(resolve("Hex"));
     key = Hex.parse(keyArg);
   }
   else if(options.key.toLowerCase() === "base64"){
-    const {Base64} = require("../dist/Base64");
+    const {Base64} = require(resolve("Base64"));
     key = Base64.parse(keyArg);
   }
   else{
@@ -350,13 +353,13 @@ function doHmac(){
   
   let outputEncoding;
   if(options.out.toLowerCase() === "hex"){
-    outputEncoding = require("../dist/Hex").Hex;
+    outputEncoding = require(resolve("Hex")).Hex;
   }
   else if(options.out.toLowerCase() === "base64"){
-    outputEncoding = require("../dist/Base64").Base64;
+    outputEncoding = require(resolve("Base64")).Base64;
   }
   else if(options.out.toLowerCase() === "utf8"){
-    outputEncoding = require("../dist/Utf8").Utf8;
+    outputEncoding = require(resolve("Utf8")).Utf8;
   }
   else{
     console.error("ERROR: unknown -out value");
@@ -493,11 +496,11 @@ function doCipher(){
   
   let Cipher;
   switch (command.toLowerCase()){
-    case "aes": Cipher = require("../dist/AES").AES; break;
-    case "des": Cipher = require("../dist/DES").DES; break;
-    case "des3": Cipher = require("../dist/DES3").DES3; break;
-    case "rabbit": Cipher = require("../dist/Rabbit ").Rabbit; break;
-    case "rc4": Cipher = require("../dist/RC4").RC4; break;
+    case "aes": Cipher = require(resolve("AES")).AES; break;
+    case "des": Cipher = require(resolve("DES")).DES; break;
+    case "des3": Cipher = require(resolve("DES3")).DES3; break;
+    case "rabbit": Cipher = require(resolve("Rabbit ")).Rabbit; break;
+    case "rc4": Cipher = require(resolve("RC4")).RC4; break;
     default:
       console.error("ERROR: Unknown cipher");
       console.error("");
@@ -531,11 +534,11 @@ function doCipher(){
         process.exit(1);
       }
     
-      const {Hex} = require("../dist/Hex");
+      const {Hex} = require(resolve("Hex"));
       message = Hex.parse(messageArg);
     }
     else if(options.msg.toLowerCase() === "base64"){
-      const {Base64} = require("../dist/Base64");
+      const {Base64} = require(resolve("Base64"));
       message = Base64.parse(messageArg);
     }
     else{
@@ -561,7 +564,7 @@ function doCipher(){
       process.exit(1);
     }
     
-    const {Hex} = require("../dist/Hex");
+    const {Hex} = require(resolve("Hex"));
     key = Hex.parse(keyArg);
     
     if(command === "aes" && key.nSigBytes % 4 !== 0){
@@ -574,7 +577,7 @@ function doCipher(){
     }
   }
   else if(options.key.toLowerCase() === "base64"){
-    const {Base64} = require("../dist/Base64");
+    const {Base64} = require(resolve("Base64"));
     key = Base64.parse(keyArg);
   
     if(command === "aes" && key.nSigBytes % 4 !== 0){
@@ -593,13 +596,13 @@ function doCipher(){
   
   let outputEncoding;
   if(options.out.toLowerCase() === "hex"){
-    outputEncoding = require("../dist/Hex").Hex;
+    outputEncoding = require(resolve("Hex")).Hex;
   }
   else if(options.out.toLowerCase() === "base64"){
-    outputEncoding = require("../dist/Base64").Base64;
+    outputEncoding = require(resolve("Base64")).Base64;
   }
   else if(options.out.toLowerCase() === "utf8"){
-    outputEncoding = require("../dist/Utf8").Utf8;
+    outputEncoding = require(resolve("Utf8")).Utf8;
   }
   else{
     console.error("ERROR: unknown -out value");
@@ -608,19 +611,19 @@ function doCipher(){
   
   let mode;
   if(options.mode.toLowerCase() === "cbc"){
-    mode = require("../dist/mode/CBC").CBC;
+    mode = require(resolve("mode/CBC")).CBC;
   }
   else if(options.mode.toLowerCase() === "ecb"){
-    mode = require("../dist/mode/ECB").ECB;
+    mode = require(resolve("mode/ECB")).ECB;
   }
   else if(options.mode.toLowerCase() === "ofb"){
-    mode = require("../dist/mode/OFB").OFB;
+    mode = require(resolve("mode/OFB")).OFB;
   }
   else if(options.mode.toLowerCase() === "cfb"){
-    mode = require("../dist/mode/CFB").CFB;
+    mode = require(resolve("mode/CFB")).CFB;
   }
   else if(options.mode.toLowerCase() === "ctr"){
-    mode = require("../dist/mode/CTR").CTR;
+    mode = require(resolve("mode/CTR")).CTR;
   }
   else{
     console.error("ERROR: unknown -mode value");
@@ -629,22 +632,22 @@ function doCipher(){
   
   let padding;
   if(options.pad.toLowerCase() === "ansix923"){
-    padding = require("../dist/pad/AnsiX923").AnsiX923;
+    padding = require(resolve("pad/AnsiX923")).AnsiX923;
   }
   else if(options.pad.toLowerCase() === "iso10126"){
-    padding = require("../dist/pad/ISO10126").ISO10126;
+    padding = require(resolve("pad/ISO10126")).ISO10126;
   }
   else if(options.pad.toLowerCase() === "iso97971"){
-    padding = require("../dist/pad/ISO97971").ISO97971;
+    padding = require(resolve("pad/ISO97971")).ISO97971;
   }
   else if(options.pad.toLowerCase() === "nopadding"){
-    padding = require("../dist/pad/NoPadding").NoPadding;
+    padding = require(resolve("pad/NoPadding")).NoPadding;
   }
   else if(options.pad.toLowerCase() === "pkcs7"){
-    padding = require("../dist/pad/Pkcs7").Pkcs7;
+    padding = require(resolve("pad/Pkcs7")).Pkcs7;
   }
   else if(options.pad.toLowerCase() === "zero"){
-    padding = require("../dist/pad/Zero").Zero;
+    padding = require(resolve("pad/Zero")).Zero;
   }
   else{
     console.error("ERROR: unknown -pad value");
@@ -653,10 +656,10 @@ function doCipher(){
   
   let kdfModule;
   if(options.kdf.toLowerCase() === "pbkdf2"){
-    kdfModule = require("../dist/PBKDF2").PBKDF2;
+    kdfModule = require(resolve("PBKDF2")).PBKDF2;
   }
   else if(options.kdf.toLowerCase() === "evpkdf"){
-    kdfModule = require("../dist/EvpKDF").EvpKDF;
+    kdfModule = require(resolve("EvpKDF")).EvpKDF;
   }
   else{
     console.error("ERROR: unknown -kdf value");
@@ -667,14 +670,14 @@ function doCipher(){
   
   let kdfHasher;
   switch (options.hasher.toLowerCase()){
-    case "md5": kdfHasher = require("../dist/MD5").MD5; break;
-    case "sha1": kdfHasher = require("../dist/SHA1").SHA1; break;
-    case "sha3": kdfHasher = require("../dist/SHA3").SHA3; break;
-    case "sha224": kdfHasher = require("../dist/SHA224").SHA224; break;
-    case "sha256": kdfHasher = require("../dist/SHA256").SHA256; break;
-    case "sha384": kdfHasher = require("../dist/SHA384").SHA384; break;
-    case "sha512": kdfHasher = require("../dist/SHA512").SHA512; break;
-    case "ripemd160": kdfHasher = require("../dist/RIPEMD160").RIPEMD160; break;
+    case "md5": kdfHasher = require(resolve("MD5")).MD5; break;
+    case "sha1": kdfHasher = require(resolve("SHA1")).SHA1; break;
+    case "sha3": kdfHasher = require(resolve("SHA3")).SHA3; break;
+    case "sha224": kdfHasher = require(resolve("SHA224")).SHA224; break;
+    case "sha256": kdfHasher = require(resolve("SHA256")).SHA256; break;
+    case "sha384": kdfHasher = require(resolve("SHA384")).SHA384; break;
+    case "sha512": kdfHasher = require(resolve("SHA512")).SHA512; break;
+    case "ripemd160": kdfHasher = require(resolve("RIPEMD160")).RIPEMD160; break;
     default:
       console.error("ERROR: Unknown hash");
       process.exit(1);

@@ -9,6 +9,8 @@
   \*IE9/10 uses weak random generator on cipher encryption with string password. Use it at your own risk.  
   \*If only using decryption or hash/hmac, weak random generator does not cause any trouble.
 - Loadable with ES6/CommonJS/Typescript/Browser runtimes.
+- [CLI commands](#cli) available:  
+  i.e. `npx jscrypto sha1 "message"`, `npx jscrypto aes enc "message" "password"`, etc.  
 - Written in Typescript with rich type declarations.
 - When bundling only SHA256 module, the webpack-ed js file can be less than 6kb.  
 - Default parameters for Block cipher (AES/DES/Triple-DES) is tuned to be OpenSSL(1.1.1f) compatible. 
@@ -39,6 +41,10 @@ npm install jscrypto
 # or
 yarn add jscrypto
 ```
+
+If you only want to use [CLI commands](#cli), you don't even need to install `jscrypto`.  
+Just dispatch `npx` command like `npx jscrypto sha256 "message"`.  
+Read further [here](#cli)
 
 ## Usage
 ### CommonJS Environment (Node.js environment like node CLI, AWS Lambda, etc)
@@ -91,6 +97,62 @@ Then directly load js file into `<script>` tag.
   // This will output: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
   console.log(JsCrypto.SHA256.hash("test").toString());
 </script>
+```
+
+<h3 id='cli'>CLI</h3>
+
+Command Line Interface to try various crypto modules on terminal.
+```cmd
+  Usage: npx jscrypto <hash|hmac|cipher> [command options]
+
+  hash: md5, sha1, sha3, sha224, sha256, sha384, sha512, ripemd160
+  hmac: hmac-md5, hmac-sha1, hmac-sha224, hmac-sha256, hmac-sha384, hmac-sha512
+  cipher: aes, des, des3, rc4
+
+  
+  $ npx jscrypto <hash> message [-msg hex|base64|utf8] [-out hex|base64]
+
+    default:
+      -msg: utf8 ... recognize message as utf-8 string
+      -out: hex ... output hashed binary as hex string
+    example:
+      #Output of below 3 examples are the same
+      npx jscrypto sha1 test
+      npx jscrypto sha1 74657374 -msg hex
+      npx jscrypto sha1 dGVzdA== -msg base64
+
+
+  $ npx jscrypto <hmac> message key [msg hex|base64|utf8] [-key hex|base64|utf8] [-out hex|base64]
+
+    default:
+      -msg: utf8 ... recognize message as utf-8 string
+      -key: utf8 ... recognize key as utf-8 string
+      -out: hex ... output hashed binary as hex string
+    example:
+      #Output of below 3 examples are the same
+      npx jscrypto hmac-sha1 test key
+      npx jscrypto hmac-sha1 74657374 6b6579 -msg hex -key hex
+      npx jscrypto hmac-sha1 dGVzdA== a2V5 -msg base64 -key base64
+
+
+  $ npx jscrypto <cipher> message key [-msg hex|base64|utf8] [-key hex|base64|utf8] [-out hex|base64|utf8] [-mode cbc|ecb|ofb|cfb] [-pad pkcs7|iso10126|iso97971|ansix923|nopadding] [-kdf pbkdf2|evpkdf]
+
+    default:
+      -msg: utf8 ... recognize message as utf-8 string
+      -key: utf8 ... recognize key as utf-8 string
+      -out: base64|hex ... base64 on encryption, hex on decryption. Note: utf8 cannot be used on encryption.
+      -mode: cbc ... Code block chaining as block cipher mode
+      -pad: pkcs7 ... Pkcs7 padding as block padding
+      -kdf: pbkdf2 ... PBKDF2 as key derivation function
+    example:
+      #Encrypt (Output would not be the same because of a random salt, but can be decrypted with the same key)
+      npx jscrypto aes enc test password
+      npx jscrypto aes enc 74657374 70617373776f7264 -msg hex -key hex
+      npx jscrypto aes enc dGVzdA== cGFzc3dvcmQ= -msg base64 -key base64
+      #Decrypt
+      npx jscrypto aes dec U2FsdGVkX19Kf/wItWMuaTrQYV3OljA3Cr9WPMhC6Tk= password -out utf8
+      npx jscrypto aes dec A2pYDd/3oeENsRFGA1Y0Mg== 70617373776f7264 -key hex -out utf8
+      npx jscrypto aes dec A2pYDd/3oeENsRFGA1Y0Mg== cGFzc3dvcmQ= -key base64 -out utf8
 ```
 
 ## FAQ

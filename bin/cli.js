@@ -23,7 +23,7 @@ const manJsCrypto = [
 ].join("");
 
 const manJsCryptoHash = [
-  `${exeCommand} <hash> message [-msg hex|base64|utf8] [-out hex|base64|utf8]\n`,
+  `${exeCommand} <hash> message [-msg hex|base64|utf8] [-out hex|base64]\n`,
   "\n",
   `  <hash>: ${hashCommands.join(", ")}\n`,
   "  default:\n",
@@ -37,7 +37,7 @@ const manJsCryptoHash = [
 ].join("");
 
 const manJsCryptoHmac = [
-  `${exeCommand} <hmac> message key [-msg hex|base64|utf8] [-key hex|base64|utf8] [-out hex|base64|utf8]\n`,
+  `${exeCommand} <hmac> message key [-msg hex|base64|utf8] [-key hex|base64|utf8] [-out hex|base64]\n`,
   "\n",
   `  <hmac>: ${hmacCommands.join(", ")}\n`,
   "  default:\n",
@@ -193,7 +193,7 @@ function doHash(){
     message = Base64.parse(messageArg);
   }
   else{
-    console.error("ERROR: unknown -in value");
+    console.error("ERROR: unknown -msg value");
     process.exit(1);
   }
   
@@ -203,9 +203,6 @@ function doHash(){
   }
   else if(options.out.toLowerCase() === "base64"){
     outputEncoding = require(resolve("Base64")).Base64;
-  }
-  else if(options.out.toLowerCase() === "utf8"){
-    outputEncoding = require(resolve("Utf8")).Utf8;
   }
   else{
     console.error("ERROR: unknown -out value");
@@ -358,9 +355,6 @@ function doHmac(){
   else if(options.out.toLowerCase() === "base64"){
     outputEncoding = require(resolve("Base64")).Base64;
   }
-  else if(options.out.toLowerCase() === "utf8"){
-    outputEncoding = require(resolve("Utf8")).Utf8;
-  }
   else{
     console.error("ERROR: unknown -out value");
     process.exit(1);
@@ -393,7 +387,7 @@ function doCipher(){
   const options = {
     msg: "utf8",
     key: "utf8",
-    out: "hex",
+    out: "", // default value will be set later
     mode: "cbc",
     pad: "pkcs7",
     kdf: "pbkdf2",
@@ -594,6 +588,20 @@ function doCipher(){
     process.exit(1);
   }
   
+  // Decide -out default value
+  if(!options.out){
+    if(encType === "enc"){
+      options.out = "base64";
+    }
+    else{
+      options.out = "hex";
+    }
+  }
+  else if(encType === "enc" && options.out.toLowerCase() === "utf8"){
+    console.error("ERROR: '-out utf8' cannot be used on encryption");
+    process.exit(1);
+  }
+  
   let outputEncoding;
   if(options.out.toLowerCase() === "hex"){
     outputEncoding = require(resolve("Hex")).Hex;
@@ -695,7 +703,14 @@ function doCipher(){
   let output;
   try{
     if(encType === "enc"){
-      output = result.toString();
+      if(options.out.toLowerCase() === "base64"){
+        output = result.toString();
+      }
+      else{
+        const {Base64} = require(resolve("Base64"));
+        const word = Base64.parse(result.toString());
+        output = word.toString(require(resolve("Hex")).Hex);
+      }
     }
     else{
       output = result.toString(outputEncoding);

@@ -58,6 +58,7 @@ exports.modeModuleEntry = () => {
     CTR: "./src/mode/CTR.ts",
     ECB: "./src/mode/ECB.ts",
     OFB: "./src/mode/OFB.ts",
+    GCM: "./src/mode/GCM.ts",
   };
 };
 

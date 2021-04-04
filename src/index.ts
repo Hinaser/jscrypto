@@ -44,12 +44,14 @@ import {CFB} from "./mode/CFB";
 import {CTR} from "./mode/CTR";
 import {ECB} from "./mode/ECB";
 import {OFB} from "./mode/OFB";
+import {GCM} from "./mode/GCM";
 export const mode = {
   CBC,
   CFB,
   CTR,
   ECB,
   OFB,
+  GCM,
 };
 
 import {AnsiX923} from "./pad/AnsiX923";

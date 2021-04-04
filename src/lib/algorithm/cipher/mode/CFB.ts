@@ -24,6 +24,7 @@ export class CFB extends BlockCipherMode {
   
       // Remember this block to use with next block
       this._prevBlock = words.slice(offset, offset + this._cipher.blockSize);
+      return undefined;
     }
   };
   
@@ -47,6 +48,7 @@ export class CFB extends BlockCipherMode {
   
       // This block becomes the previous block
       this._prevBlock = thisBlock;
+      return undefined;
     }
   };
   

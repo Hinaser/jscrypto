@@ -1,4 +1,5 @@
 import type {BlockCipher} from "../BlockCipher";
+import type {Word32Array} from "../../../Word32Array";
 
 export interface BlockCipherModeProps {
   cipher: BlockCipher;
@@ -23,7 +24,7 @@ export class BlockCipherMode {
   /**
    * @abstract
    */
-  public processBlock(words: number[], offset: number){
+  public processBlock(words: number[], offset: number): undefined|Word32Array {
     return;
   }
   

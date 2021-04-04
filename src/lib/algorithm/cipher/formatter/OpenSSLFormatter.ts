@@ -20,14 +20,22 @@ export const OpenSSLFormatter: Formatter = {
     if(!cipherText){
       return "";
     }
-  
+    
     // Format
-    if (salt) {
+    let retStr: string;
+    if(salt){
       const wordArray = new Word32Array([0x53616c74, 0x65645f5f]).concat(salt).concat(cipherText);
-      return wordArray.toString(Base64);
+      retStr = wordArray.toString(Base64);
+    }
+    else{
+      retStr = cipherText.toString(Base64);
     }
     
-    return cipherText.toString(Base64);
+    if(cipherParams.authTag){
+      retStr += `\n${cipherParams.authTag.toString(Base64)}`;
+    }
+    
+    return retStr;
   },
   
   /**
@@ -40,9 +48,18 @@ export const OpenSSLFormatter: Formatter = {
    */
   parse(openSSLStr: string){
     let salt;
-  
-    // Parse base64
-    const cipherText = Base64.parse(openSSLStr);
+    let authTag;
+    let cipherText;
+    
+    if(openSSLStr.includes("\n")){
+      const arr = openSSLStr.split(/\n/);
+      cipherText = Base64.parse(arr[0]);
+      authTag = Base64.parse(arr[1]);
+    }
+    else{
+      // Parse base64
+      cipherText = Base64.parse(openSSLStr);
+    }
   
     // Shortcut
     const ciphertextWords = cipherText.words;
@@ -57,6 +74,6 @@ export const OpenSSLFormatter: Formatter = {
       cipherText.nSigBytes -= 16;
     }
   
-    return new CipherParams({cipherText, salt });
+    return new CipherParams({cipherText, salt, authTag});
   }
 }

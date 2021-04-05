@@ -25,7 +25,7 @@ export class BlockCipher extends Cipher {
   protected _padding: Pad = Pkcs7;
   protected _modeCreator?: (props: BlockCipherModeProps) => BlockCipherMode;
   protected _authData: Word32Array|undefined;
-  protected _authTag: Word32Array|undefined;
+  protected _authTagForABlock: Word32Array[] = [];
   
   /**
    * @see https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
@@ -56,7 +56,14 @@ export class BlockCipher extends Cipher {
   }
   
   public get authTag(){
-    return this._authTag?.clone();
+    if(this._authTagForABlock.length < 1){
+      return undefined;
+    }
+    const w = this._authTagForABlock[0].clone();
+    for(let i=1;i<this._authTagForABlock.length;i++){
+      w.concat(this._authTagForABlock[i]);
+    }
+    return w;
   }
   
   reset(data?: Word32Array, nBytes?: number) {
@@ -82,7 +89,10 @@ export class BlockCipher extends Cipher {
   }
   
   protected _doProcessBlock(words: number[], offset: number) {
-    this._authTag = this._mode?.processBlock(words, offset);
+    const authTag = this._mode?.processBlock(words, offset);
+    if(authTag){
+      this._authTagForABlock.push(authTag);
+    }
   }
   
   protected _doFinalize(): Word32Array {

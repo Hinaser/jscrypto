@@ -1,4 +1,4 @@
-## [Unreleased]
+## [0.2.0] - 2021-04-07
 ### Added
 - Added GCM block cipher mode. (Galois Counter Mode)
 - Added GMAC (Galois Message Authentication Code)
@@ -46,7 +46,7 @@
 Initial release.
 
 <!-- [Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0 -->
-[Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0
+[0.2.0]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Hinaser/jscrypto/compare/v0.0.2...v0.1.0
 [0.0.2]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.2
 [0.0.1]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.1

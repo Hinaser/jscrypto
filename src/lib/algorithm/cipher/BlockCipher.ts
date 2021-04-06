@@ -25,7 +25,7 @@ export class BlockCipher extends Cipher {
   protected _padding: Pad = Pkcs7;
   protected _modeCreator?: (props: BlockCipherModeProps) => BlockCipherMode;
   protected _authData: Word32Array|undefined;
-  protected _authTagForABlock: Word32Array[] = [];
+  protected _authTag: Word32Array|undefined;
   
   /**
    * @see https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
@@ -56,14 +56,7 @@ export class BlockCipher extends Cipher {
   }
   
   public get authTag(){
-    if(this._authTagForABlock.length < 1){
-      return undefined;
-    }
-    const w = this._authTagForABlock[0].clone();
-    for(let i=1;i<this._authTagForABlock.length;i++){
-      w.concat(this._authTagForABlock[i]);
-    }
-    return w;
+    return this._authTag?.clone();
   }
   
   reset(data?: Word32Array, nBytes?: number) {
@@ -89,10 +82,7 @@ export class BlockCipher extends Cipher {
   }
   
   protected _doProcessBlock(words: number[], offset: number) {
-    const authTag = this._mode?.processBlock(words, offset);
-    if(authTag){
-      this._authTagForABlock.push(authTag);
-    }
+    this._mode?.processBlock(words, offset);
   }
   
   protected _doFinalize(): Word32Array {
@@ -108,8 +98,14 @@ export class BlockCipher extends Cipher {
     
       // Process final blocks
       finalProcessedBlocks = this._process(true);
+  
+      // If Authenticated cipher, generate auth tag
+      this._authTag = this._mode?.generateAuthTag(finalProcessedBlocks);
     }
     else /* if (this._transformMode == Cipher._DEC_TRANSFORM_MODE) */ {
+      // If Authenticated cipher, generate auth tag
+      this._authTag = this._mode?.generateAuthTag(this._data);
+      
       // Process final blocks
       finalProcessedBlocks = this._process(true);
     

@@ -24,8 +24,15 @@ export class BlockCipherMode {
   /**
    * @abstract
    */
-  public processBlock(words: number[], offset: number): undefined|Word32Array {
+  public processBlock(words: number[], offset: number) {
     return;
+  }
+  
+  /**
+   * @abstract
+   */
+  public generateAuthTag(cipherText: Word32Array): Word32Array|undefined {
+    return undefined;
   }
   
   /**

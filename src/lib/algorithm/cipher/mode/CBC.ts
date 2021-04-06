@@ -28,7 +28,6 @@ export class CBC extends BlockCipherMode {
   
       // Remember this block to use with next block
       this._prevBlock = words.slice(offset, offset + blockSize);
-      return undefined;
     }
   };
   
@@ -58,7 +57,6 @@ export class CBC extends BlockCipherMode {
     
       // This block becomes the previous block
       this._prevBlock = thisBlock;
-      return undefined;
     }
     
   };

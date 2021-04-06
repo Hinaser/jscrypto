@@ -18,7 +18,6 @@ export class ECB extends BlockCipherMode {
      */
     public processBlock(words: number[], offset: number){
       this._cipher.encryptBlock(words, offset);
-      return undefined;
     }
   };
   
@@ -36,7 +35,6 @@ export class ECB extends BlockCipherMode {
      */
     public processBlock(words: number[], offset: number){
       this._cipher.decryptBlock(words, offset);
-      return undefined;
     }
     
   };

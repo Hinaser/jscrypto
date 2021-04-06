@@ -1,12 +1,14 @@
 import {BlockCipherMode, BlockCipherModeProps} from "./BlockCipherMode";
 import {Word32Array} from "../../../Word32Array";
+import type {BlockCipher} from "../BlockCipher";
 
 /**
  * Galois Counter Mode
  */
 export class GCM extends BlockCipherMode {
   protected _H: number[] = [];
-  protected _J: number[] = [];
+  protected _J0: number[] = [];
+  protected _CB: number[] = []; // Counter Block
   protected _A: Word32Array;
   protected _lenA: number[];
   
@@ -22,8 +24,26 @@ export class GCM extends BlockCipherMode {
     cipher.encryptBlock(H, 0);
     this._H = H;
   
-    let J0 = [];
     // iv should be array of 32bit int
+    this._J0 = GCM.getJ0(H, iv);
+    this._CB = this._J0.slice();
+  
+    const A = cipher.authData?.clone() || new Word32Array();
+    const lenA = [0, A.nSigBytes*8];
+    // Pad AuthData
+    GCM.padTo128m(A);
+    
+    this._A = A;
+    this._lenA = lenA;
+  }
+  
+  /**
+   * Initialize Initial Counter Block J0.
+   * @param {[number, number, number, number]} H - 128bit(4word) block
+   * @param {number[]} iv - Initializing Vector which must be multiple of 32bit(4byte)
+   */
+  public static getJ0(H: number[], iv?: number[]){
+    let J0: number[];
     if(!iv || iv.length === 0){
       J0 = [0, 0, 0, 1];
     }
@@ -33,7 +53,7 @@ export class GCM extends BlockCipherMode {
     else{
       const remainderOf4Word = (iv.length % 4) > 0 ? 4 - (iv.length % 4) : 0;
       const iv2 = iv.slice();
-      
+    
       for(let i=0;i<remainderOf4Word+2;i++){
         iv2.push(0); // append 32bit 0
       }
@@ -44,30 +64,10 @@ export class GCM extends BlockCipherMode {
     
       iv2.push(iv.length * 32); // An element of `iv` is 4byte = 32bit.
     
-      J0 = this.GHASH(H, iv2);
+      J0 = GCM.GHASH(H, iv2);
     }
     
-    this._J = J0;
-  
-    const A = cipher.authData?.clone() || new Word32Array();
-    // Pad AuthData
-    const v = 16 - (A.nSigBytes % 16);
-    if(v < 16){
-      const padA = [];
-      let nPadABytes = 0;
-      for(let i=0;i<Math.floor(v/4);i++){
-        padA.push(0);
-        nPadABytes += 4;
-      }
-      if(v % 4 > 0){
-        padA.push(0);
-        nPadABytes += v % 4;
-      }
-      A.concat(new Word32Array(padA, nPadABytes));
-    }
-    
-    this._A = A;
-    this._lenA = [0, A.nSigBytes*8];
+    return J0;
   }
   
   /**
@@ -83,7 +83,7 @@ export class GCM extends BlockCipherMode {
    *   inc32([0,0,0xffffffff,0xffffffff]) = [0,1,0,0]
    *   inc32([0,0xffffffff,0xffffffff,0xffffffff]) = [0,0,0,0]
    */
-  public inc32(X: number[]){
+  public static inc32(X: number[]){
     const A = X.slice();
     const unsignedX3 = (A[3] >>> 0);
     const carry3 = ((unsignedX3+1)>>>0) < unsignedX3;
@@ -106,8 +106,9 @@ export class GCM extends BlockCipherMode {
    *
    * @param {number[]} X - [32bit int, 32bit int, 32bit int, 32bit int], 128bit block.
    * @param {number[]} Y - [32bit int, 32bit int, 32bit int, 32bit int], 128bit block.
+   * @returns 128bit block
    */
-  public mul(X: number[], Y: number[]){
+  public static mul(X: number[], Y: number[]){
     const R = [0xe1000000, 0, 0, 0];
     const Z = [0, 0, 0, 0];
     const V = Y.slice();
@@ -147,8 +148,9 @@ export class GCM extends BlockCipherMode {
    * 
    * @param {number[]} H - The hash sub key block of 128bit.
    * @param {number[]} X - X.length must be multiple of 4. (multiple of 128bit)
+   * @returns 128bit block
    */
-  public GHASH(H: number[], X: number[]){
+  public static GHASH(H: number[], X: number[]){
     if(H.length % 4 !== 0){
       throw new Error("Length of 32bit word array 'H' must be multiple of 4(128bit)");
     }
@@ -163,7 +165,7 @@ export class GCM extends BlockCipherMode {
       Y[1] = (Y[1] ^ X[i+1]);
       Y[2] = (Y[2] ^ X[i+2]);
       Y[3] = (Y[3] ^ X[i+3]);
-      Y = this.mul(Y, H);
+      Y = GCM.mul(Y, H);
     }
     return Y;
   }
@@ -172,10 +174,11 @@ export class GCM extends BlockCipherMode {
    * https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
    * 6.5 GCTR Function
    * 
+   * @param {BlockCipher} cipher
    * @param {number[]} ICB - Initial Code Block. Required to be 128bit(4word).
    * @param {Word32Array} X - Arbitrary length block
    */
-  public GCTR(ICB: number[], X: Word32Array){
+  public static GCTR(cipher: BlockCipher, ICB: number[], X: Word32Array){
     if(X.nSigBytes === 0){
       return X.clone();
     }
@@ -183,13 +186,12 @@ export class GCM extends BlockCipherMode {
       throw new Error("Initial Counter Block size must be 128bit");
     }
     
-    const cipher = this._cipher;
     const words = X.words;
     const n = Math.ceil(X.nSigBytes / 16);
     const CB = [ICB.slice()];
     
     for(let i=1;i<n;i++){
-      const CBi = this.inc32(CB[i-1]);
+      const CBi = GCM.inc32(CB[i-1]);
       CB.push(CBi);
     }
     
@@ -235,6 +237,69 @@ export class GCM extends BlockCipherMode {
   }
   
   /**
+   * Pad word array to multiple of 128bit(4byte)
+   * @param {Word32Array} w - Padding target. This w will be modified directly.
+   * @returns {void}
+   */
+  public static padTo128m(w: Word32Array){
+    const remainder = w.nSigBytes % 16;
+    if(remainder === 0){
+      return;
+    }
+    const nPaddingBytes = 16 - remainder;
+    
+    // Pad Ciphertext
+    const pad = [];
+    for(let i=0;i<Math.floor(nPaddingBytes/4);i++){
+      pad.push(0);
+    }
+    if(nPaddingBytes % 4 > 0){
+      pad.push(0);
+    }
+    w.concat(new Word32Array(pad, nPaddingBytes));
+  }
+  
+  public static hash(cipher: BlockCipher, authData?: Word32Array, cipherText?: Word32Array){
+    const iv = cipher.iv && cipher.iv.words;
+    const H = [0,0,0,0];
+    cipher.encryptBlock(H, 0);
+    const J0 = GCM.getJ0(H, iv);
+    const A = authData?.clone() || new Word32Array();
+    const lenA = [0, A.nSigBytes*8];
+    const C = cipherText?.clone() || new Word32Array();
+    const lenC = [0, C.nSigBytes*8];
+  
+    // Pad
+    GCM.padTo128m(A);
+    GCM.padTo128m(C);
+  
+    const s = A.words.concat(C.words).concat(lenA).concat(lenC);
+    const S = GCM.GHASH(H, s);
+    return GCM.GCTR(cipher, J0, new Word32Array(S));
+  }
+  
+  /**
+   * Generate authentication tag for ciphertext with inner GCM parameters.
+   * @param {Word32Array} cipherText
+   * @returns {Word32Array}
+   */
+  public generateAuthTag(cipherText: Word32Array){
+    const cipher = this._cipher;
+    const H = this._H;
+    const J0 = this._J0;
+    const A = this._A;
+    const lenA = this._lenA;
+    const C = cipherText.clone();
+    const lenC = [0, C.nSigBytes*8];
+    
+    GCM.padTo128m(C);
+  
+    const s = A.words.concat(C.words).concat(lenA).concat(lenC);
+    const S = GCM.GHASH(H, s);
+    return GCM.GCTR(cipher, J0, new Word32Array(S));
+  }
+  
+  /**
    * CTR encryptor.
    */
   public static Encryptor: typeof GCM = class Encryptor extends GCM {
@@ -250,37 +315,14 @@ export class GCM extends BlockCipherMode {
       // Shortcuts
       const cipher = this._cipher
       const blockSize = cipher.blockSize;
-      const A = this._A;
-      const H = this._H;
       
       // Encrypt with CTR mode
-      this._J = this.inc32(this._J);
+      this._CB = GCM.inc32(this._CB);
       const plainText = new Word32Array(words.slice(offset, offset+blockSize));
-      const C = this.GCTR(this._J, plainText);
+      const C = GCM.GCTR(this._cipher, this._CB, plainText);
       for(let i=0;i<blockSize;i++){
         words[offset + i] = C.words[i];
       }
-      
-      // Generate auth tag
-      const u = 16 - (C.nSigBytes % 16);
-      if(u < 16){
-        // Pad Ciphertext
-        const padC = [];
-        let nPadCBytes = 0;
-        for(let i=0;i<Math.floor(u/4);i++){
-          padC.push(0);
-          nPadCBytes += 4;
-        }
-        if(u % 4 > 0){
-          padC.push(0);
-          nPadCBytes += u % 4;
-        }
-        C.concat(new Word32Array(padC, nPadCBytes));
-      }
-  
-      const s = A.words.concat(C.words).concat(this._lenA).concat([0, C.nSigBytes*8]);
-      const S = this.GHASH(H, s);
-      return this.GCTR(this._J, new Word32Array(S));
     }
   };
   
@@ -300,37 +342,14 @@ export class GCM extends BlockCipherMode {
       // Shortcuts
       const cipher = this._cipher
       const blockSize = cipher.blockSize;
-      const A = this._A;
-      const H = this._H;
     
       // Decrypt with CTR mode
-      this._J = this.inc32(this._J);
+      this._CB = GCM.inc32(this._CB);
       const C = new Word32Array(words.slice(offset, offset+blockSize));
-      const P = this.GCTR(this._J, C);
+      const P = GCM.GCTR(this._cipher, this._CB, C);
       for(let i=0;i<blockSize;i++){
         words[offset + i] = P.words[i];
       }
-    
-      // Generate auth tag
-      const u = 16 - (C.nSigBytes % 16);
-      if(u < 16){
-        // Pad Ciphertext
-        const padC = [];
-        let nPadCBytes = 0;
-        for(let i=0;i<Math.floor(u/4);i++){
-          padC.push(0);
-          nPadCBytes += 4;
-        }
-        if(u % 4 > 0){
-          padC.push(0);
-          nPadCBytes += u % 4;
-        }
-        C.concat(new Word32Array(padC, nPadCBytes));
-      }
-    
-      const s = A.words.concat(C.words).concat(this._lenA).concat([0, C.nSigBytes*8]);
-      const S = this.GHASH(H, s);
-      return this.GCTR(this._J, new Word32Array(S));
     }
   };
   

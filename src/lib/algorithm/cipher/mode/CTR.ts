@@ -42,7 +42,6 @@ export class CTR extends BlockCipherMode {
       for (let i = 0; i < blockSize; i++) {
         words[offset + i] ^= keyStream[i];
       }
-      return undefined;
     }
   };
   

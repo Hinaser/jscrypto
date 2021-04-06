@@ -31,10 +31,6 @@ export const OpenSSLFormatter: Formatter = {
       retStr = cipherText.toString(Base64);
     }
     
-    if(cipherParams.authTag){
-      retStr += `\n${cipherParams.authTag.toString(Base64)}`;
-    }
-    
     return retStr;
   },
   
@@ -49,17 +45,9 @@ export const OpenSSLFormatter: Formatter = {
   parse(openSSLStr: string){
     let salt;
     let authTag;
-    let cipherText;
-    
-    if(openSSLStr.includes("\n")){
-      const arr = openSSLStr.split(/\n/);
-      cipherText = Base64.parse(arr[0]);
-      authTag = Base64.parse(arr[1]);
-    }
-    else{
-      // Parse base64
-      cipherText = Base64.parse(openSSLStr);
-    }
+  
+    // Parse base64
+    const cipherText = Base64.parse(openSSLStr);
   
     // Shortcut
     const ciphertextWords = cipherText.words;

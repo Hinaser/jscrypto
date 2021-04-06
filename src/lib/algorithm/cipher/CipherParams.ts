@@ -16,6 +16,7 @@ import {OpenSSLFormatter} from "./formatter/OpenSSLFormatter";
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
+ * @property {Word32Array} authTag Authentication tag for AAD.
  * @property {Formatter} formatter The default formatting strategy to convert this cipher params object to a string.
  */
 export class CipherParams {
@@ -27,6 +28,8 @@ export class CipherParams {
   public mode?: BlockCipherMode;
   public padding?: Pad;
   public blockSize?: number;
+  public authData?: Word32Array;
+  public authTag?: Word32Array;
   public formatter: Formatter = OpenSSLFormatter;
   
   /**
@@ -56,6 +59,8 @@ export class CipherParams {
       this.mode = cp.mode;
       this.padding = cp.padding;
       this.blockSize = cp.blockSize;
+      this.authData = cp.authData;
+      this.authTag = cp.authTag;
       this.formatter = cp.formatter || OpenSSLFormatter;
     }
   }

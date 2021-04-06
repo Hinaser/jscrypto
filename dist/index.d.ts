@@ -8,6 +8,7 @@ export { HmacSHA224 } from "./HmacSHA224";
 export { HmacSHA256 } from "./HmacSHA256";
 export { HmacSHA384 } from "./HmacSHA384";
 export { HmacSHA512 } from "./HmacSHA512";
+export { GMAC } from "./GMAC";
 export { MD5 } from "./MD5";
 export { SHA1 } from "./SHA1";
 export { SHA224 } from "./SHA224";
@@ -27,12 +28,14 @@ import { CFB } from "./mode/CFB";
 import { CTR } from "./mode/CTR";
 import { ECB } from "./mode/ECB";
 import { OFB } from "./mode/OFB";
+import { GCM } from "./mode/GCM";
 export declare const mode: {
     CBC: typeof CBC;
     CFB: typeof CFB;
     CTR: typeof CTR;
     ECB: typeof ECB;
     OFB: typeof OFB;
+    GCM: typeof GCM;
 };
 export declare const pad: {
     AnsiX923: import("./lib/algorithm/cipher/pad/type").Pad;

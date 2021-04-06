@@ -24,6 +24,7 @@ export {HmacSHA224} from "./HmacSHA224";
 export {HmacSHA256} from "./HmacSHA256";
 export {HmacSHA384} from "./HmacSHA384";
 export {HmacSHA512} from "./HmacSHA512";
+export {GMAC} from "./GMAC";
 export {MD5} from "./MD5";
 export {SHA1} from "./SHA1";
 export {SHA224} from "./SHA224";
@@ -44,12 +45,14 @@ import {CFB} from "./mode/CFB";
 import {CTR} from "./mode/CTR";
 import {ECB} from "./mode/ECB";
 import {OFB} from "./mode/OFB";
+import {GCM} from "./mode/GCM";
 export const mode = {
   CBC,
   CFB,
   CTR,
   ECB,
   OFB,
+  GCM,
 };
 
 import {AnsiX923} from "./pad/AnsiX923";

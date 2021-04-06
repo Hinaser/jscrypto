@@ -1,4 +1,5 @@
 import type { BlockCipher } from "../BlockCipher";
+import type { Word32Array } from "../../../Word32Array";
 export interface BlockCipherModeProps {
     cipher: BlockCipher;
     iv: number[] | undefined;
@@ -16,6 +17,10 @@ export declare class BlockCipherMode {
      * @abstract
      */
     processBlock(words: number[], offset: number): void;
+    /**
+     * @abstract
+     */
+    generateAuthTag(cipherText: Word32Array): Word32Array | undefined;
     /**
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props

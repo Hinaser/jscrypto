@@ -15,6 +15,12 @@ export class BlockCipherMode {
         return;
     }
     /**
+     * @abstract
+     */
+    generateAuthTag(cipherText) {
+        return undefined;
+    }
+    /**
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props
      * @abstract

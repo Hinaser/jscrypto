@@ -57,6 +57,6 @@ export const OpenSSLFormatter: Formatter = {
       cipherText.nSigBytes -= 16;
     }
   
-    return new CipherParams({cipherText, salt });
+    return new CipherParams({cipherText, salt});
   }
 }

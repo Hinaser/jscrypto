@@ -250,6 +250,20 @@ hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA==
 // Can Gradual update as well as HMAC-MD5. See HMAC-MD5 example above.
 ```
 
+<h4 id='gmac'>GMAC</h4>
+
+Default Cipher: `AES`.  
+If you do not supply `iv` to GMAC, `iv` is initialized to 0^128. (128bit 0s)
+```js
+var message = JsCrypto.Hex.parse("1063509E5A672C092CAD0B1DC6CE009A61AAAAAAAAAAAA");
+var key = JsCrypto.Hex.parse("55804F3AEB4E914DC91255944A1F565A");
+var iv = JsCrypto.Hex.parse("BBBBBBBBBBBBBBBBBBBBBBBB"); // 96bit(12byte) iv is recommended.
+
+var authTagWord = JsCrypto.GMAC(message, key, iv);
+authTagWord.toString(); // 44c955d63799428524e979936bedba96
+authTagWord.toString(JsCrypto.Base64); // "RMlV1jeZQoUk6XmTa+26lg=="
+```
+
 ### Block Cipher
 
 <h4 id="aes">AES</h4>
@@ -348,8 +362,35 @@ var decrypted = JsCrypto.AES.decrypt(encryptedData, "password", aesProps);
 decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
-JsCrypto supports AES-128, AES-192, AES-256.  
 When you supply encryption key as a string password, it automatically generates 256bit key for encryption. (AES-256).
+
+<h4 id="aes-gcm">AES-GCM</h4>
+
+[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.
+
+```js
+////////////////////////////////////////////////////////////////////////////////////////
+// Authenticated encryption by AES-GCM
+////////////////////////////////////////////////////////////////////////////////////////
+var key = JsCrypto.Hex.parse("0123456789ABCDEF11113333555577770123456789ABCDEF1111333355557777");
+var msg = JsCrypto.Hex.parse("00000000000000000000000000000000");
+var iv = JsCrypto.Hex.parse("000000000000000000000000"); // 96bit(12byte) iv is recommended.
+var authData = JsCrypto.Utf8.parse("some plain text data for authentication. This will not be encrypted.");
+
+var encryptedData = JsCrypto.AES.encrypt(msg, key, { iv, mode: JsCrypto.mode.GCM, authData });
+
+// Encrypted message
+var cipherText = encryptedData.cipherText;
+// Authentication Tag
+var authTag = encryptedData.authTag;
+
+var decryptedData = JsCrypto.AES.decrypt(encryptedData, key, { iv, mode: JsCrypto.mode.GCM, authData });
+
+// Encrypt/Decrypt as usual
+decryptedData.toString() === msg.toString(); // true
+// Verify authentication code as well as HMAC
+authTag.toString() === JsCrypto.mode.GCM.hash(JsCrypto.AES, key, iv, authData, encryptedData.cipherText).toString(); // true
+```
 
 <h4 id="des">DES</h4>
 
@@ -691,6 +732,22 @@ var OFB = JsCrypto.mode.OFB;
 var NoPadding = JsCrypto.pad.NoPadding;
 var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: OFB, padding: NoPadding });
 var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: OFB, padding: NoPadding });
+decrypted.toString(JsCrypto.Utf8); // "message"
+```
+
+<h4 id='gcm'>GCM</h4>
+
+[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.
+GCM does not require encrypting data to be padded.  
+Changing Block padding has no effect.
+```js
+var message = JsCrypto.Utf8.parse("message"); // 7bytes.
+var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
+var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0], 3); // Recommended 96bit/12byte iv
+
+var GCM = JsCrypto.mode.GCM;
+var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: GCM });
+var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: GCM });
 decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 

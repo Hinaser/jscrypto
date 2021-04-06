@@ -9,6 +9,7 @@
   \*IE9/10 uses weak random generator on cipher encryption with string password. Use it at your own risk.  
   \*If only using decryption or hash/hmac, weak random generator does not cause any trouble.
 - Loadable with ES6/CommonJS/Typescript/Browser runtimes.
+- Support [`AES-GCM`](#aes-gcm)/[`GMAC`](#gmac) :tada::tada::tada:
 - [CLI commands](#cli) available:  
   i.e. `npx jscrypto sha1 "message"`, `npx jscrypto aes enc "message" "password"`, etc.  
 - Written in Typescript with rich type declarations.
@@ -174,7 +175,7 @@ Check your `tsconfig.js` to be:
 
 ### *Popular*
 **Hash** [`MD5`](#md5), [`SHA1`](#sha1), [`SHA3`](#sha3), [`SHA224`](#sha224), [`SHA256`](#sha256), [`SHA384`](#sha384), [`SHA512`](#sha512), [`RIPEMD160`](#ripemd160),  
-**Message/Key Hash** [`HMAC-MD5`](#hmac-md5), [`HMAC-SHA224`](#hmac-sha224), [`HMAC-SHA256`](#hmac-sha256), [`HMAC-SHA384`](#hmac-sha384), [`HMAC-SHA512`](#hmac-sha512)  
+**Message/Key Hash** [`HMAC-MD5`](#hmac-md5), [`HMAC-SHA224`](#hmac-sha224), [`HMAC-SHA256`](#hmac-sha256), [`HMAC-SHA384`](#hmac-sha384), [`HMAC-SHA512`](#hmac-sha512), [`GMAC`](#gmac)  
 **Block Cipher** [`AES`](#aes), [`DES`](#des), [`DES3`](#des3)
 
 ### *Basic structure*
@@ -184,7 +185,7 @@ Check your `tsconfig.js` to be:
 ### *Misc*
 **Stream Cipher** [`Rabbits`](API.md#rabbits), [`RC4`](API.md#rC4), [`RC4Drop`](API.md#rC4Drop)  
 **Key Derive Function** [`OpenSSLKDF`](API.md#openSSLKDF), [`EvpKDF`](API.md#evpKDF), [`PBKDF2`](API.md#pBKDF2)  
-**Block Cipher mode** [`CBC`](API.md#cBC), [`CFB`](API.md#cFB), [`CTR`](API.md#cTR), [`ECB`](API.md#eCB), [`OFB`](API.md#oFB)  
+**Block Cipher mode** [`CBC`](API.md#cbc), [`CFB`](API.md#cfb), [`CTR`](API.md#ctr), [`ECB`](API.md#ecb), [`OFB`](API.md#ofb), [`GCM`](API.md#gcm)  
 **Block Padding** [`AnsiX923`](API.md#ansiX923), [`ISO10126`](API.md#iSO10126), [`ISO97971`](API.md#iSO97971), [`NoPadding`](API.md#nopadding), [`Pkcs7`](API.md#pkcs7), [`Zero`](API.md#zero)  
 **Formatter** [`OpenSSLFormatter`](API.md#openSSLFormatter)
 
@@ -422,6 +423,20 @@ hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA==
 // Can Gradual update as well as HMAC-MD5. See HMAC-MD5 example above.
 ```
 
+<h4 id='gmac'>GMAC</h4>
+
+Default Cipher: `AES`.  
+If you do not supply `iv` to GMAC, `iv` is initialized to 0^128. (128bit 0s)
+```js
+var message = JsCrypto.Hex.parse("1063509E5A672C092CAD0B1DC6CE009A61AAAAAAAAAAAA");
+var key = JsCrypto.Hex.parse("55804F3AEB4E914DC91255944A1F565A");
+var iv = JsCrypto.Hex.parse("BBBBBBBBBBBBBBBBBBBBBBBB"); // 96bit(12byte) iv is recommended.
+
+var authTagWord = JsCrypto.GMAC(message, key, iv);
+authTagWord.toString(); // 44c955d63799428524e979936bedba96
+authTagWord.toString(JsCrypto.Base64); // "RMlV1jeZQoUk6XmTa+26lg=="
+```
+
 ### Block Cipher
 
 <h4 id="aes">AES</h4>
@@ -499,7 +514,7 @@ reader.readAsArrayBuffer(file);
 ////////////////////////////////////////////////////////////////////////////////////////
 // Options for block cipher like AES.
 ////////////////////////////////////////////////////////////////////////////////////////
-// CBC/ECB/CTR/OFB/CFB is the options. CBC is the default.
+// CBC/ECB/CTR/OFB/CFB/GCM is the options. CBC is the default.
 var mode = JsCrypto.mode.CBC;
 // AnsiX923/ISO10126/ISO97971/Pkcs7/NoPadding/Zero is the options. Pkcs7 is the default.
 var padding = JsCrypto.pad.Pkcs7;
@@ -522,8 +537,35 @@ var decrypted = JsCrypto.AES.decrypt(encryptedData, "password", aesProps);
 decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
-JsCrypto supports AES-128, AES-192, AES-256.  
 When you supply encryption key as a string password, it automatically generates 256bit key for encryption. (AES-256).  
+
+<h4 id="aes-gcm">AES-GCM</h4>
+
+[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.
+
+```js
+////////////////////////////////////////////////////////////////////////////////////////
+// Authenticated encryption by AES-GCM
+////////////////////////////////////////////////////////////////////////////////////////
+var key = JsCrypto.Hex.parse("0123456789ABCDEF11113333555577770123456789ABCDEF1111333355557777");
+var msg = JsCrypto.Hex.parse("00000000000000000000000000000000");
+var iv = JsCrypto.Hex.parse("000000000000000000000000"); // 96bit(12byte) iv is recommended.
+var authData = JsCrypto.Utf8.parse("some plain text data for authentication. This will not be encrypted.");
+
+var encryptedData = JsCrypto.AES.encrypt(msg, key, { iv, mode: JsCrypto.mode.GCM, authData });
+
+// Encrypted message
+var cipherText = encryptedData.cipherText;
+// Authentication Tag
+var authTag = encryptedData.authTag;
+
+var decryptedData = JsCrypto.AES.decrypt(encryptedData, key, { iv, mode: JsCrypto.mode.GCM, authData });
+
+// Encrypt/Decrypt as usual
+decryptedData.toString() === msg.toString(); // true
+// Verify authentication code as well as HMAC
+authTag.toString() === JsCrypto.mode.GCM.hash(JsCrypto.AES, key, iv, authData, encryptedData.cipherText).toString(); // true
+```
 
 <h4 id="des">DES</h4>
 

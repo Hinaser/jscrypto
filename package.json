@@ -21,7 +21,8 @@
     "DES",
     "Triple-DES",
     "OpenSSL",
-    "AES-GCM"
+    "AES-GCM",
+    "GMAC"
   ],
   "repository": {
     "type": "git",

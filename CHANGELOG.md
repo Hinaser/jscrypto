@@ -1,6 +1,7 @@
 ## [Unreleased]
 ### Added
 - Added GCM block cipher mode. (Galois Counter Mode)
+- Added GMAC (Galois Message Authentication Code)
 
 ## [0.1.0] - 2021-03-30
 ### Added

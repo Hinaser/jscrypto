@@ -19,10 +19,5 @@ export function GMAC(
   const Cipher = (props && props.Cipher) ? props.Cipher : AES;
   const wKey = typeof key === "string" ? Utf8.parse(key) : key;
   
-  const cipher = new Cipher({iv: initializingVector, key: wKey});
-  if(cipher.blockSize !== 128/32){
-    throw new Error("Block size of cipher must be 128bit. Consider to use AES as a block cipher");
-  }
-  
-  return GCM.hash(cipher, aad);
+  return GCM.hash(Cipher, wKey, initializingVector, aad);
 }

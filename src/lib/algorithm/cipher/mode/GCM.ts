@@ -259,11 +259,11 @@ export class GCM extends BlockCipherMode {
     w.concat(new Word32Array(pad, nPaddingBytes));
   }
   
-  public static hash(cipher: BlockCipher, authData?: Word32Array, cipherText?: Word32Array){
-    const iv = cipher.iv && cipher.iv.words;
+  public static hash(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){
+    const cipher = new Cipher({key, iv});
     const H = [0,0,0,0];
     cipher.encryptBlock(H, 0);
-    const J0 = GCM.getJ0(H, iv);
+    const J0 = GCM.getJ0(H, iv.words);
     const A = authData?.clone() || new Word32Array();
     const lenA = [0, A.nSigBytes*8];
     const C = cipherText?.clone() || new Word32Array();

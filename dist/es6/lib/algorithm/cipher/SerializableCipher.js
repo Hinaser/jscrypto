@@ -39,6 +39,8 @@ export const SerializableCipher = {
             mode: encryptor.mode,
             padding: encryptor.padding,
             blockSize: encryptor.blockSize,
+            authData: encryptor.authData,
+            authTag: encryptor.authTag,
             formatter: (props === null || props === void 0 ? void 0 : props.formatter) || OpenSSLFormatter,
         });
     },

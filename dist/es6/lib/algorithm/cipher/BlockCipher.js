@@ -3,6 +3,7 @@ import { CBC } from "./mode/CBC";
 import { Pkcs7 } from "./pad/Pkcs7";
 export class BlockCipher extends Cipher {
     constructor(props) {
+        var _a;
         super(props);
         this._blockSize = 128 / 32;
         this._Mode = CBC;
@@ -10,6 +11,7 @@ export class BlockCipher extends Cipher {
         this._props = props;
         this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
         this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
+        this._authData = (_a = props.authData) === null || _a === void 0 ? void 0 : _a.clone();
         this.reset(props === null || props === void 0 ? void 0 : props.data, props === null || props === void 0 ? void 0 : props.nBytes);
     }
     get mode() {
@@ -17,6 +19,14 @@ export class BlockCipher extends Cipher {
     }
     get padding() {
         return this._padding;
+    }
+    get authData() {
+        var _a;
+        return (_a = this._authData) === null || _a === void 0 ? void 0 : _a.clone();
+    }
+    get authTag() {
+        var _a;
+        return (_a = this._authTag) === null || _a === void 0 ? void 0 : _a.clone();
     }
     reset(data, nBytes) {
         super.reset(data, nBytes);
@@ -42,6 +52,7 @@ export class BlockCipher extends Cipher {
         (_a = this._mode) === null || _a === void 0 ? void 0 : _a.processBlock(words, offset);
     }
     _doFinalize() {
+        var _a, _b;
         let finalProcessedBlocks;
         // Shortcut
         const padding = this._padding;
@@ -51,8 +62,12 @@ export class BlockCipher extends Cipher {
             padding.pad(this._data, this.blockSize);
             // Process final blocks
             finalProcessedBlocks = this._process(true);
+            // If Authenticated cipher, generate auth tag
+            this._authTag = (_a = this._mode) === null || _a === void 0 ? void 0 : _a.generateAuthTag(finalProcessedBlocks);
         }
         else /* if (this._transformMode == Cipher._DEC_TRANSFORM_MODE) */ {
+            // If Authenticated cipher, generate auth tag
+            this._authTag = (_b = this._mode) === null || _b === void 0 ? void 0 : _b.generateAuthTag(this._data);
             // Process final blocks
             finalProcessedBlocks = this._process(true);
             // Unpad data

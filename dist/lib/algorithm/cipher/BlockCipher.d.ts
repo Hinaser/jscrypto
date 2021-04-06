@@ -11,6 +11,7 @@ export interface BlockCipherProps extends CipherProps {
     kdfModule: typeof BaseKDFModule;
     kdfHasher: typeof Hasher;
     kdfIterations: number;
+    authData: Word32Array;
 }
 export declare class BlockCipher extends Cipher {
     protected _props: PropsWithKey<BlockCipherProps>;
@@ -19,6 +20,8 @@ export declare class BlockCipher extends Cipher {
     protected _mode?: BlockCipherMode;
     protected _padding: Pad;
     protected _modeCreator?: (props: BlockCipherModeProps) => BlockCipherMode;
+    protected _authData: Word32Array | undefined;
+    protected _authTag: Word32Array | undefined;
     /**
      * @see https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
      */
@@ -26,6 +29,8 @@ export declare class BlockCipher extends Cipher {
     constructor(props: PropsWithKey<BlockCipherProps>);
     get mode(): BlockCipherMode | undefined;
     get padding(): Pad;
+    get authData(): Word32Array | undefined;
+    get authTag(): Word32Array | undefined;
     reset(data?: Word32Array, nBytes?: number): void;
     protected _doProcessBlock(words: number[], offset: number): void;
     protected _doFinalize(): Word32Array;

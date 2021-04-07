@@ -426,7 +426,7 @@ hashedWord.toString(JsCrypto.Base64); // "5Hc4TXyiKd0UJuZ...xp9NdbQ0IWgQ+jZ+mA==
 <h4 id='gmac'>GMAC</h4>
 
 Default Cipher: `AES`.  
-If you do not supply `iv` to GMAC, `iv` is initialized to 0^128. (128bit 0s)
+If you do not supply `iv` to GMAC, `iv` is initialized to 0^96. (96bit 0s)
 ```js
 var message = JsCrypto.Hex.parse("1063509E5A672C092CAD0B1DC6CE009A61AAAAAAAAAAAA");
 var key = JsCrypto.Hex.parse("55804F3AEB4E914DC91255944A1F565A");

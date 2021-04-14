@@ -46,6 +46,7 @@ import {CTR} from "./mode/CTR";
 import {ECB} from "./mode/ECB";
 import {OFB} from "./mode/OFB";
 import {GCM} from "./mode/GCM";
+import {CCM} from "./mode/CCM";
 export const mode = {
   CBC,
   CFB,
@@ -53,6 +54,7 @@ export const mode = {
   ECB,
   OFB,
   GCM,
+  CCM,
 };
 
 import {AnsiX923} from "./pad/AnsiX923";

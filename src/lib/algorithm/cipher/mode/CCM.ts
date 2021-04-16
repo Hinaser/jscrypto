@@ -21,127 +21,107 @@ export class CCM extends BlockCipherMode {
   
   /**
    * Generate first block of B.
-   * 
+   *
    * @param {boolean} hasAData - If payload has AData, true.
    * @param {number} t - Octet length of T(Auth tag)
-   * @param {number} q - Octet length -f Q(Octet length of Payload size)
-   * @param {[number, number]} Q - Octet length of payload. If Q=2^32(~4GB), Q=[1,0]. If Q=2^32+260, Q=[1,0x00000104]
-   * @param {[number, number]} N - Nonce. If N=2^32, N=[1,0]. If N=260, N=[0x00000104]
+   * @param {Word32Array} Q - Octet length of payload.
+   * @param {Word32Array} N - Nonce.
    */
-  public static getB0(hasAData: boolean, t: number, q: number, Q: number[], N: number[]){
-    if(q > 8){
-      throw new Error("q must be less than or equal to 8");
-    }
-    else if(q < 2){
-      throw new Error("q must be larger than or equal to 2");
+  public static getB0(hasAData: boolean, t: number, Q: Word32Array, N: Word32Array){
+    if(Q.nSigBytes + N.nSigBytes !== 15){
+      throw new Error("LEN(Q)+LEN(N) must be 15");
     }
     
     const reservedBit = 0 << 7;
     const ADataBit = (hasAData ? 1 : 0) << 6;
     const tBit = (((t-2)/2) << 3); // 3bits
-    const qBit = (q-1); // 3bits
+    const qBit = (Q.nSigBytes-1); // 3bits
     const flags = (reservedBit | ADataBit | tBit | qBit) & 0x000000ff;
-  
-    const n = 15 - q;
-    const lsbN = CCM.getLSB(N, n);
-    const lsbQ = CCM.getLSB(Q, q);
-    const NQ = CCM.concatBytes(lsbN, n, lsbQ, q);
     
-    const B00 = [flags];
-    return CCM.concatBytes(B00, 1, NQ, 15);
-  }
+    const NQ = N.clone().concat(Q);
   
-  public static getB02(hasData: boolean, t: number, Q: Word32Array, N: Word32Array){
-    
+    const B00 = new Word32Array([flags<<24], 1);
+    return B00.concat(NQ);
   }
   
   /**
    * Format associated data
    * @param {Word32Array} A - Associated data
+   * @param {Word32Array} P - Payload
    */
-  public static formatAssociatedData(A: Word32Array){
+  public static formatAssociatedDataAndPayload(A: Word32Array, P: Word32Array){
     const a = A.nSigBytes;
-  }
-  
-  /**
-   * Extract LSB(n) from N.
-   * 
-   * @param {number[]} N - 32bit int array. Must be BigEndian.
-   * @param {number} n - Number of bytes to extract
-   */
-  public static getLSB(N: number[], n: number){
-    if(n <= 0){
-      throw new Error("Invalid argument n. n must be greater than 0");
+    let ad: Word32Array;
+    if(a === 0){
+      ad = new Word32Array([0], 0);
     }
-    
-    const lsbN: number[] = [];
-    const maxI = Math.ceil(n / 4);
-    const N2 = N.slice();
-    while(N2.length < maxI){
-      N2.unshift(0);
+    else if(a < 2**16 - 2**8){
+      ad = new Word32Array([a<<16], 16);
     }
-    
-    for(let i=maxI-1;i>0;i--){
-      lsbN[i] = (N2[i] | 0);
-    }
-    
-    if(n%4 > 0){
-      lsbN[0] = (N2[0] | 0) & (0xffffffff >>> (4 - n%4)*8);
+    else if(a < 2**32){
+      ad = new Word32Array([0xfffe0000], 2).concat(new Word32Array([a], 4));
     }
     else{
-      lsbN[0] = (N2[0] | 0);
+      throw new Error("LEN(A) larger than 2**32-1 is not supported");
     }
     
-    return lsbN;
+    // Format AdditionalData
+    const nAd = Math.floor(A.nSigBytes / 4);
+    for(let i=0;i<nAd;i++){
+      ad.concat(new Word32Array([A.words[i]], 4));
+    }
+    
+    if(A.nSigBytes % 4){
+      ad.concat(new Word32Array([A.words[nAd]], A.nSigBytes % 4));
+      ad.concat(new Word32Array([0], 4 - A.nSigBytes%4));
+    }
+    
+    // Format Payload
+    const nPayload = Math.floor(P.nSigBytes / 4);
+    for(let i=0;i<nPayload;i++){
+      ad.concat(new Word32Array([P.words[i]], 4));
+    }
+  
+    if(P.nSigBytes % 4){
+      ad.concat(new Word32Array([P.words[nAd]], P.nSigBytes % 4));
+      ad.concat(new Word32Array([0], 4 - P.nSigBytes%4));
+    }
+    
+    return ad;
   }
   
   /**
-   * Concat two byte array as B1 || B2. The size of output byte array is `b1+b2`.
-   * 
-   * @param {number[]} B1 - Byte array 1
-   * @param {number} b1 - Number of bytes of B1
-   * @param {number[]} B2 - Byte array 2
-   * @param {number} b2 - Number of bytes of B1
+   * Generate Counter Block
+   * @param {number} q - LEN(Q)
+   * @param {Word32Array} N - Nonce
+   * @param {number} index - Block index of 32bit integer
    */
-  public static concatBytes(B1: number[], b1: number, B2: number[], b2: number){
-    if(b1 === 0){
-      return B2.slice();
-    }
-    else if(b2 === 0){
-      return B1.slice();
+  public static genCtr(q: number, N: Word32Array, index: number){
+    if(N.nSigBytes + q !== 15){
+      throw new Error("LEN(Q)+LEN(N) must be 15");
     }
     
-    const B3: number[] = [];
-    const b3 = b1 + b2;
-    const lastIndexB1 = B1.length-1;
-    const lastIndexB2 = B2.length-1;
-    const lastIndexB3 = Math.ceil(b3/4)-1;
-  
-    for(let i=0;i<b2;i++){
-      const nShift = (i % 4) * 8;
-      const indexB2 = lastIndexB2 - (i>>>2);
-      const b = (B2[indexB2] >>> nShift) & 0xff;
-    
-      const indexB3 = lastIndexB3 - (i>>>2);
-      B3[indexB3] = (B3[indexB3] | 0) | (b << nShift);
+    const flag = new Word32Array([((q-1) & 0x00000007) << 24], 1);
+    const indexBytes = new Word32Array([], 0);
+    const nq = Math.floor(q/4);
+    for(let i=0;i<nq-1;i++){
+      indexBytes.concat(new Word32Array([0], 4));
     }
     
-    const r = b2 % 4;
-    for(let i=0;i<b1;i++){
-      const nShift = (i % 4) * 8;
-      const indexB1 = lastIndexB1 - (i>>>2);
-      const b = (B1[indexB1] >>> nShift) & 0xff;
-    
-      const indexB3 = lastIndexB3 - ((b2+i)>>>2);
-      if(r){
-        B3[indexB3] = (B3[indexB3] | 0) | (b << ((i % 4 + r) * 8)%32);
+    if(q % 4){
+      if(q > 4){
+        indexBytes.concat(new Word32Array([0], q%4));
+        indexBytes.concat(new Word32Array([index], 4));
       }
       else{
-        B3[indexB3] = (B3[indexB3] | 0) | (b << ((i % 4) * 8));
+        indexBytes.concat(new Word32Array([index << (32-q*8)], q - q%4));
       }
     }
+    else{
+      indexBytes.concat(new Word32Array([index], 4));
+    }
     
-    return B3;
+    return flag.concat(N).concat(indexBytes);
   }
   
   public static hash(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){

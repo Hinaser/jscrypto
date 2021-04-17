@@ -1,3 +1,17 @@
+<!--
+## [1.0.0]
+### Changed
+- Pass initializing vector as Word32Array to constructor of BlockCipherMode instead of just a 32bit number array.  
+  \*This may enable developers to use non-32bit-aligned iv value to block cipher mode in future release.  
+  \*This change may not be breaking lib compatibility unless developers directly instantiate BlockCipherMode or  
+    creating original BlockCipherMode extending old BlockCipherMode class.
+-->
+## [0.2.1]
+### Added
+- CCM block cipher mode (Counter mode/CBC-MAC)  
+  \*At this version, length of Nonce(iv) is fixed to (recognized as) 8bytes.  
+    Thus max length of Payload is 
+
 ## [0.2.0] - 2021-04-07
 ### Added
 - Added GCM block cipher mode. (Galois Counter Mode)
@@ -46,6 +60,7 @@
 Initial release.
 
 <!-- [Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0 -->
+[0.2.1]: https://github.com/Hinaser/jscrypto/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Hinaser/jscrypto/compare/v0.0.2...v0.1.0
 [0.0.2]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.2

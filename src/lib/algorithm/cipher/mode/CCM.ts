@@ -6,17 +6,16 @@ import type {BlockCipher} from "../BlockCipher";
  * Counter/CBC-MAC
  */
 export class CCM extends BlockCipherMode {
-  protected _J0: number[] = [];
   protected _CB: number[] = []; // Counter Block
   
   public constructor(props: BlockCipherModeProps) {
     super(props);
-    
-    if(props.cipher.blockSize !== 128/32){
+  
+    const {cipher/* , iv */} = props;
+    if(cipher.blockSize !== 128/32){
       throw new Error("In CCM, cipher block size must be 128bit");
     }
-  
-    // const {cipher, iv} = props;
+    
   }
   
   /**
@@ -114,7 +113,7 @@ export class CCM extends BlockCipherMode {
         indexBytes.concat(new Word32Array([index], 4));
       }
       else{
-        indexBytes.concat(new Word32Array([index << (32-q*8)], q - q%4));
+        indexBytes.concat(new Word32Array([index << (32-q*8)], q));
       }
     }
     else{

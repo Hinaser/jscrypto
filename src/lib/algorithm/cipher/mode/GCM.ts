@@ -26,7 +26,7 @@ export class GCM extends BlockCipherMode {
     this._H = H;
   
     // iv should be array of 32bit int
-    this._J0 = GCM.getJ0(H, iv);
+    this._J0 = GCM.getJ0(H, iv?.words);
     this._CB = this._J0.slice();
   
     const A = cipher.authData?.clone() || new Word32Array();

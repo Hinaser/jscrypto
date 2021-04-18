@@ -27,7 +27,7 @@ export class CTR extends BlockCipherMode {
   
       // Generate keyStream
       if (iv) {
-        counter = this._counter = iv.slice(0);
+        counter = this._counter = iv.words.slice(0);
     
         // Remove IV for subsequent blocks
         this._iv = undefined;

@@ -22,12 +22,12 @@ export class CCM extends BlockCipherMode {
     }
     
     let words: number[];
-    if(iv && iv.length > 0){
-      if(iv.length === 1){
-        words = [0, iv[0]];
+    if(iv && iv.words.length > 0){
+      if(iv.words.length === 1){
+        words = [0, iv.words[0]];
       }
-      else if(iv.length === 2){
-        words = iv.slice();
+      else if(iv.words.length === 2){
+        words = iv.words.slice();
       }
       else{
         throw new Error("iv must be 0/4/8 bytes");

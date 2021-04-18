@@ -3,7 +3,7 @@ import type {Word32Array} from "../../../Word32Array";
 
 export interface BlockCipherModeProps {
   cipher: BlockCipher;
-  iv: number[]|undefined;
+  iv: Word32Array|undefined;
 }
 
 /**
@@ -13,7 +13,7 @@ export interface BlockCipherModeProps {
 export class BlockCipherMode {
   protected _props: BlockCipherModeProps;
   protected _cipher: BlockCipher;
-  protected _iv?: number[];
+  protected _iv?: Word32Array;
   
   public constructor(props: BlockCipherModeProps) {
     this._props = props;

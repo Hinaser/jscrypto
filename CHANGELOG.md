@@ -1,4 +1,3 @@
-<!--
 ## [1.0.0]
 ### Changed
 - Pass initializing vector as Word32Array to constructor of BlockCipherMode instead of just a 32bit number array.  
@@ -31,8 +30,7 @@
   encrypted.authTag === undefined; // This returns true. authTag must be manually calculated as below.
   const authTag = CCM.hash(AES, key, iv, authData, msg); // Note: CCM requires original plaintext to get authTag.
   ```
--->
-## [0.2.1]
+
 ### Added
 - CCM block cipher mode (Counter mode/CBC-MAC)  
   **Note**  
@@ -87,7 +85,7 @@
 Initial release.
 
 <!-- [Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0 -->
-[0.2.1]: https://github.com/Hinaser/jscrypto/compare/v0.2.0...v0.2.1
+[1.0.0]: https://github.com/Hinaser/jscrypto/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Hinaser/jscrypto/compare/v0.0.2...v0.1.0
 [0.0.2]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.2

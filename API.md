@@ -264,6 +264,13 @@ authTagWord.toString(); // 44c955d63799428524e979936bedba96
 authTagWord.toString(JsCrypto.Base64); // "RMlV1jeZQoUk6XmTa+26lg=="
 ```
 
+<h4 id='cbc-mac'>CBC-MAC</h4>
+
+Default Cipher: `AES`.  
+If you do not supply `iv` to CBC-MAC, `iv` is initialized to 0^64. (64bit 0s)
+```js
+```
+
 ### Block Cipher
 
 <h4 id="aes">AES</h4>
@@ -377,19 +384,29 @@ var msg = JsCrypto.Hex.parse("00000000000000000000000000000000");
 var iv = JsCrypto.Hex.parse("000000000000000000000000"); // 96bit(12byte) iv is recommended.
 var authData = JsCrypto.Utf8.parse("some plain text data for authentication. This will not be encrypted.");
 
-var encryptedData = JsCrypto.AES.encrypt(msg, key, { iv, mode: JsCrypto.mode.GCM, authData });
+var encryptedData = JsCrypto.AES.encrypt(msg, key, {iv, mode: JsCrypto.mode.GCM});
 
 // Encrypted message
 var cipherText = encryptedData.cipherText;
 // Authentication Tag
-var authTag = encryptedData.authTag;
+var authTag = JsCrypto.mode.GCM.mac(AES, key, iv, authData, cipherText);
 
-var decryptedData = JsCrypto.AES.decrypt(encryptedData, key, { iv, mode: JsCrypto.mode.GCM, authData });
+////////////////////////////////////////////////////////////////////////////////////////
+// Authenticated decryption by AES-GCM
+////////////////////////////////////////////////////////////////////////////////////////
+var decryptedData = JsCrypto.AES.decrypt(encryptedData, key, {iv, mode: JsCrypto.mode.GCM});
 
 // Encrypt/Decrypt as usual
 decryptedData.toString() === msg.toString(); // true
 // Verify authentication code as well as HMAC
-authTag.toString() === JsCrypto.mode.GCM.hash(JsCrypto.AES, key, iv, authData, encryptedData.cipherText).toString(); // true
+authTag.toString() === JsCrypto.mode.GCM.mac(JsCrypto.AES, key, iv, authData, cipherText).toString(); // true
+```
+
+<h4 id="aes-ccm">AES-CCM</h4>
+
+[CCM Mode](https://en.wikipedia.org/wiki/CCM_mode) for authenticated encryption.
+
+```js
 ```
 
 <h4 id="des">DES</h4>
@@ -749,6 +766,14 @@ var GCM = JsCrypto.mode.GCM;
 var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: GCM });
 var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: GCM });
 decrypted.toString(JsCrypto.Utf8); // "message"
+```
+
+<h4 id='ccm'>CCM</h4>
+
+[CCM mode](https://en.wikipedia.org/wiki/CCM_mode) for authenticated encryption.
+CCM does not require encrypting data to be padded.  
+Changing Block padding has no effect.
+```js
 ```
 
 ### Block Padding

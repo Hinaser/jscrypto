@@ -1,10 +1,22 @@
 ## [1.0.0]
 ### Changed
+**Small breaking change**
 - Pass initializing vector as Word32Array to constructor of BlockCipherMode instead of just a 32bit number array.  
   \*This may enable developers to use non-32bit-aligned iv value to block cipher mode in future release.  
   \*This change may not be breaking lib compatibility unless developers directly instantiate BlockCipherMode or  
     creating original BlockCipherMode extending old BlockCipherMode class.
+  ```js
+  // BEFORE
+  const gcm = new GCM({cipher: AES, iv: [0x11223344]});
+  
+  // AFTER
+  const gcm = new GCM({cipher: AES, iv: new Word32Array([0x11223344], 4)});
+  ```
+
+**Breaking change**
+- Changed GMAC hash function name to `GCM.mac()` from `GCM.hash()`.
 - Calculating authTag in GCM/CCM now requires developer to manually call authTag function.  
+  Encryption/Decryption and MAC Generation are now calculated independently.
   ```js
   //////////////////////
   // AES-GCM
@@ -16,7 +28,7 @@
   // AFTER
   const encrypted = AES.encrypt(msg, key, { iv, mode: GCM, padding: NoPadding, authData });
   encrypted.authTag === undefined; // This returns true. authTag must be manually calculated as below.
-  const authTag = GCM.hash(AES, key, iv, authData, encrypted.cipherText);
+  const authTag = GCM.mac(AES, key, iv, authData, encrypted.cipherText);
   
   //////////////////////
   // AES-CCM

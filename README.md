@@ -19,7 +19,7 @@
 
 ### Breaking changes for version 0.x.x users
 There are several breaking changes between version 0.x and 1.x.  
-Please see detail in [CHANGELOG](https://github.com/Hinaser/jscrypto/CHANGELOG.md)
+Please see detail in [CHANGELOG](https://github.com/Hinaser/jscrypto/blob/master/CHANGELOG.md)
 
 
 ## Install
@@ -199,50 +199,50 @@ Check your `tsconfig.js` to be:
 **Block Padding** [`AnsiX923`][AnsiX923], [`ISO10126`][ISO10126], [`ISO97971`][ISO97971], [`NoPadding`][NoPadding], [`Pkcs7`][Pkcs7], [`Zero`][Zero]  
 **Formatter** [`OpenSSLFormatter`][OpenSSLFormatter]
 
-[MD5]: https://github.com/Hinaser/jscrypto/API.md#md5
-[SHA1]: https://github.com/Hinaser/jscrypto/API.md#sha1
-[SHA3]: https://github.com/Hinaser/jscrypto/API.md#sha3
-[SHA224]: https://github.com/Hinaser/jscrypto/API.md#sha224
-[SHA256]: https://github.com/Hinaser/jscrypto/API.md#sha256
-[SHA384]: https://github.com/Hinaser/jscrypto/API.md#sha384
-[SHA512]: https://github.com/Hinaser/jscrypto/API.md#sha512
-[RIPEMD160]: https://github.com/Hinaser/jscrypto/API.md#ripemd160
-[HMAC-MD5]: https://github.com/Hinaser/jscrypto/API.md#hmac-md5
-[HMAC-SHA224]: https://github.com/Hinaser/jscrypto/API.md#hmac-sha224
-[HMAC-SHA256]: https://github.com/Hinaser/jscrypto/API.md#hmac-sha256
-[HMAC-SHA384]: https://github.com/Hinaser/jscrypto/API.md#hmac-sha384
-[HMAC-SHA512]: https://github.com/Hinaser/jscrypto/API.md#hmac-sha512
-[GMAC]: https://github.com/Hinaser/jscrypto/API.md#gmac
-[CBC-MAC]: https://github.com/Hinaser/jscrypto/API.md#cbc-mac
-[AES]: https://github.com/Hinaser/jscrypto/API.md#aes
-[AES-GCM]: https://github.com/Hinaser/jscrypto/API.md#aes-gcm
-[AES-CCM]: https://github.com/Hinaser/jscrypto/API.md#aes-ccm
-[DES]: https://github.com/Hinaser/jscrypto/API.md#des
-[Triple-DES]: https://github.com/Hinaser/jscrypto/API.md#des3
-[Word32Array]: https://github.com/Hinaser/jscrypto/API.md#word32array
-[Word64Array]: https://github.com/Hinaser/jscrypto/API.md#mword64Array
-[Base64]: https://github.com/Hinaser/jscrypto/API.md#base64
-[Hex]: https://github.com/Hinaser/jscrypto/API.md#hex
-[Latin1]: https://github.com/Hinaser/jscrypto/API.md#latin1
-[Utf8]: https://github.com/Hinaser/jscrypto/API.md#utf8
-[Utf16]: https://github.com/Hinaser/jscrypto/API.md#utf16
-[Rabbits]: https://github.com/Hinaser/jscrypto/API.md#rabbits
-[RC4]: https://github.com/Hinaser/jscrypto/API.md#rc4
-[RC4Drop]: https://github.com/Hinaser/jscrypto/API.md#rc4drop
-[OpenSSLKDF]: https://github.com/Hinaser/jscrypto/API.md#opensslkdf
-[EvpKDF]: https://github.com/Hinaser/jscrypto/API.md#evpkdf
-[PBKDF2]: https://github.com/Hinaser/jscrypto/API.md#pbkdf2
-[CBC]: https://github.com/Hinaser/jscrypto/API.md#cbc
-[CFB]: https://github.com/Hinaser/jscrypto/API.md#cfb
-[CTR]: https://github.com/Hinaser/jscrypto/API.md#ctr
-[ECB]: https://github.com/Hinaser/jscrypto/API.md#ecb
-[OFB]: https://github.com/Hinaser/jscrypto/API.md#ofb
-[GCM]: https://github.com/Hinaser/jscrypto/API.md#gcm
-[CCM]: https://github.com/Hinaser/jscrypto/API.md#ccm
-[AnsiX923]: https://github.com/Hinaser/jscrypto/API.md#ansix923
-[ISO10126]: https://github.com/Hinaser/jscrypto/API.md#iso10126
-[ISO97971]: https://github.com/Hinaser/jscrypto/API.md#iso97971
-[NoPadding]: https://github.com/Hinaser/jscrypto/API.md#nopadding
-[Pkcs7]: https://github.com/Hinaser/jscrypto/API.md#pkcs7
-[Zero]: https://github.com/Hinaser/jscrypto/API.md#zero
-[OpenSSLFormatter]: https://github.com/Hinaser/jscrypto/API.md#opensslformatter
+[MD5]: https://github.com/Hinaser/jscrypto/blob/master/API.md#md5
+[SHA1]: https://github.com/Hinaser/jscrypto/blob/master/API.md#sha1
+[SHA3]: https://github.com/Hinaser/jscrypto/blob/master/API.md#sha3
+[SHA224]: https://github.com/Hinaser/jscrypto/blob/master/API.md#sha224
+[SHA256]: https://github.com/Hinaser/jscrypto/blob/master/API.md#sha256
+[SHA384]: https://github.com/Hinaser/jscrypto/blob/master/API.md#sha384
+[SHA512]: https://github.com/Hinaser/jscrypto/blob/master/API.md#sha512
+[RIPEMD160]: https://github.com/Hinaser/jscrypto/blob/master/API.md#ripemd160
+[HMAC-MD5]: https://github.com/Hinaser/jscrypto/blob/master/API.md#hmac-md5
+[HMAC-SHA224]: https://github.com/Hinaser/jscrypto/blob/master/API.md#hmac-sha224
+[HMAC-SHA256]: https://github.com/Hinaser/jscrypto/blob/master/API.md#hmac-sha256
+[HMAC-SHA384]: https://github.com/Hinaser/jscrypto/blob/master/API.md#hmac-sha384
+[HMAC-SHA512]: https://github.com/Hinaser/jscrypto/blob/master/API.md#hmac-sha512
+[GMAC]: https://github.com/Hinaser/jscrypto/blob/master/API.md#gmac
+[CBC-MAC]: https://github.com/Hinaser/jscrypto/blob/master/API.md#cbc-mac
+[AES]: https://github.com/Hinaser/jscrypto/blob/master/API.md#aes
+[AES-GCM]: https://github.com/Hinaser/jscrypto/blob/master/API.md#aes-gcm
+[AES-CCM]: https://github.com/Hinaser/jscrypto/blob/master/API.md#aes-ccm
+[DES]: https://github.com/Hinaser/jscrypto/blob/master/API.md#des
+[Triple-DES]: https://github.com/Hinaser/jscrypto/blob/master/API.md#des3
+[Word32Array]: https://github.com/Hinaser/jscrypto/blob/master/API.md#word32array
+[Word64Array]: https://github.com/Hinaser/jscrypto/blob/master/API.md#mword64Array
+[Base64]: https://github.com/Hinaser/jscrypto/blob/master/API.md#base64
+[Hex]: https://github.com/Hinaser/jscrypto/blob/master/API.md#hex
+[Latin1]: https://github.com/Hinaser/jscrypto/blob/master/API.md#latin1
+[Utf8]: https://github.com/Hinaser/jscrypto/blob/master/API.md#utf8
+[Utf16]: https://github.com/Hinaser/jscrypto/blob/master/API.md#utf16
+[Rabbits]: https://github.com/Hinaser/jscrypto/blob/master/API.md#rabbits
+[RC4]: https://github.com/Hinaser/jscrypto/blob/master/API.md#rc4
+[RC4Drop]: https://github.com/Hinaser/jscrypto/blob/master/API.md#rc4drop
+[OpenSSLKDF]: https://github.com/Hinaser/jscrypto/blob/master/API.md#opensslkdf
+[EvpKDF]: https://github.com/Hinaser/jscrypto/blob/master/API.md#evpkdf
+[PBKDF2]: https://github.com/Hinaser/jscrypto/blob/master/API.md#pbkdf2
+[CBC]: https://github.com/Hinaser/jscrypto/blob/master/API.md#cbc
+[CFB]: https://github.com/Hinaser/jscrypto/blob/master/API.md#cfb
+[CTR]: https://github.com/Hinaser/jscrypto/blob/master/API.md#ctr
+[ECB]: https://github.com/Hinaser/jscrypto/blob/master/API.md#ecb
+[OFB]: https://github.com/Hinaser/jscrypto/blob/master/API.md#ofb
+[GCM]: https://github.com/Hinaser/jscrypto/blob/master/API.md#gcm
+[CCM]: https://github.com/Hinaser/jscrypto/blob/master/API.md#ccm
+[AnsiX923]: https://github.com/Hinaser/jscrypto/blob/master/API.md#ansix923
+[ISO10126]: https://github.com/Hinaser/jscrypto/blob/master/API.md#iso10126
+[ISO97971]: https://github.com/Hinaser/jscrypto/blob/master/API.md#iso97971
+[NoPadding]: https://github.com/Hinaser/jscrypto/blob/master/API.md#nopadding
+[Pkcs7]: https://github.com/Hinaser/jscrypto/blob/master/API.md#pkcs7
+[Zero]: https://github.com/Hinaser/jscrypto/blob/master/API.md#zero
+[OpenSSLFormatter]: https://github.com/Hinaser/jscrypto/blob/master/API.md#opensslformatter

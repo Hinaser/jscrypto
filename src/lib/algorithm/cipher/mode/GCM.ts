@@ -1,6 +1,7 @@
 import {BlockCipherMode, BlockCipherModeProps} from "./BlockCipherMode";
 import {Word32Array} from "../../../Word32Array";
 import type {BlockCipher} from "../BlockCipher";
+import {padTo128m} from "./commonLib";
 
 /**
  * Galois Counter Mode
@@ -31,7 +32,7 @@ export class GCM extends BlockCipherMode {
     const A = cipher.authData?.clone() || new Word32Array();
     const lenA = [0, A.nSigBytes*8];
     // Pad AuthData
-    GCM.padTo128m(A);
+    padTo128m(A);
     
     this._A = A;
     this._lenA = lenA;
@@ -236,29 +237,6 @@ export class GCM extends BlockCipherMode {
     return Y;
   }
   
-  /**
-   * Pad word array to multiple of 128bit(4byte)
-   * @param {Word32Array} w - Padding target. This w will be modified directly.
-   * @returns {void}
-   */
-  public static padTo128m(w: Word32Array){
-    const remainder = w.nSigBytes % 16;
-    if(remainder === 0){
-      return;
-    }
-    const nPaddingBytes = 16 - remainder;
-    
-    // Pad Ciphertext
-    const pad = [];
-    for(let i=0;i<Math.floor(nPaddingBytes/4);i++){
-      pad.push(0);
-    }
-    if(nPaddingBytes % 4 > 0){
-      pad.push(0);
-    }
-    w.concat(new Word32Array(pad, nPaddingBytes));
-  }
-  
   public static hash(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){
     const cipher = new Cipher({key, iv});
     const H = [0,0,0,0];
@@ -270,8 +248,8 @@ export class GCM extends BlockCipherMode {
     const lenC = [0, C.nSigBytes*8];
   
     // Pad
-    GCM.padTo128m(A);
-    GCM.padTo128m(C);
+    padTo128m(A);
+    padTo128m(C);
   
     const s = A.words.concat(C.words).concat(lenA).concat(lenC);
     const S = GCM.GHASH(H, s);
@@ -292,7 +270,7 @@ export class GCM extends BlockCipherMode {
     const C = cipherText.clone();
     const lenC = [0, C.nSigBytes*8];
     
-    GCM.padTo128m(C);
+    padTo128m(C);
   
     const s = A.words.concat(C.words).concat(lenA).concat(lenC);
     const S = GCM.GHASH(H, s);

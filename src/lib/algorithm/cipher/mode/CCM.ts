@@ -1,21 +1,51 @@
 import {BlockCipherMode, BlockCipherModeProps} from "./BlockCipherMode";
 import {Word32Array} from "../../../Word32Array";
 import type {BlockCipher} from "../BlockCipher";
+import {padTo128m} from "./commonLib";
 
 /**
  * Counter/CBC-MAC
  */
 export class CCM extends BlockCipherMode {
-  protected _CB: number[] = []; // Counter Block
+  protected _N: Word32Array;
+  protected _CBIndex: number = 0;
+  protected readonly _q = 7; // At this time, q=LEN(Q) is fixed to 7 and n=LEN(N) is fixed to 8;
+  protected _A: Word32Array;
+  protected _lenA: number[];
   
   public constructor(props: BlockCipherModeProps) {
     super(props);
   
-    const {cipher/* , iv */} = props;
+    const {cipher, iv} = props;
     if(cipher.blockSize !== 128/32){
       throw new Error("In CCM, cipher block size must be 128bit");
     }
     
+    let words: number[];
+    if(iv && iv.length > 0){
+      if(iv.length === 1){
+        words = [0, iv[0]];
+      }
+      else if(iv.length === 2){
+        words = iv.slice();
+      }
+      else{
+        throw new Error("iv must be 0/4/8 bytes");
+      }
+    }
+    else{
+      words = [0, 0];
+    }
+    
+    this._N = new Word32Array(words, 8);
+  
+    const A = cipher.authData?.clone() || new Word32Array();
+    const lenA = [0, A.nSigBytes*8];
+    // Pad AuthData
+    padTo128m(A);
+  
+    this._A = A;
+    this._lenA = lenA;
   }
   
   /**
@@ -128,7 +158,7 @@ export class CCM extends BlockCipherMode {
   }
   
   /**
-   * Generate authentication tag for ciphertext with inner GCM parameters.
+   * Generate authentication tag for ciphertext with inner CCM parameters.
    * @param {Word32Array} cipherText
    * @returns {Word32Array}
    */
@@ -150,8 +180,16 @@ export class CCM extends BlockCipherMode {
      */
     public processBlock(words: number[], offset: number){
       // Shortcuts
-      // const cipher = this._cipher
-      // const blockSize = cipher.blockSize;
+      const cipher = this._cipher
+      const blockSize = cipher.blockSize;
+      
+      const CBi = CCM.genCtr(this._q, this._N, this._CBIndex);
+      
+      for(let i=0;i<blockSize;i++){
+        words[offset + i] ^= CBi.words[i];
+      }
+      
+      this._CBIndex++;
     }
   };
   
@@ -169,8 +207,16 @@ export class CCM extends BlockCipherMode {
      */
     public processBlock(words: number[], offset: number){
       // Shortcuts
-      // const cipher = this._cipher
-      // const blockSize = cipher.blockSize;
+      const cipher = this._cipher
+      const blockSize = cipher.blockSize;
+  
+      const CBi = CCM.genCtr(this._q, this._N, this._CBIndex);
+  
+      for(let i=0;i<blockSize;i++){
+        words[offset + i] ^= CBi.words[i];
+      }
+  
+      this._CBIndex++;
     }
   };
   

@@ -5,12 +5,39 @@
   \*This may enable developers to use non-32bit-aligned iv value to block cipher mode in future release.  
   \*This change may not be breaking lib compatibility unless developers directly instantiate BlockCipherMode or  
     creating original BlockCipherMode extending old BlockCipherMode class.
+- Calculating authTag in GCM/CCM now requires developer to manually call authTag function.  
+  ```js
+  //////////////////////
+  // AES-GCM
+  //////////////////////
+  // BEFORE
+  const encrypted = AES.encrypt(msg, key, { iv, mode: GCM, padding: NoPadding, authData });
+  encrypted.authTag !== undefined; // This returns true. authTag is automatically calculated on encryption.
+
+  // AFTER
+  const encrypted = AES.encrypt(msg, key, { iv, mode: GCM, padding: NoPadding, authData });
+  encrypted.authTag === undefined; // This returns true. authTag must be manually calculated as below.
+  const authTag = GCM.hash(AES, key, iv, authData, encrypted.cipherText);
+  
+  //////////////////////
+  // AES-CCM
+  //////////////////////
+  // BEFORE
+  const encrypted = AES.encrypt(msg, key, { iv, mode: CCM, padding: NoPadding, authData });
+  encrypted.authTag !== undefined; // This returns true. authTag is automatically calculated on encryption.
+
+  // AFTER
+  const encrypted = AES.encrypt(msg, key, { iv, mode: CCM, padding: NoPadding, authData });
+  encrypted.authTag === undefined; // This returns true. authTag must be manually calculated as below.
+  const authTag = CCM.hash(AES, key, iv, authData, msg); // Note: CCM requires original plaintext to get authTag.
+  ```
 -->
 ## [0.2.1]
 ### Added
 - CCM block cipher mode (Counter mode/CBC-MAC)  
-  \*At this version, length of Nonce(iv) is fixed to (recognized as) 8bytes.  
-    Thus max length of Payload is 
+  **Note**  
+  At this version, length of Nonce(iv) is fixed to (recognized as) 8bytes.  
+  Thus max byte length of Payload is the one which can be represented in 7bytes. (=2^56-1 byte)
 
 ## [0.2.0] - 2021-04-07
 ### Added

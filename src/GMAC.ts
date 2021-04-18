@@ -19,5 +19,5 @@ export function GMAC(
   const Cipher = (props && props.Cipher) ? props.Cipher : AES;
   const wKey = typeof key === "string" ? Utf8.parse(key) : key;
   
-  return GCM.hash(Cipher, wKey, initializingVector, aad);
+  return GCM.mac(Cipher, wKey, initializingVector, aad);
 }

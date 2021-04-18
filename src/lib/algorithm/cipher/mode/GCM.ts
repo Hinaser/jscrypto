@@ -227,7 +227,7 @@ export class GCM extends BlockCipherMode {
     return Y;
   }
   
-  public static hash(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){
+  public static mac(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){
     const cipher = new Cipher({key, iv});
     const H = [0,0,0,0];
     cipher.encryptBlock(H, 0);

@@ -100,7 +100,7 @@ describe("mode/GCM", function(){
     const authData = Hex.parse("feedfacedeadbeeffeedfacedeadbeefabaddad2");
     const cipherText = Hex.parse("42831ec2217774244b7221b784d0d49ce3aa212f2c02a4e035c17e2329aca12e21d514b25466931c7d8f6a5aac84aa051ba30b396a0aac973d58e091");
     
-    expect(GCM.hash(AES, key, iv, authData, cipherText).toString()).to.be("5bc94fbc3221a5db94fae95ae7121a47");
+    expect(GCM.mac(AES, key, iv, authData, cipherText).toString()).to.be("5bc94fbc3221a5db94fae95ae7121a47");
   });
   
   it("test hash with CipherText", function(){
@@ -108,7 +108,7 @@ describe("mode/GCM", function(){
     const iv = Hex.parse("cafebabefacedbaddecaf888");
     const cipherText = Hex.parse("42831ec2217774244b7221b784d0d49ce3aa212f2c02a4e035c17e2329aca12e21d514b25466931c7d8f6a5aac84aa051ba30b396a0aac973d58e091473f5985");
     
-    expect(GCM.hash(AES, key, iv, undefined, cipherText).toString()).to.be("4d5c2af327cd64a62cf35abd2ba6fab4");
+    expect(GCM.mac(AES, key, iv, undefined, cipherText).toString()).to.be("4d5c2af327cd64a62cf35abd2ba6fab4");
   });
   
   it("test hash with AAD (GMAC)", function(){
@@ -116,6 +116,6 @@ describe("mode/GCM", function(){
     const iv = Hex.parse("BBBBBBBBBBBBBBBBBBBBBBBB");
     const aad = Hex.parse("1063509E5A672C092CAD0B1DC6CE009A61AAAAAAAAAAAA");
     
-    expect(GCM.hash(AES, key, iv, aad).toString().slice(0, 24)).to.be("44c955d63799428524e97993");
+    expect(GCM.mac(AES, key, iv, aad).toString().slice(0, 24)).to.be("44c955d63799428524e97993");
   });
 });

@@ -1,7 +1,7 @@
 import {BlockCipherMode, BlockCipherModeProps} from "./BlockCipherMode";
 import {Word32Array} from "../../../Word32Array";
 import type {BlockCipher} from "../BlockCipher";
-import {padTo128m} from "./commonLib";
+// import {padTo128m} from "./commonLib";
 
 /**
  * Counter/CBC-MAC
@@ -10,8 +10,6 @@ export class CCM extends BlockCipherMode {
   protected _N: Word32Array;
   protected _CBIndex: number = 0;
   protected readonly _q = 7; // At this time, q=LEN(Q) is fixed to 7 and n=LEN(N) is fixed to 8;
-  protected _A: Word32Array;
-  protected _lenA: number[];
   
   public constructor(props: BlockCipherModeProps) {
     super(props);
@@ -38,14 +36,6 @@ export class CCM extends BlockCipherMode {
     }
     
     this._N = new Word32Array(words, 8);
-  
-    const A = cipher.authData?.clone() || new Word32Array();
-    const lenA = [0, A.nSigBytes*8];
-    // Pad AuthData
-    padTo128m(A);
-  
-    this._A = A;
-    this._lenA = lenA;
   }
   
   /**
@@ -154,16 +144,13 @@ export class CCM extends BlockCipherMode {
   }
   
   public static hash(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){
+    /*
+    const A = authData?.clone() || new Word32Array();
+    const lenA = [0, A.nSigBytes*8];
+    // Pad AuthData
+    padTo128m(A);
+    */
     return;
-  }
-  
-  /**
-   * Generate authentication tag for ciphertext with inner CCM parameters.
-   * @param {Word32Array} cipherText
-   * @returns {Word32Array}
-   */
-  public generateAuthTag(cipherText: Word32Array){
-    return undefined;
   }
   
   /**

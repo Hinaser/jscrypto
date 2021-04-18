@@ -14,7 +14,6 @@ export interface BlockCipherProps extends CipherProps {
   kdfModule: typeof BaseKDFModule;
   kdfHasher: typeof Hasher;
   kdfIterations: number;
-  authData: Word32Array;
 }
 
 export class BlockCipher extends Cipher {
@@ -24,8 +23,6 @@ export class BlockCipher extends Cipher {
   protected _mode?: BlockCipherMode;
   protected _padding: Pad = Pkcs7;
   protected _modeCreator?: (props: BlockCipherModeProps) => BlockCipherMode;
-  protected _authData: Word32Array|undefined;
-  protected _authTag: Word32Array|undefined;
   
   /**
    * @see https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
@@ -38,7 +35,6 @@ export class BlockCipher extends Cipher {
   
     this._Mode = typeof props.mode !== "undefined" ? props.mode : this._Mode;
     this._padding = typeof props.padding !== "undefined" ? props.padding : this._padding;
-    this._authData = props.authData?.clone();
   
     this.reset(props?.data, props?.nBytes);
   }
@@ -49,14 +45,6 @@ export class BlockCipher extends Cipher {
   
   public get padding(){
     return this._padding;
-  }
-  
-  public get authData(){
-    return this._authData?.clone();
-  }
-  
-  public get authTag(){
-    return this._authTag?.clone();
   }
   
   reset(data?: Word32Array, nBytes?: number) {
@@ -98,14 +86,8 @@ export class BlockCipher extends Cipher {
     
       // Process final blocks
       finalProcessedBlocks = this._process(true);
-  
-      // If Authenticated cipher, generate auth tag
-      this._authTag = this._mode?.generateAuthTag(finalProcessedBlocks);
     }
     else /* if (this._transformMode == Cipher._DEC_TRANSFORM_MODE) */ {
-      // If Authenticated cipher, generate auth tag
-      this._authTag = this._mode?.generateAuthTag(this._data);
-      
       // Process final blocks
       finalProcessedBlocks = this._process(true);
     

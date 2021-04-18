@@ -94,35 +94,6 @@ describe("mode/GCM", function(){
     expect(decryptedData.toString(Utf8)).to.be(msg);
   });
   
-  it("test authTag without authData", function(){
-    const key = Hex.parse("feffe9928665731c6d6a8f9467308308");
-    const msg = Hex.parse("d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b391aafd255");
-    const iv = Hex.parse("cafebabefacedbaddecaf888");
-    const encrypted = AES.encrypt(msg, key, { iv, mode: GCM, padding: NoPadding });
-    const decryptor = AES.createDecryptor(key, { iv, mode: GCM, padding: NoPadding });
-    const decrypted = decryptor.finalize(encrypted.cipherText || "");
-    
-    expect(encrypted.cipherText.toString()).to.be("42831ec2217774244b7221b784d0d49ce3aa212f2c02a4e035c17e2329aca12e21d514b25466931c7d8f6a5aac84aa051ba30b396a0aac973d58e091473f5985");
-    expect(encrypted.authTag.toString()).to.be("4d5c2af327cd64a62cf35abd2ba6fab4");
-    expect(decryptor.authTag.toString()).to.be("4d5c2af327cd64a62cf35abd2ba6fab4");
-    expect(decrypted.toString()).to.be(msg.toString());
-  });
-  
-  it("test authTag with authData", function(){
-    const key = Hex.parse("feffe9928665731c6d6a8f9467308308");
-    const msg = Hex.parse("d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b39");
-    const iv = Hex.parse("cafebabefacedbaddecaf888");
-    const authData = Hex.parse("feedfacedeadbeeffeedfacedeadbeefabaddad2");
-    const encrypted = AES.encrypt(msg, key, { iv, mode: GCM, padding: NoPadding, authData });
-    const decryptor = AES.createDecryptor(key, { iv, mode: GCM, padding: NoPadding, authData });
-    const decrypted = decryptor.finalize(encrypted.cipherText || "");
-  
-    expect(encrypted.cipherText.toString()).to.be("42831ec2217774244b7221b784d0d49ce3aa212f2c02a4e035c17e2329aca12e21d514b25466931c7d8f6a5aac84aa051ba30b396a0aac973d58e091");
-    expect(encrypted.authTag.toString()).to.be("5bc94fbc3221a5db94fae95ae7121a47");
-    expect(decryptor.authTag.toString()).to.be("5bc94fbc3221a5db94fae95ae7121a47");
-    expect(decrypted.toString()).to.be(msg.toString());
-  });
-  
   it("test hash with AAD, CipherText", function(){
     const key = Hex.parse("feffe9928665731c6d6a8f9467308308");
     const iv = Hex.parse("cafebabefacedbaddecaf888");

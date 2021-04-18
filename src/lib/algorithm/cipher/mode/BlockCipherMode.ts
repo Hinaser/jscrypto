@@ -29,13 +29,6 @@ export class BlockCipherMode {
   }
   
   /**
-   * @abstract
-   */
-  public generateAuthTag(cipherText: Word32Array): Word32Array|undefined {
-    return undefined;
-  }
-  
-  /**
    * Creates this mode for encryption.
    * @param {BlockCipherModeProps} props
    * @abstract

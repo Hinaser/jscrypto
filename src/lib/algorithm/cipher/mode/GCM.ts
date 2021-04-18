@@ -10,8 +10,6 @@ export class GCM extends BlockCipherMode {
   protected _H: number[] = [];
   protected _J0: number[] = [];
   protected _CB: number[] = []; // Counter Block
-  protected _A: Word32Array;
-  protected _lenA: number[];
   
   public constructor(props: BlockCipherModeProps) {
     super(props);
@@ -28,14 +26,6 @@ export class GCM extends BlockCipherMode {
     // iv should be array of 32bit int
     this._J0 = GCM.getJ0(H, iv?.words);
     this._CB = this._J0.slice();
-  
-    const A = cipher.authData?.clone() || new Word32Array();
-    const lenA = [0, A.nSigBytes*8];
-    // Pad AuthData
-    padTo128m(A);
-    
-    this._A = A;
-    this._lenA = lenA;
   }
   
   /**
@@ -249,27 +239,6 @@ export class GCM extends BlockCipherMode {
   
     // Pad
     padTo128m(A);
-    padTo128m(C);
-  
-    const s = A.words.concat(C.words).concat(lenA).concat(lenC);
-    const S = GCM.GHASH(H, s);
-    return GCM.GCTR(cipher, J0, new Word32Array(S));
-  }
-  
-  /**
-   * Generate authentication tag for ciphertext with inner GCM parameters.
-   * @param {Word32Array} cipherText
-   * @returns {Word32Array}
-   */
-  public generateAuthTag(cipherText: Word32Array){
-    const cipher = this._cipher;
-    const H = this._H;
-    const J0 = this._J0;
-    const A = this._A;
-    const lenA = this._lenA;
-    const C = cipherText.clone();
-    const lenC = [0, C.nSigBytes*8];
-    
     padTo128m(C);
   
     const s = A.words.concat(C.words).concat(lenA).concat(lenC);

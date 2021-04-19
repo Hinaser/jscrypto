@@ -25,6 +25,7 @@ export {HmacSHA256} from "./HmacSHA256";
 export {HmacSHA384} from "./HmacSHA384";
 export {HmacSHA512} from "./HmacSHA512";
 export {GMAC} from "./GMAC";
+export {CBCMAC} from "./CBCMAC";
 export {MD5} from "./MD5";
 export {SHA1} from "./SHA1";
 export {SHA224} from "./SHA224";

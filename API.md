@@ -389,7 +389,7 @@ var encryptedData = JsCrypto.AES.encrypt(msg, key, {iv, mode: JsCrypto.mode.GCM}
 // Encrypted message
 var cipherText = encryptedData.cipherText;
 // Authentication Tag
-var authTag = JsCrypto.mode.GCM.mac(AES, key, iv, authData, cipherText);
+var authTag = JsCrypto.mode.GCM.mac(JsCrypto.AES, key, iv, authData, cipherText);
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // Authenticated decryption by AES-GCM

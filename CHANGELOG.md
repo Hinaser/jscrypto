@@ -34,6 +34,7 @@
 ### Added
 - Added CCM block cipher mode (Counter mode/CBC-MAC)  
   https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf  
+- Added CBC-MAC
 
 ## [0.2.0] - 2021-04-07
 ### Added

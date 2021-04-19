@@ -25,3 +25,41 @@ export function padTo128m(w: Word32Array){
   
   w.concat(new Word32Array(pad, nPaddingBytes));
 }
+
+/**
+ * Extract Most Significant Bit.
+ * @param {Word32Array} w
+ * @param {number} bytes - Number of bytes to extract
+ * @example
+ *   const w = new Word32Array([0x11223344, 0x55667788]);
+ *   msb(w, 2).toString() === "1122"; // true
+ */
+export function msb(w: Word32Array, bytes: number){
+  return new Word32Array(w.words.slice(), bytes);
+}
+
+/**
+ * Extract Least Significant Bit.
+ * @param {Word32Array} w
+ * @param {number} bytes - Number of bytes to extract
+ * @example
+ *   const w = new Word32Array([0x11223344, 0x55667788, 0x99aabb00], 11);
+ *   lsb(w, 5).toString() === "778899aabb"; // true
+ */
+export function lsb(w: Word32Array, bytes: number){
+  const n = w.nSigBytes;
+  const nShift = n - bytes;
+  const lsbWords: number[] = [];
+  
+  for(let i=0;i<bytes;i++){
+    const j = i >>> 2;
+    const byteIndex = nShift + i;
+    const wordIndex = byteIndex >>> 2;
+    const b = (w.words[wordIndex] >>> (24 - (byteIndex % 4)*8)) & 0x000000ff;
+    lsbWords[j] = (lsbWords[j] | 0) | (b << (24 - (i % 4)*8));
+  }
+  
+  const wLsb = new Word32Array(lsbWords, bytes);
+  wLsb.clamp();
+  return wLsb;
+}

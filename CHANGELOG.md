@@ -29,25 +29,11 @@
   const encrypted = AES.encrypt(msg, key, { iv, mode: GCM, padding: NoPadding, authData });
   encrypted.authTag === undefined; // This returns true. authTag must be manually calculated as below.
   const authTag = GCM.mac(AES, key, iv, authData, encrypted.cipherText);
-  
-  //////////////////////
-  // AES-CCM
-  //////////////////////
-  // BEFORE
-  const encrypted = AES.encrypt(msg, key, { iv, mode: CCM, padding: NoPadding, authData });
-  encrypted.authTag !== undefined; // This returns true. authTag is automatically calculated on encryption.
-
-  // AFTER
-  const encrypted = AES.encrypt(msg, key, { iv, mode: CCM, padding: NoPadding, authData });
-  encrypted.authTag === undefined; // This returns true. authTag must be manually calculated as below.
-  const authTag = CCM.hash(AES, key, iv, authData, msg); // Note: CCM requires original plaintext to get authTag.
   ```
 
 ### Added
-- CCM block cipher mode (Counter mode/CBC-MAC)  
-  **Note**  
-  At this version, length of Nonce(iv) is fixed to (recognized as) 8bytes.  
-  Thus max byte length of Payload is the one which can be represented in 7bytes. (=2^56-1 byte)
+- Added CCM block cipher mode (Counter mode/CBC-MAC)  
+  https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf  
 
 ## [0.2.0] - 2021-04-07
 ### Added

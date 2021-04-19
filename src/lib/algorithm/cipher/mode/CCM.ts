@@ -1,15 +1,15 @@
 import {BlockCipherMode, BlockCipherModeProps} from "./BlockCipherMode";
 import {Word32Array} from "../../../Word32Array";
 import type {BlockCipher} from "../BlockCipher";
-// import {padTo128m} from "./commonLib";
+import {lsb, msb} from "./commonLib";
 
 /**
  * Counter/CBC-MAC
  */
 export class CCM extends BlockCipherMode {
   protected _N: Word32Array;
-  protected _CBIndex: number = 0;
-  protected readonly _q = 7; // At this time, q=LEN(Q) is fixed to 7 and n=LEN(N) is fixed to 8;
+  protected _CBIndex: number = 1;
+  protected readonly _q;
   
   public constructor(props: BlockCipherModeProps) {
     super(props);
@@ -18,24 +18,12 @@ export class CCM extends BlockCipherMode {
     if(cipher.blockSize !== 128/32){
       throw new Error("In CCM, cipher block size must be 128bit");
     }
-    
-    let words: number[];
-    if(iv && iv.words.length > 0){
-      if(iv.words.length === 1){
-        words = [0, iv.words[0]];
-      }
-      else if(iv.words.length === 2){
-        words = iv.words.slice();
-      }
-      else{
-        throw new Error("iv must be 0/4/8 bytes");
-      }
-    }
-    else{
-      words = [0, 0];
+    else if(iv && (iv.nSigBytes > 13 || iv.nSigBytes < 7)){
+      throw new Error("Byte size of iv must be between 7 and 13");
     }
     
-    this._N = new Word32Array(words, 8);
+    this._N = iv || new Word32Array([0, 0], 8);
+    this._q = 15 - this._N.nSigBytes;
   }
   
   /**
@@ -75,7 +63,7 @@ export class CCM extends BlockCipherMode {
       ad = new Word32Array([0], 0);
     }
     else if(a < 2**16 - 2**8){
-      ad = new Word32Array([a<<16], 16);
+      ad = new Word32Array([a<<16], 2);
     }
     else if(a < 2**32){
       ad = new Word32Array([0xfffe0000], 2).concat(new Word32Array([a], 4));
@@ -95,6 +83,11 @@ export class CCM extends BlockCipherMode {
       ad.concat(new Word32Array([0], 4 - A.nSigBytes%4));
     }
     
+    // Align to 16byte block
+    if(ad.nSigBytes % 16){
+      ad.concat(new Word32Array([0], 16 - ad.nSigBytes%16));
+    }
+    
     // Format Payload
     const nPayload = Math.floor(P.nSigBytes / 4);
     for(let i=0;i<nPayload;i++){
@@ -105,7 +98,12 @@ export class CCM extends BlockCipherMode {
       ad.concat(new Word32Array([P.words[nAd]], P.nSigBytes % 4));
       ad.concat(new Word32Array([0], 4 - P.nSigBytes%4));
     }
-    
+  
+    // Align to 16byte block
+    if(ad.nSigBytes % 16){
+      ad.concat(new Word32Array([0], 16 - ad.nSigBytes%16));
+    }
+  
     return ad;
   }
   
@@ -143,14 +141,87 @@ export class CCM extends BlockCipherMode {
     return flag.concat(N).concat(indexBytes);
   }
   
-  public static hash(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){
-    /*
+  /**
+   * Generate Message Authentication Code
+   * 
+   * @param {typeof BlockCipher} Cipher - 128 bit block Cipher i.e. AES
+   * @param {Word32Array} key - Key
+   * @param {Word32Array} iv - Nonce. iv less than or equal to 8byte(64bit) is supported.
+   * @param {Word32Array?} authData - Associated data
+   * @param {Word32Array?} plainText - Payload
+   * @param {number?} tagLength - authTag size in octet length. If omitted, tagLength will be set to 16byte.
+   */
+  public static mac(
+    Cipher: typeof BlockCipher,
+    key: Word32Array,
+    iv: Word32Array,
+    authData?: Word32Array,
+    plainText?: Word32Array,
+    tagLength?: number,
+  ){
+    const cipher = new Cipher({key, iv});
+    if(cipher.blockSize !== 128/32){
+      throw new Error("In CCM, cipher block size must be 128bit");
+    }
+    else if(iv && (iv.nSigBytes > 13 || iv.nSigBytes < 7)){
+      throw new Error("Byte size of iv must be between 7 and 13");
+    }
+  
+    const N = iv || new Word32Array([0, 0], 8);
     const A = authData?.clone() || new Word32Array();
-    const lenA = [0, A.nSigBytes*8];
-    // Pad AuthData
-    padTo128m(A);
-    */
-    return;
+    const a = A.nSigBytes;
+    const P = plainText?.clone() || new Word32Array();
+    const p = P.nSigBytes;
+    if((p >>> 0) > 4294967295){
+      throw new Error("Byte length of Payload(plainText) larger than 2^32-1 (4,294,967,295byte) is not supported at this time.");
+    }
+  
+    const q = 15 - N.nSigBytes;
+    const Q = lsb(new Word32Array([0, p], 8), q);
+    const t = tagLength || 16;
+    
+    const B0 = CCM.getB0(Boolean(a), t, Q, N);
+    const Bi = CCM.formatAssociatedDataAndPayload(A, P);
+    const Y0 = B0.words.slice();
+    cipher.encryptBlock(Y0, 0);
+  
+    const n = Bi.nSigBytes / 16;
+    const wordsBi = Bi.words;
+  
+    let Y = Y0;
+    for(let i=0;i<n;i++){
+      const Yi0 = wordsBi[i*4] ^ Y[0];
+      const Yi1 = wordsBi[i*4+1] ^ Y[1];
+      const Yi2 = wordsBi[i*4+2] ^ Y[2];
+      const Yi3 = wordsBi[i*4+3] ^ Y[3];
+      const Yi = [Yi0, Yi1, Yi2, Yi3];
+      
+      cipher.encryptBlock(Yi, 0);
+      Y = Yi;
+    }
+  
+    const T = new Word32Array(Y, t);
+    const ctr0 = CCM.genCtr(q, N, 0);
+    cipher.encryptBlock(ctr0.words, 0);
+    
+    for(let i=0;i<4;i++){
+      T.words[i] ^= ctr0.words[i];
+    }
+    
+    T.clamp();
+    
+    return T;
+  }
+  
+  public static combineCipherTextAndAuthTag(cipherText: Word32Array, authTag: Word32Array){
+    return cipherText.clone().concat(authTag);
+  }
+  
+  public static splitCipherTextAndAuthTag(cipherTextWithAuthTag: Word32Array, tLen?: number){
+    const t = tLen || 16;
+    const cipherText = msb(cipherTextWithAuthTag, cipherTextWithAuthTag.nSigBytes - t);
+    const authTag = lsb(cipherTextWithAuthTag, t);
+    return {cipherText, authTag};
   }
   
   /**
@@ -171,6 +242,7 @@ export class CCM extends BlockCipherMode {
       const blockSize = cipher.blockSize;
       
       const CBi = CCM.genCtr(this._q, this._N, this._CBIndex);
+      cipher.encryptBlock(CBi.words, 0);
       
       for(let i=0;i<blockSize;i++){
         words[offset + i] ^= CBi.words[i];
@@ -198,6 +270,7 @@ export class CCM extends BlockCipherMode {
       const blockSize = cipher.blockSize;
   
       const CBi = CCM.genCtr(this._q, this._N, this._CBIndex);
+      cipher.encryptBlock(CBi.words, 0);
   
       for(let i=0;i<blockSize;i++){
         words[offset + i] ^= CBi.words[i];

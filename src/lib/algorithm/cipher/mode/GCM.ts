@@ -192,10 +192,10 @@ export class GCM extends BlockCipherMode {
       const remainderOf16Bytes = X.nSigBytes % 16;
       
       if(i < n-1 || /* i === n-1 && */ remainderOf16Bytes === 0){
-        const Yi0 = words[i] ^ CB[i][0];
-        const Yi1 = words[i+1] ^ CB[i][1];
-        const Yi2 = words[i+2] ^ CB[i][2];
-        const Yi3 = words[i+3] ^ CB[i][3];
+        const Yi0 = words[i*4] ^ CB[i][0];
+        const Yi1 = words[i*4+1] ^ CB[i][1];
+        const Yi2 = words[i*4+2] ^ CB[i][2];
+        const Yi3 = words[i*4+3] ^ CB[i][3];
         const Yi = new Word32Array([Yi0, Yi1, Yi2, Yi3]);
         Y.concat(Yi);
         continue;
@@ -206,14 +206,14 @@ export class GCM extends BlockCipherMode {
       let nSigBytes = 0;
       const nMaxAligned = Math.floor(remainderOf16Bytes/4);
       for(let k=0;k<nMaxAligned;k++){
-        const Ynk = words[i+k] ^ CB[i][k];
+        const Ynk = words[i*4+k] ^ CB[i][k];
         w.push(Ynk);
         nSigBytes += 4;
       }
       
       const remaining0to3Bytes = remainderOf16Bytes % 4;
       if(remaining0to3Bytes > 0){
-        const Ynr = (words[i+nMaxAligned] << (32-8*remaining0to3Bytes)) ^ CB[i][nMaxAligned];
+        const Ynr = (words[i*4+nMaxAligned] << (32-8*remaining0to3Bytes)) ^ CB[i][nMaxAligned];
         w.push(Ynr);
         nSigBytes += remaining0to3Bytes;
       }

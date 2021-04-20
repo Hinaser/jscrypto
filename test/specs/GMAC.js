@@ -14,7 +14,8 @@ describe("gmac", function(){
     const key = Hex.parse("55804F3AEB4E914DC91255944A1F565A");
     const iv = Hex.parse("BBBBBBBBBBBBBBBBBBBBBBBB");
     const aad = Hex.parse("1063509E5A672C092CAD0B1DC6CE009A61AAAAAAAAAAAA");
+    const tagLength = 8;
     
-    expect(GMAC(aad, key, iv, {tagLength: 8}).toString()).to.be("44c955d637994285");
+    expect(GMAC(aad, key, iv, tagLength).toString()).to.be("44c955d637994285");
   });
 });

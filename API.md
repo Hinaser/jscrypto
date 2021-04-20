@@ -258,9 +258,9 @@ If you do not supply `iv` to GMAC, `iv` is initialized to 0^128. (128bit 0s)
 var message = JsCrypto.Hex.parse("1063509E5A672C092CAD0B1DC6CE009A61AAAAAAAAAAAA");
 var key = JsCrypto.Hex.parse("55804F3AEB4E914DC91255944A1F565A");
 var iv = JsCrypto.Hex.parse("BBBBBBBBBBBBBBBBBBBBBBBB"); // 96bit(12byte) iv is recommended.
-var option = {tagLength: 8/* byte */}; // Optional. If omitted, tagLength will be set to 16(byte).
+var tagLength = 8; // 8byte. Optional. If omitted, tagLength will be set to 16(byte).
 
-var authTagWord = JsCrypto.GMAC(message, key, iv, option);
+var authTagWord = JsCrypto.GMAC(message, key, iv, tagLength);
 authTagWord.toString(); // 44c955d637994285
 authTagWord.toString(JsCrypto.Base64); // "RMlV1jeZQoU="
 ```
@@ -269,16 +269,16 @@ authTagWord.toString(JsCrypto.Base64); // "RMlV1jeZQoU="
 
 Default Cipher: `AES`.  
 If you set `Nonce` below to falsy value like `null|undefined|0`, Nonce will be reset to `new Word32Array([0, 0], 8);` (64bit/8byte 0s).  
-In CBC-MAC, Nonce should always set to be 0s. So keep nonce undefined unless you required to set value to nonce.
+In CBC-MAC, Nonce should always set to be 0s. So keep Nonce `undefined` unless you required to set a value to it.
 
 ```js
+var Plaintext = JsCrypto.Hex.parse("20212223");
+var Message = JsCrypto.Hex.parse("0001020304050607");
 var Key = JsCrypto.Hex.parse("404142434445464748494a4b4c4d4e4f");
 var Nonce = undefined; // Nonce/iv shouldn't be used. Always set to be `undefined` or `new Word32Array([0,0], 8)`
-var AssociatedData = JsCrypto.Hex.parse("0001020304050607");
-var Plaintext = JsCrypto.Hex.parse("20212223");
 var tagLength = 32/8; // 32bit = 4byte
 
-var authTagWord = JsCrypto.CBCMAC(Plaintext, Key, Nonce, AssociatedData, {tagLength});
+var authTagWord = JsCrypto.CBCMAC(Plaintext, Message, Key, Nonce, tagLength);
 authTagWord.toString(); // "9bd4029e"
 ```
 
@@ -436,6 +436,7 @@ https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
 
 ```js
 // Example test vectors
+// See page 17 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
 // Klen=128bit, Tlen=32bit, Nlen=56bit, Alen=64bit, Plen=32bit
 var K = JsCrypto.Hex.parse("404142434445464748494a4b4c4d4e4f"); // key
 var N = JsCrypto.Hex.parse("10111213141516"); // Nonce/iv
@@ -445,15 +446,28 @@ var t = 32/8; // 4byte. tag length byte.
 
 // Test CBC-MAC
 var cbcMac = JsCrypto.mode.CCM.mac(JsCrypto.AES, K, N, A, P, t);
-cbcMac.toString() === "4dac255d"; // true
+cbcMac.toString(); // "4dac255d"
 
 // Test encryption
 var encrypted = JsCrypto.AES.encrypt(P, K, { iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding });
-encrypted.cipherText.toString() === "7162015b"; // true
+encrypted.cipherText.toString(); // "7162015b"
+
+// Combine encrypted block and MAC to be compatible with cipher output at Steps 8 in chapter 6.1, NIST-800-38C.
+// See page 9 through page 10 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+var nist80038cStyleCiphertext = JsCrypto.mode.CCM.combineCipherTextAndAuthTag(encrypted.cipherText, cbcMac);
+nist80038cStyleCiphertext.toString(); // "7162015b4dac255d"
 
 // Test decryption
-var decrypted = JsCrypto.AES.decrypt(encrypted, K, {iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding});
+// Assuming you receive nist 800-38c style ciphertext and N, A, P, t from encrypting entity.
+// K(key) should be pre-shared privately.
+var cipherTextAndAuthTag = JsCrypto.mode.CCM.splitCipherTextAndAuthTag(nist80038cStyleCiphertext, t);
+var cipherText = cipherTextAndAuthTag.cipherText;
+var authTag = cipherTextAndAuthTag.authTag;
+var cp = new JsCrypto.CipherParams({cipherText});
+// Finally decrypt here
+var decrypted = JsCrypto.AES.decrypt(cp, K, {iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding});
 decrypted.toString() === P.toString(); // true
+authTag.toString() === cbcMac.toString(); // true
 ```
 
 <h4 id="des">DES</h4>

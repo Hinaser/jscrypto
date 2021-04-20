@@ -9,6 +9,7 @@ exports.mainEntry = () => {
     index: "./src/index.ts",
     Word32Array: "./src/Word32Array.ts",
     Word64Array: "./src/Word64Array.ts",
+    CipherParams: "./src/CipherParams.ts",
     SHA1: "./src/SHA1.ts",
     SHA224: "./src/SHA224.ts",
     SHA256: "./src/SHA256.ts",

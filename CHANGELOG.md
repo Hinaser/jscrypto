@@ -4,6 +4,7 @@
   https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
 - Added [CBC-MAC](https://github.com/Hinaser/jscrypto/blob/master/API.md#cbc-mac)
 - Added tag length option to [`GMAC`](https://github.com/Hinaser/jscrypto/blob/master/API.md#gmac) and [AES-GCM](https://github.com/Hinaser/jscrypto/blob/master/API.md#aes-gcm)
+- Exposed `CipherParams` class to public.
 
 ### Changed
 **Small breaking change**

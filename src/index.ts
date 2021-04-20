@@ -16,6 +16,7 @@ export {
 
 export {SerializableCipher} from "./lib/algorithm/cipher/SerializableCipher";
 export {PasswordBasedCipher} from "./lib/algorithm/cipher/PasswordBasedCipher";
+export {CipherParams} from "./lib/algorithm/cipher/CipherParams";
 
 export {Hmac} from "./Hmac";
 export {HmacMD5} from "./HmacMD5";

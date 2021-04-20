@@ -6,6 +6,7 @@ import {BlockCipher} from "./lib/algorithm/cipher/BlockCipher";
 
 export type GMACProps = {
   Cipher: typeof BlockCipher;
+  tagLength?: number;
 };
 
 export function GMAC(
@@ -18,6 +19,7 @@ export function GMAC(
   const initializingVector = iv ? iv : new Word32Array([0, 0, 0, 0]);
   const Cipher = (props && props.Cipher) ? props.Cipher : AES;
   const wKey = typeof key === "string" ? Utf8.parse(key) : key;
+  const t = props && props.tagLength || 16;
   
-  return GCM.mac(Cipher, wKey, initializingVector, aad);
+  return GCM.mac(Cipher, wKey, initializingVector, aad, undefined, t);
 }

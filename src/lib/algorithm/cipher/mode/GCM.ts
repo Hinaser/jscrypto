@@ -1,7 +1,7 @@
 import {BlockCipherMode, BlockCipherModeProps} from "./BlockCipherMode";
 import {Word32Array} from "../../../Word32Array";
 import type {BlockCipher} from "../BlockCipher";
-import {padTo128m} from "./commonLib";
+import {msb, padTo128m} from "./commonLib";
 
 /**
  * Galois Counter Mode
@@ -227,15 +227,33 @@ export class GCM extends BlockCipherMode {
     return Y;
   }
   
-  public static mac(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){
+  /**
+   * Calculate Message Authentication Code with GCM
+   *
+   * @param {typeof BlockCipher} Cipher - 128 bit block Cipher i.e. AES
+   * @param {Word32Array} key - key
+   * @param {Word32Array} iv - iv should be 12byte length. i.e. `new Word32Array([0x11223344, 0x55667788, 0x99aabbcc], 12);`
+   * @param {Word32Array?} aad - Additional Authenticated Data
+   * @param {Word32Array?} cipherText - encrypted text
+   * @param {number?} tagLength - authTag size in octet length. If omitted, tagLength will be set to 16byte.
+   */
+  public static mac(
+    Cipher: typeof BlockCipher,
+    key: Word32Array,
+    iv: Word32Array,
+    aad?: Word32Array,
+    cipherText?: Word32Array,
+    tagLength?: number,
+  ){
     const cipher = new Cipher({key, iv});
     const H = [0,0,0,0];
     cipher.encryptBlock(H, 0);
     const J0 = GCM.getJ0(H, iv.words);
-    const A = authData?.clone() || new Word32Array();
+    const A = aad?.clone() || new Word32Array();
     const lenA = [0, A.nSigBytes*8];
     const C = cipherText?.clone() || new Word32Array();
     const lenC = [0, C.nSigBytes*8];
+    const lenT = tagLength || 16;
   
     // Pad
     padTo128m(A);
@@ -243,7 +261,8 @@ export class GCM extends BlockCipherMode {
   
     const s = A.words.concat(C.words).concat(lenA).concat(lenC);
     const S = GCM.GHASH(H, s);
-    return GCM.GCTR(cipher, J0, new Word32Array(S));
+    const MAC = GCM.GCTR(cipher, J0, new Word32Array(S));
+    return msb(MAC, lenT);
   }
   
   /**

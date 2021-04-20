@@ -1,4 +1,10 @@
 ## [1.0.0]
+### Added
+- Added [CCM block cipher mode (Counter mode/CBC-MAC)](https://github.com/Hinaser/jscrypto/blob/master/API.md#ccm)  
+  https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+- Added [CBC-MAC](https://github.com/Hinaser/jscrypto/blob/master/API.md#cbc-mac)
+- Added tag length option to [`GMAC`](https://github.com/Hinaser/jscrypto/blob/master/API.md#gmac) and [AES-GCM](https://github.com/Hinaser/jscrypto/blob/master/API.md#aes-gcm)
+
 ### Changed
 **Small breaking change**
 - Pass initializing vector as Word32Array to constructor of BlockCipherMode instead of just a 32bit number array.  
@@ -14,7 +20,7 @@
   ```
 
 **Breaking change**
-- Changed GMAC hash function name to `GCM.mac()` from `GCM.hash()`.
+- Changed GMAC hash function name from `GCM.hash()` to `GCM.mac()`.
 - Calculating authTag in GCM/CCM now requires developer to manually call authTag function.  
   Encryption/Decryption and MAC Generation are now calculated independently.
   ```js
@@ -30,11 +36,6 @@
   encrypted.authTag === undefined; // This returns true. authTag must be manually calculated as below.
   const authTag = GCM.mac(AES, key, iv, authData, encrypted.cipherText);
   ```
-
-### Added
-- Added CCM block cipher mode (Counter mode/CBC-MAC)  
-  https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf  
-- Added CBC-MAC
 
 ## [0.2.0] - 2021-04-07
 ### Added

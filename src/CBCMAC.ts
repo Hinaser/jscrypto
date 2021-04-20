@@ -10,18 +10,16 @@ export type CBCMACProps = {
 };
 
 export function CBCMAC(
-  plainText: Word32Array|string,
+  message: Word32Array|string,
   key: Word32Array|string,
   iv: Word32Array|null,
-  associatedData: Word32Array|string,
   props?: Partial<CBCMACProps>,
 ){
   const Cipher = (props && props.Cipher) ? props.Cipher : AES;
   const K = typeof key === "string" ? Utf8.parse(key) : key;
   const N = iv ? iv : new Word32Array([0, 0]);
-  const P = typeof plainText === "string" ? Utf8.parse(plainText) : plainText;
-  const A = typeof associatedData === "string" ? Utf8.parse(associatedData) : associatedData;
+  const A = typeof message === "string" ? Utf8.parse(message) : message;
   const t = props && props.tagLength || 16;
   
-  return CCM.mac(Cipher, K, N, A, P, t);
+  return CCM.mac(Cipher, K, N, A, undefined, t);
 }

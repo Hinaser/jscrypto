@@ -271,6 +271,13 @@ Default Cipher: `AES`.
 If you set `Nonce` below to falsy value like `null|undefined|0`, Nonce will be reset to `new Word32Array([0, 0], 8);` (64bit/8byte 0s).  
 In CBC-MAC, Nonce should always set to be 0s. So keep Nonce `undefined` unless you required to set a value to it.
 
+Please note that there are many implementations of CBC-MAC in the world. Some implementation says CBC-MAC is just
+the final processed block of CBC with iv=0.  
+So you need to take extra care what implementation is used if you are just told to "Go get Message-Authentication-Code with CBC-MAC".  
+For `jscrypto`, it implements `CBC-MAC` so that it satisfies [NIST 800-38C specification and its test vectors](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf).  
+
+For additional description, [please read this](#note-for-ccm-implementation).
+
 ```js
 var Plaintext = JsCrypto.Hex.parse("20212223");
 var Message = JsCrypto.Hex.parse("0001020304050607");
@@ -444,11 +451,11 @@ var A = JsCrypto.Hex.parse("0001020304050607"); // Associated Data
 var P = JsCrypto.Hex.parse("20212223"); // Payload/Plaintext
 var t = 32/8; // 4byte. tag length byte.
 
-// Test CBC-MAC
+// Generate CBC-MAC
 var cbcMac = JsCrypto.mode.CCM.mac(JsCrypto.AES, K, N, A, P, t);
 cbcMac.toString(); // "4dac255d"
 
-// Test encryption
+// Encryption
 var encrypted = JsCrypto.AES.encrypt(P, K, { iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding });
 encrypted.cipherText.toString(); // "7162015b"
 
@@ -457,7 +464,7 @@ encrypted.cipherText.toString(); // "7162015b"
 var nist80038cStyleCiphertext = JsCrypto.mode.CCM.combineCipherTextAndAuthTag(encrypted.cipherText, cbcMac);
 nist80038cStyleCiphertext.toString(); // "7162015b4dac255d"
 
-// Test decryption
+// Decryption
 // Assuming you receive nist 800-38c style ciphertext and N, A, P, t from encrypting entity.
 // K(key) should be pre-shared privately.
 var cipherTextAndAuthTag = JsCrypto.mode.CCM.splitCipherTextAndAuthTag(nist80038cStyleCiphertext, t);
@@ -469,6 +476,29 @@ var decrypted = JsCrypto.AES.decrypt(cp, K, {iv: N, mode: JsCrypto.mode.CCM, pad
 decrypted.toString() === P.toString(); // true
 authTag.toString() === cbcMac.toString(); // true
 ```
+
+<h5 id="note-for-ccm-implementation">Note for CCM implementation</h5>
+Since there are many CCM implementations out in the world, interoperability among those implementations can't be expected.  
+I can only say that CCM implementation of `jscrypto` follows NIST 800-38C style ciphertext.  
+However, since I put an emphasis on coherence on this library,
+jscrypto requires you to take additional steps to reproduce exact the same cipher output as NIST 800-38C style ciphertext.
+  - JsCrypto's CCM independently outputs ciphertext and authTag(mac).  
+    Each operation(encryption/generating mac) does not care opponent's internal state at all.
+  - If you want to generate NIST 800-38C style ciphertext, you need to take steps as below.
+    1. encrypt plain text
+    2. generate CBC-MAC
+    3. combine outputs from above operations.
+
+![](./docs/how-jscrypto-CCM-handles-ciphertext.png)
+
+<h5 id="reason-why-it-takes-extra-steps-in-ccm">The reason why it takes extra steps</h5>
+
+You may notice that in NIST 800-38C style ciphertext, sizes of input plaintext and output ciphertext does not match
+because 800-38C's ciphertext is followed by MAC of input data. So size of output ciphertext is size of plaintext plus size of MAC.
+
+In `jscrypto`, block cipher takes fixed size block and produces the same size block and repeats it
+until all blocks which compose of input plaintext are consumed.  Even CCM is not an exception. CCM takes fixed size block and produce the same size encrypted block.  
+So if you want NIST 800-38C style ciphertext, you need to combine encrypted plaintext and MAC.
 
 <h4 id="des">DES</h4>
 

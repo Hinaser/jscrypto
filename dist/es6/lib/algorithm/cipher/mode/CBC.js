@@ -10,7 +10,7 @@ export class CBC extends BlockCipherMode {
         const iv = this._iv;
         // Choose mixing block
         if (iv) {
-            block = iv;
+            block = iv.words;
             // Remove IV for subsequent blocks
             this._iv = undefined;
         }

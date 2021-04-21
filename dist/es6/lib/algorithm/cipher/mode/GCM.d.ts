@@ -8,8 +8,6 @@ export declare class GCM extends BlockCipherMode {
     protected _H: number[];
     protected _J0: number[];
     protected _CB: number[];
-    protected _A: Word32Array;
-    protected _lenA: number[];
     constructor(props: BlockCipherModeProps);
     /**
      * Initialize Initial Counter Block J0.
@@ -59,18 +57,16 @@ export declare class GCM extends BlockCipherMode {
      */
     static GCTR(cipher: BlockCipher, ICB: number[], X: Word32Array): Word32Array;
     /**
-     * Pad word array to multiple of 128bit(4byte)
-     * @param {Word32Array} w - Padding target. This w will be modified directly.
-     * @returns {void}
+     * Calculate Message Authentication Code with GCM
+     *
+     * @param {typeof BlockCipher} Cipher - 128 bit block Cipher i.e. AES
+     * @param {Word32Array} key - key
+     * @param {Word32Array} iv - iv should be 12byte length. i.e. `new Word32Array([0x11223344, 0x55667788, 0x99aabbcc], 12);`
+     * @param {Word32Array?} aad - Additional Authenticated Data
+     * @param {Word32Array?} cipherText - encrypted text
+     * @param {number?} tagLength - authTag size in octet length. If omitted, tagLength will be set to 16byte.
      */
-    static padTo128m(w: Word32Array): void;
-    static hash(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array): Word32Array;
-    /**
-     * Generate authentication tag for ciphertext with inner GCM parameters.
-     * @param {Word32Array} cipherText
-     * @returns {Word32Array}
-     */
-    generateAuthTag(cipherText: Word32Array): Word32Array;
+    static mac(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, aad?: Word32Array, cipherText?: Word32Array, tagLength?: number): Word32Array;
     /**
      * CTR encryptor.
      */

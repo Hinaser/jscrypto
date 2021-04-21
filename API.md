@@ -4,7 +4,7 @@
 ### *Popular*
 **Hash** [`MD5`][MD5], [`SHA1`][SHA1], [`SHA3`][SHA3], [`SHA224`][SHA224], [`SHA256`][SHA256], [`SHA384`][SHA384], [`SHA512`][SHA512], [`RIPEMD160`][RIPEMD160],  
 **Message/Key Hash** [`HMAC-MD5`][HMAC-MD5], [`HMAC-SHA224`][HMAC-SHA224], [`HMAC-SHA256`][HMAC-SHA256], [`HMAC-SHA384`][HMAC-SHA384], [`HMAC-SHA512`][HMAC-SHA512], [`GMAC`][GMAC], [`CBC-MAC`][CBC-MAC]  
-**Block Cipher** [`AES`][AES], [`AES-GCM`][AES-GCM], [`AES-CCM`][AES-CCM], [`DES`][DES], [`Triple-DES`][Triple-DES]
+**Block Cipher** [`AES`][AES], [`DES`][DES], [`Triple-DES`][Triple-DES]
 
 ### *Basic structure*
 **Word** [`Word32Array`][Word32Array], [`Word64Array`][Word64Array]  
@@ -389,120 +389,6 @@ decrypted.toString(JsCrypto.Utf8); // "message"
 
 When you supply encryption key as a string password, it automatically generates 256bit key for encryption. (AES-256).
 
-<h4 id="aes-gcm">AES-GCM</h4>
-
-[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.  
-For detailed specification, please read official NIST publication.  
-https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
-
-```js
-////////////////////////////////////////////////////////////////////////////////////////
-// Authenticated encryption by AES-GCM
-////////////////////////////////////////////////////////////////////////////////////////
-var key = JsCrypto.Hex.parse("0123456789ABCDEF11113333555577770123456789ABCDEF1111333355557777");
-var msg = JsCrypto.Hex.parse("00000000000000000000000000000000");
-var iv = JsCrypto.Hex.parse("000000000000000000000000"); // 96bit(12byte) iv is recommended.
-var authData = JsCrypto.Utf8.parse("some plain text data for authentication. This will not be encrypted.");
-
-var encryptedData = JsCrypto.AES.encrypt(msg, key, {iv, mode: JsCrypto.mode.GCM});
-
-// Encrypted message
-var cipherText = encryptedData.cipherText;
-// Authentication Tag
-// 16byte. Output tag length in byte. If you omit this option, default value 16 is used.
-var tagLength = 16; 
-var authTag = JsCrypto.mode.GCM.mac(JsCrypto.AES, key, iv, authData, cipherText, tagLength);
-
-// Base64 encoded encrypted data which can be safely shared in public.
-// DO NOT share original `encryptedData` itself without calling `toString()`.
-// Original encrypteData object contains key data, so if you share encryptedData variable in public,
-// it turns to be just a plain text.
-var encryptedPayload = encryptedData.toString();
-
-////////////////////////////////////////////////////////////////////////////////////////
-// Authenticated decryption by AES-GCM
-////////////////////////////////////////////////////////////////////////////////////////
-// Decrypting entity receives encryptedPayload, iv, authData. key should be share previously.
-var decryptedData = JsCrypto.AES.decrypt(encryptedPayload, key, {iv, mode: JsCrypto.mode.GCM});
-
-// Encrypt/Decrypt as usual
-decryptedData.toString() === msg.toString(); // true
-
-// Verify authentication code as well as HMAC
-var cipherText = JsCrypto.formatter.OpenSSLFormatter.parse(encryptedPayload).cipherText;
-// authTag, iv, authData, cipherText(encryptedPayload) may be shared in public.
-// key should be pre-shared in private.
-authTag.toString() === JsCrypto.mode.GCM.mac(JsCrypto.AES, key, iv, authData, cipherText).toString(); // true
-```
-
-<h4 id="aes-ccm">AES-CCM</h4>
-
-[CCM Mode](https://en.wikipedia.org/wiki/CCM_mode) for authenticated encryption.
-For detailed specification, please read official NIST publication.  
-https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
-
-```js
-// Example test vectors
-// See page 17 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
-// Klen=128bit, Tlen=32bit, Nlen=56bit, Alen=64bit, Plen=32bit
-var K = JsCrypto.Hex.parse("404142434445464748494a4b4c4d4e4f"); // key
-var N = JsCrypto.Hex.parse("10111213141516"); // Nonce/iv
-var A = JsCrypto.Hex.parse("0001020304050607"); // Associated Data
-var P = JsCrypto.Hex.parse("20212223"); // Payload/Plaintext
-var t = 32/8; // 4byte. tag length byte.
-
-// Generate CBC-MAC
-var cbcMac = JsCrypto.mode.CCM.mac(JsCrypto.AES, K, N, A, P, t);
-cbcMac.toString(); // "4dac255d"
-
-// Encryption
-var encrypted = JsCrypto.AES.encrypt(P, K, { iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding });
-encrypted.cipherText.toString(); // "7162015b"
-
-// Combine encrypted block and MAC to be compatible with cipher output at Steps 8 in chapter 6.1, NIST-800-38C.
-// See page 9 through page 10 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
-var nist80038cStyleCiphertext = JsCrypto.mode.CCM.combineCipherTextAndAuthTag(encrypted.cipherText, cbcMac);
-nist80038cStyleCiphertext.toString(); // "7162015b4dac255d"
-
-// Decryption
-// Assuming you receive nist 800-38c style ciphertext and N, A, P, t from encrypting entity.
-// K(key) should be pre-shared privately.
-var cipherTextAndAuthTag = JsCrypto.mode.CCM.splitCipherTextAndAuthTag(nist80038cStyleCiphertext, t);
-var cipherText = cipherTextAndAuthTag.cipherText;
-var authTag = cipherTextAndAuthTag.authTag;
-var cp = new JsCrypto.CipherParams({cipherText});
-// Finally decrypt here
-var decrypted = JsCrypto.AES.decrypt(cp, K, {iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding});
-decrypted.toString() === P.toString(); // true
-authTag.toString() === cbcMac.toString(); // true
-```
-
-<h5 id="note-for-ccm-implementation">Note for CCM implementation</h5>
-
-Since there are many CCM implementations out in the world, interoperability among those implementations can't be expected.  
-I can only say that CCM implementation of `jscrypto` follows NIST 800-38C style ciphertext.  
-
-However, since I put an emphasis on coherence on this library,
-jscrypto requires you to take additional steps to reproduce exact the same cipher output as NIST 800-38C style ciphertext.
-
-- JsCrypto's CCM independently outputs ciphertext and authTag(mac).  
-  Each operation(encryption/generating mac) does not care opponent's internal state at all.
-- If you want to generate NIST 800-38C style ciphertext, you need to take steps as below.  
-  1. encrypt plain text
-  2. generate CBC-MAC
-  3. combine outputs from above operations.
-
-![](./docs/how-jscrypto-CCM-handles-ciphertext.png)
-
-<h5 id="reason-why-it-takes-extra-steps-in-ccm">The reason why it takes extra steps</h5>
-
-You may notice that in NIST 800-38C style ciphertext, sizes of input plaintext and output ciphertext does not match
-because 800-38C's ciphertext is followed by MAC of input data. So size of output ciphertext is size of plaintext plus size of MAC.
-
-In `jscrypto`, block cipher takes fixed size block and produces the same size block and repeats it
-until all blocks which compose of input plaintext are consumed.  Even CCM is not an exception. CCM takes fixed size block and produce the same size encrypted block.  
-So if you want NIST 800-38C style ciphertext, you need to combine encrypted plaintext and MAC.
-
 <h4 id="des">DES</h4>
 
 
@@ -862,13 +748,124 @@ var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: GCM });
 decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
-<h4 id='ccm'>CCM</h4>
+<h4 id="gcm">GCM</h4>
 
-[CCM mode](https://en.wikipedia.org/wiki/CCM_mode) for authenticated encryption.
-CCM does not require encrypting data to be padded.  
+[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.  
+
+GCM does not require encrypting data to be padded.  
 Changing Block padding has no effect.
+
+For detailed specification, please read official NIST publication.  
+https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
+
 ```js
+////////////////////////////////////////////////////////////////////////////////////////
+// Authenticated encryption by AES-GCM
+////////////////////////////////////////////////////////////////////////////////////////
+var key = JsCrypto.Hex.parse("0123456789ABCDEF11113333555577770123456789ABCDEF1111333355557777");
+var msg = JsCrypto.Hex.parse("00000000000000000000000000000000");
+var iv = JsCrypto.Hex.parse("000000000000000000000000"); // 96bit(12byte) iv is recommended.
+var authData = JsCrypto.Utf8.parse("some plain text data for authentication. This will not be encrypted.");
+
+var encryptedData = JsCrypto.AES.encrypt(msg, key, {iv, mode: JsCrypto.mode.GCM});
+
+// Encrypted message
+var cipherText = encryptedData.cipherText;
+// Authentication Tag
+// 16byte. Output tag length in byte. If you omit this option, default value 16 is used.
+var tagLength = 16; 
+var authTag = JsCrypto.mode.GCM.mac(JsCrypto.AES, key, iv, authData, cipherText, tagLength);
+
+// Base64 encoded encrypted data which can be safely shared in public.
+// DO NOT share original `encryptedData` itself without calling `toString()`.
+// Original encrypteData object contains key data, so if you share encryptedData variable in public,
+// it turns to be just a plain text.
+var encryptedPayload = encryptedData.toString();
+
+////////////////////////////////////////////////////////////////////////////////////////
+// Authenticated decryption by AES-GCM
+////////////////////////////////////////////////////////////////////////////////////////
+// Decrypting entity receives encryptedPayload, iv, authData. key should be share previously.
+var decryptedData = JsCrypto.AES.decrypt(encryptedPayload, key, {iv, mode: JsCrypto.mode.GCM});
+
+// Encrypt/Decrypt as usual
+decryptedData.toString() === msg.toString(); // true
+
+// Verify authentication code as well as HMAC
+var cipherText = JsCrypto.formatter.OpenSSLFormatter.parse(encryptedPayload).cipherText;
+// authTag, iv, authData, cipherText(encryptedPayload) may be shared in public.
+// key should be pre-shared in private.
+authTag.toString() === JsCrypto.mode.GCM.mac(JsCrypto.AES, key, iv, authData, cipherText).toString(); // true
 ```
+
+<h4 id="ccm">CCM</h4>
+
+[CCM Mode](https://en.wikipedia.org/wiki/CCM_mode) for authenticated encryption.  
+
+For detailed specification, please read official NIST publication.  
+https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+
+```js
+// Example test vectors
+// See page 17 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+// Klen=128bit, Tlen=32bit, Nlen=56bit, Alen=64bit, Plen=32bit
+var K = JsCrypto.Hex.parse("404142434445464748494a4b4c4d4e4f"); // key
+var N = JsCrypto.Hex.parse("10111213141516"); // Nonce/iv
+var A = JsCrypto.Hex.parse("0001020304050607"); // Associated Data
+var P = JsCrypto.Hex.parse("20212223"); // Payload/Plaintext
+var t = 32/8; // 4byte. tag length byte.
+
+// Generate CBC-MAC
+var cbcMac = JsCrypto.mode.CCM.mac(JsCrypto.AES, K, N, A, P, t);
+cbcMac.toString(); // "4dac255d"
+
+// Encryption
+var encrypted = JsCrypto.AES.encrypt(P, K, { iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding });
+encrypted.cipherText.toString(); // "7162015b"
+
+// Combine encrypted block and MAC to be compatible with cipher output at Steps 8 in chapter 6.1, NIST-800-38C.
+// See page 9 through page 10 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+var nist80038cStyleCiphertext = JsCrypto.mode.CCM.combineCipherTextAndAuthTag(encrypted.cipherText, cbcMac);
+nist80038cStyleCiphertext.toString(); // "7162015b4dac255d"
+
+// Decryption
+// Assuming you receive nist 800-38c style ciphertext and N, A, P, t from encrypting entity.
+// K(key) should be pre-shared privately.
+var cipherTextAndAuthTag = JsCrypto.mode.CCM.splitCipherTextAndAuthTag(nist80038cStyleCiphertext, t);
+var cipherText = cipherTextAndAuthTag.cipherText;
+var authTag = cipherTextAndAuthTag.authTag;
+var cp = new JsCrypto.CipherParams({cipherText});
+// Finally decrypt here
+var decrypted = JsCrypto.AES.decrypt(cp, K, {iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding});
+decrypted.toString() === P.toString(); // true
+authTag.toString() === cbcMac.toString(); // true
+```
+
+<h5 id="note-for-ccm-implementation">Note for CCM implementation</h5>
+
+Since there are many CCM implementations out in the world, interoperability among those implementations can't be expected.  
+I can only say that CCM implementation of `jscrypto` follows NIST 800-38C style ciphertext.
+
+However, since I put an emphasis on coherence on this library,
+jscrypto requires you to take additional steps to reproduce exact the same cipher output as NIST 800-38C style ciphertext.
+
+- JsCrypto's CCM independently outputs ciphertext and authTag(mac).  
+  Each operation(encryption/generating mac) does not care opponent's internal state at all.
+- If you want to generate NIST 800-38C style ciphertext, you need to take steps as below.
+  1. encrypt plain text
+  2. generate CBC-MAC
+  3. combine outputs from above operations.
+
+![](./docs/how-jscrypto-CCM-handles-ciphertext.png)
+
+<h5 id="reason-why-it-takes-extra-steps-in-ccm">The reason why it takes extra steps</h5>
+
+You may notice that in NIST 800-38C style ciphertext, sizes of input plaintext and output ciphertext does not match
+because 800-38C's ciphertext is followed by MAC of input data. So size of output ciphertext is size of plaintext plus size of MAC.
+
+In `jscrypto`, block cipher takes fixed size block and produces the same size block and repeats it
+until all blocks which compose of input plaintext are consumed.  Even CCM is not an exception. CCM takes fixed size block and produce the same size encrypted block.  
+So if you want NIST 800-38C style ciphertext, you need to combine encrypted plaintext and MAC.
 
 ### Block Padding
 <h4 id='ansix923'>AnsiX923</h4>
@@ -1058,8 +1055,6 @@ echo "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=" | openssl enc -d -aes-256-cb
 [GMAC]: #gmac
 [CBC-MAC]: #cbc-mac
 [AES]: #aes
-[AES-GCM]: #aes-gcm
-[AES-CCM]: #aes-ccm
 [DES]: #des
 [Triple-DES]: #des3
 [Word32Array]: #word32array

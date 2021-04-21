@@ -13,7 +13,7 @@ export class CFB extends BlockCipherMode {
         const iv = this._iv;
         // Generate keyStream
         if (iv) {
-            keyStream = iv.slice(0);
+            keyStream = iv.words.slice(0);
             // Remove IV for subsequent blocks
             this._iv = undefined;
         }

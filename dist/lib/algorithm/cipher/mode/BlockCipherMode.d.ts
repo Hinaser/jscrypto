@@ -2,7 +2,7 @@ import type { BlockCipher } from "../BlockCipher";
 import type { Word32Array } from "../../../Word32Array";
 export interface BlockCipherModeProps {
     cipher: BlockCipher;
-    iv: number[] | undefined;
+    iv: Word32Array | undefined;
 }
 /**
  * Abstract base block cipher mode template.
@@ -11,16 +11,12 @@ export interface BlockCipherModeProps {
 export declare class BlockCipherMode {
     protected _props: BlockCipherModeProps;
     protected _cipher: BlockCipher;
-    protected _iv?: number[];
+    protected _iv?: Word32Array;
     constructor(props: BlockCipherModeProps);
     /**
      * @abstract
      */
     processBlock(words: number[], offset: number): void;
-    /**
-     * @abstract
-     */
-    generateAuthTag(cipherText: Word32Array): Word32Array | undefined;
     /**
      * Creates this mode for encryption.
      * @param {BlockCipherModeProps} props

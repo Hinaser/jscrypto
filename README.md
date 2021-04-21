@@ -186,7 +186,7 @@ Check your `tsconfig.js` to be:
 ### *Popular*
 **Hash** [`MD5`][MD5], [`SHA1`][SHA1], [`SHA3`][SHA3], [`SHA224`][SHA224], [`SHA256`][SHA256], [`SHA384`][SHA384], [`SHA512`][SHA512], [`RIPEMD160`][RIPEMD160],  
 **Message/Key Hash** [`HMAC-MD5`][HMAC-MD5], [`HMAC-SHA224`][HMAC-SHA224], [`HMAC-SHA256`][HMAC-SHA256], [`HMAC-SHA384`][HMAC-SHA384], [`HMAC-SHA512`][HMAC-SHA512], [`GMAC`][GMAC], [`CBC-MAC`][CBC-MAC]  
-**Block Cipher** [`AES`][AES], [`AES-GCM`][AES-GCM], [`DES`][DES], [`Triple-DES`][Triple-DES]
+**Block Cipher** [`AES`][AES], [`DES`][DES], [`Triple-DES`][Triple-DES]
 
 ### *Basic structure*
 **Word** [`Word32Array`][Word32Array], [`Word64Array`][Word64Array]  

@@ -269,7 +269,6 @@ authTagWord.toString(JsCrypto.Base64); // "RMlV1jeZQoU="
 
 Default Cipher: `AES`.  
 If you set `Nonce` below to falsy value like `null|undefined|0`, Nonce will be reset to `new Word32Array([0, 0], 8);` (64bit/8byte 0s).  
-In CBC-MAC, Nonce should always set to be 0s. So keep Nonce `undefined` unless you required to set a value to it.
 
 Please note that there are many implementations of CBC-MAC in the world. Some implementation says CBC-MAC is just
 the final processed block of CBC with iv=0.  

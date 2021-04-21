@@ -805,11 +805,12 @@ cbcMac.toString(); // "4dac255d"
 
 // Encryption
 var encrypted = JsCrypto.AES.encrypt(P, K, { iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding });
-encrypted.cipherText.toString(); // "7162015b"
+var cipherText = encrypted.cipherText;
+cipherText.toString(); // "7162015b"
 
 // Combine encrypted block and MAC to be compatible with cipher output at Steps 8 in chapter 6.1, NIST-800-38C.
 // See page 9 through page 10 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
-var nist80038cStyleCiphertext = JsCrypto.mode.CCM.combineCipherTextAndAuthTag(encrypted.cipherText, cbcMac);
+var nist80038cStyleCiphertext = JsCrypto.mode.CCM.combineCipherTextAndAuthTag(cipherText, cbcMac);
 nist80038cStyleCiphertext.toString(); // "7162015b4dac255d"
 
 // Decryption
@@ -845,10 +846,11 @@ jscrypto requires you to take additional steps to reproduce exact the same ciphe
 <h5 id="reason-why-it-takes-extra-steps-in-ccm">The reason why it takes extra steps</h5>
 
 You may notice that in NIST 800-38C style ciphertext, sizes of input plaintext and output ciphertext does not match
-because 800-38C's ciphertext is followed by MAC of input data. So size of output ciphertext is size of plaintext plus size of MAC.
+because 800-38C's ciphertext is followed by MAC of input data(a.k.a. authTag). So size of output ciphertext is size of plaintext plus size of MAC(authTag).
 
 In `jscrypto`, block cipher takes fixed size block and produces the same size block and repeats it
-until all blocks which compose of input plaintext are consumed.  Even CCM is not an exception. CCM takes fixed size block and produce the same size encrypted block.  
+until all blocks which compose of input plaintext are consumed.  
+Even CCM is not an exception. CCM takes fixed size block and produce the same size encrypted block.  
 So if you want NIST 800-38C style ciphertext, you need to combine encrypted plaintext and MAC.
 
 ### Block Padding

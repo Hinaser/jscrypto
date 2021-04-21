@@ -9,6 +9,7 @@ exports.mainEntry = () => {
     index: "./src/index.ts",
     Word32Array: "./src/Word32Array.ts",
     Word64Array: "./src/Word64Array.ts",
+    CipherParams: "./src/CipherParams.ts",
     SHA1: "./src/SHA1.ts",
     SHA224: "./src/SHA224.ts",
     SHA256: "./src/SHA256.ts",
@@ -17,6 +18,7 @@ exports.mainEntry = () => {
     SHA3: "./src/SHA3.ts",
     MD5: "./src/MD5.ts",
     GMAC: "./src/GMAC.ts",
+    CBCMAC: "./src/CBCMAC.ts",
     Hmac: "./src/Hmac.ts",
     HmacSHA1: "./src/HmacSHA1.ts",
     HmacSHA224: "./src/HmacSHA224.ts",
@@ -60,6 +62,7 @@ exports.modeModuleEntry = () => {
     ECB: "./src/mode/ECB.ts",
     OFB: "./src/mode/OFB.ts",
     GCM: "./src/mode/GCM.ts",
+    CCM: "./src/mode/CCM.ts",
   };
 };
 

@@ -70,8 +70,6 @@ export const SerializableCipher: ISerializableCipher<Word32Array> = {
       mode: (encryptor as BlockCipher).mode,
       padding: (encryptor as BlockCipher).padding,
       blockSize: encryptor.blockSize,
-      authData: (encryptor as BlockCipher).authData,
-      authTag: (encryptor as BlockCipher).authTag,
       formatter: props?.formatter || OpenSSLFormatter,
     });
   },

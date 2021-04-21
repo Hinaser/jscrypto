@@ -1,6 +1,7 @@
 import {BlockCipherMode, BlockCipherModeProps} from "./BlockCipherMode";
 import {Word32Array} from "../../../Word32Array";
 import type {BlockCipher} from "../BlockCipher";
+import {msb, padTo128m} from "./commonLib";
 
 /**
  * Galois Counter Mode
@@ -9,8 +10,6 @@ export class GCM extends BlockCipherMode {
   protected _H: number[] = [];
   protected _J0: number[] = [];
   protected _CB: number[] = []; // Counter Block
-  protected _A: Word32Array;
-  protected _lenA: number[];
   
   public constructor(props: BlockCipherModeProps) {
     super(props);
@@ -25,16 +24,8 @@ export class GCM extends BlockCipherMode {
     this._H = H;
   
     // iv should be array of 32bit int
-    this._J0 = GCM.getJ0(H, iv);
+    this._J0 = GCM.getJ0(H, iv?.words);
     this._CB = this._J0.slice();
-  
-    const A = cipher.authData?.clone() || new Word32Array();
-    const lenA = [0, A.nSigBytes*8];
-    // Pad AuthData
-    GCM.padTo128m(A);
-    
-    this._A = A;
-    this._lenA = lenA;
   }
   
   /**
@@ -201,10 +192,10 @@ export class GCM extends BlockCipherMode {
       const remainderOf16Bytes = X.nSigBytes % 16;
       
       if(i < n-1 || /* i === n-1 && */ remainderOf16Bytes === 0){
-        const Yi0 = words[i] ^ CB[i][0];
-        const Yi1 = words[i+1] ^ CB[i][1];
-        const Yi2 = words[i+2] ^ CB[i][2];
-        const Yi3 = words[i+3] ^ CB[i][3];
+        const Yi0 = words[i*4] ^ CB[i][0];
+        const Yi1 = words[i*4+1] ^ CB[i][1];
+        const Yi2 = words[i*4+2] ^ CB[i][2];
+        const Yi3 = words[i*4+3] ^ CB[i][3];
         const Yi = new Word32Array([Yi0, Yi1, Yi2, Yi3]);
         Y.concat(Yi);
         continue;
@@ -215,14 +206,14 @@ export class GCM extends BlockCipherMode {
       let nSigBytes = 0;
       const nMaxAligned = Math.floor(remainderOf16Bytes/4);
       for(let k=0;k<nMaxAligned;k++){
-        const Ynk = words[i+k] ^ CB[i][k];
+        const Ynk = words[i*4+k] ^ CB[i][k];
         w.push(Ynk);
         nSigBytes += 4;
       }
       
       const remaining0to3Bytes = remainderOf16Bytes % 4;
       if(remaining0to3Bytes > 0){
-        const Ynr = (words[i+nMaxAligned] << (32-8*remaining0to3Bytes)) ^ CB[i][nMaxAligned];
+        const Ynr = (words[i*4+nMaxAligned] << (32-8*remaining0to3Bytes)) ^ CB[i][nMaxAligned];
         w.push(Ynr);
         nSigBytes += remaining0to3Bytes;
       }
@@ -237,66 +228,41 @@ export class GCM extends BlockCipherMode {
   }
   
   /**
-   * Pad word array to multiple of 128bit(4byte)
-   * @param {Word32Array} w - Padding target. This w will be modified directly.
-   * @returns {void}
+   * Calculate Message Authentication Code with GCM
+   *
+   * @param {typeof BlockCipher} Cipher - 128 bit block Cipher i.e. AES
+   * @param {Word32Array} key - key
+   * @param {Word32Array} iv - iv should be 12byte length. i.e. `new Word32Array([0x11223344, 0x55667788, 0x99aabbcc], 12);`
+   * @param {Word32Array?} aad - Additional Authenticated Data
+   * @param {Word32Array?} cipherText - encrypted text
+   * @param {number?} tagLength - authTag size in octet length. If omitted, tagLength will be set to 16byte.
    */
-  public static padTo128m(w: Word32Array){
-    const remainder = w.nSigBytes % 16;
-    if(remainder === 0){
-      return;
-    }
-    const nPaddingBytes = 16 - remainder;
-    
-    // Pad Ciphertext
-    const pad = [];
-    for(let i=0;i<Math.floor(nPaddingBytes/4);i++){
-      pad.push(0);
-    }
-    if(nPaddingBytes % 4 > 0){
-      pad.push(0);
-    }
-    w.concat(new Word32Array(pad, nPaddingBytes));
-  }
-  
-  public static hash(Cipher: typeof BlockCipher, key: Word32Array, iv: Word32Array, authData?: Word32Array, cipherText?: Word32Array){
+  public static mac(
+    Cipher: typeof BlockCipher,
+    key: Word32Array,
+    iv: Word32Array,
+    aad?: Word32Array,
+    cipherText?: Word32Array,
+    tagLength?: number,
+  ){
     const cipher = new Cipher({key, iv});
     const H = [0,0,0,0];
     cipher.encryptBlock(H, 0);
     const J0 = GCM.getJ0(H, iv.words);
-    const A = authData?.clone() || new Word32Array();
+    const A = aad?.clone() || new Word32Array();
     const lenA = [0, A.nSigBytes*8];
     const C = cipherText?.clone() || new Word32Array();
     const lenC = [0, C.nSigBytes*8];
+    const lenT = tagLength || 16;
   
     // Pad
-    GCM.padTo128m(A);
-    GCM.padTo128m(C);
+    padTo128m(A);
+    padTo128m(C);
   
     const s = A.words.concat(C.words).concat(lenA).concat(lenC);
     const S = GCM.GHASH(H, s);
-    return GCM.GCTR(cipher, J0, new Word32Array(S));
-  }
-  
-  /**
-   * Generate authentication tag for ciphertext with inner GCM parameters.
-   * @param {Word32Array} cipherText
-   * @returns {Word32Array}
-   */
-  public generateAuthTag(cipherText: Word32Array){
-    const cipher = this._cipher;
-    const H = this._H;
-    const J0 = this._J0;
-    const A = this._A;
-    const lenA = this._lenA;
-    const C = cipherText.clone();
-    const lenC = [0, C.nSigBytes*8];
-    
-    GCM.padTo128m(C);
-  
-    const s = A.words.concat(C.words).concat(lenA).concat(lenC);
-    const S = GCM.GHASH(H, s);
-    return GCM.GCTR(cipher, J0, new Word32Array(S));
+    const MAC = GCM.GCTR(cipher, J0, new Word32Array(S));
+    return msb(MAC, lenT);
   }
   
   /**

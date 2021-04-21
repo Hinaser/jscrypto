@@ -1,3 +1,43 @@
+## [1.0.0] - 2021-04-22
+### Added
+- Added [CCM block cipher mode (Counter mode/CBC-MAC)](https://github.com/Hinaser/jscrypto/blob/master/API.md#ccm)  
+  https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+- Added [CBC-MAC](https://github.com/Hinaser/jscrypto/blob/master/API.md#cbc-mac)
+- Added tag length option to [GMAC](https://github.com/Hinaser/jscrypto/blob/master/API.md#gmac) and [GCM](https://github.com/Hinaser/jscrypto/blob/master/API.md#gcm)
+- Exposed `CipherParams` class to public.
+
+### Changed
+**Small breaking change**
+- Pass initializing vector as Word32Array to constructor of BlockCipherMode instead of just a 32bit number array.  
+  \*This may enable developers to use non-32bit-aligned iv value to block cipher mode in future release.  
+  \*This change may not be breaking lib compatibility unless developers directly instantiate BlockCipherMode or  
+    creating original BlockCipherMode extending old BlockCipherMode class.
+  ```js
+  // BEFORE
+  const gcm = new GCM({cipher: AES, iv: [0x11223344]});
+  
+  // AFTER
+  const gcm = new GCM({cipher: AES, iv: new Word32Array([0x11223344], 4)});
+  ```
+
+**Breaking change**
+- Changed GMAC hash function name from `GCM.hash()` to `GCM.mac()`.
+- Calculating authTag in GCM now requires developer to manually call authTag function.  
+  Encryption/Decryption and MAC Generation are now calculated independently.
+  ```js
+  //////////////////////
+  // AES-GCM
+  //////////////////////
+  // BEFORE
+  const encrypted = AES.encrypt(msg, key, { iv, mode: GCM, padding: NoPadding, authData });
+  encrypted.authTag !== undefined; // This returns true. authTag is automatically calculated on encryption.
+
+  // AFTER
+  const encrypted = AES.encrypt(msg, key, { iv, mode: GCM, padding: NoPadding, authData });
+  encrypted.authTag === undefined; // This returns true. authTag must be manually calculated as below.
+  const authTag = GCM.mac(AES, key, iv, authData, encrypted.cipherText);
+  ```
+
 ## [0.2.0] - 2021-04-07
 ### Added
 - Added GCM block cipher mode. (Galois Counter Mode)
@@ -46,6 +86,7 @@
 Initial release.
 
 <!-- [Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0 -->
+[1.0.0]: https://github.com/Hinaser/jscrypto/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Hinaser/jscrypto/compare/v0.0.2...v0.1.0
 [0.0.2]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.2

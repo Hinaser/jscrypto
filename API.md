@@ -2,20 +2,20 @@
 `jscrypto` supports crypto modules as well as `cryptojs`.
 
 ### *Popular*
-**Hash** [`MD5`](#md5), [`SHA1`](#sha1), [`SHA3`](#sha3), [`SHA224`](#sha224), [`SHA256`](#sha256), [`SHA384`](#sha384), [`SHA512`](#sha512), [`RIPEMD160`](#ripemd160),  
-**Message/Key Hash** [`HMAC-MD5`](#hmac-md5), [`HMAC-SHA224`](#hmac-sha224), [`HMAC-SHA256`](#hmac-sha256), [`HMAC-SHA384`](#hmac-sha384), [`HMAC-SHA512`](#hmac-sha512)  
-**Block Cipher** [`AES`](#aes), [`DES`](#des), [`DES3`](#des3)
+**Hash** [`MD5`][MD5], [`SHA1`][SHA1], [`SHA3`][SHA3], [`SHA224`][SHA224], [`SHA256`][SHA256], [`SHA384`][SHA384], [`SHA512`][SHA512], [`RIPEMD160`][RIPEMD160],  
+**Message/Key Hash** [`HMAC-MD5`][HMAC-MD5], [`HMAC-SHA224`][HMAC-SHA224], [`HMAC-SHA256`][HMAC-SHA256], [`HMAC-SHA384`][HMAC-SHA384], [`HMAC-SHA512`][HMAC-SHA512], [`GMAC`][GMAC], [`CBC-MAC`][CBC-MAC]  
+**Block Cipher** [`AES`][AES], [`DES`][DES], [`Triple-DES`][Triple-DES]
 
 ### *Basic structure*
-**Word** [`Word32Array`](#word32array), [`Word64Array`](#word64array)  
-**Encoder** [`Base64`](#base64), [`Hex`](#hex), [`Latin1`](#latin1), [`Utf8`](#utf8), [`Utf16`](#utf16)
+**Word** [`Word32Array`][Word32Array], [`Word64Array`][Word64Array]  
+**Encoder** [`Base64`][Base64], [`Hex`][Hex], [`Latin1`][Latin1], [`Utf8`][Utf8], [`Utf16`][Utf16]
 
 ### *Misc*
-**Stream Cipher** [`Rabbits`](API.md#rabbits), [`RC4`](API.md#rC4), [`RC4Drop`](API.md#rC4Drop)  
-**Key Derivation Function** [`OpenSSLKDF`](API.md#openSSLKDF), [`EvpKDF`](API.md#evpKDF), [`PBKDF2`](API.md#pBKDF2)  
-**Block Cipher mode** [`CBC`](API.md#cBC), [`CFB`](API.md#cFB), [`CTR`](API.md#cTR), [`ECB`](API.md#eCB), [`OFB`](API.md#oFB)  
-**Block Padding** [`AnsiX923`](API.md#ansiX923), [`ISO10126`](API.md#iSO10126), [`ISO97971`](API.md#iSO97971), [`NoPadding`](API.md#nopadding), [`Pkcs7`](API.md#pkcs7), [`Zero`](API.md#zero)  
-**Formatter** [`OpenSSLFormatter`](API.md#openSSLFormatter)
+**Stream Cipher** [`Rabbits`][Rabbits], [`RC4`][RC4], [`RC4Drop`][RC4Drop]  
+**Key Derive Function** [`OpenSSLKDF`][OpenSSLKDF], [`EvpKDF`][EvpKDF], [`PBKDF2`][PBKDF2]  
+**Block Cipher mode** [`CBC`][CBC], [`CFB`][CFB], [`CTR`][CTR], [`ECB`][ECB], [`OFB`][OFB], [`GCM`][GCM], [`CCM`][CCM]  
+**Block Padding** [`AnsiX923`][AnsiX923], [`ISO10126`][ISO10126], [`ISO97971`][ISO97971], [`NoPadding`][NoPadding], [`Pkcs7`][Pkcs7], [`Zero`][Zero]  
+**Formatter** [`OpenSSLFormatter`][OpenSSLFormatter]
 
 ---
 
@@ -158,7 +158,7 @@ hashedWord.toString(JsCrypto.Base64); // "jrII9+BdmHqbBEqOmMawh/FaC/w="
 
 ### Message/Key Hash
 #### General
-HMAC can be generated like below.
+HMAC function can be generated from hash function as below.
 ```js
 var hmacMD5 = new JsCrypto.Hmac(new JsCrypto.MD5(), "key");
 var words = hmacMD5.finalize("message");
@@ -258,10 +258,35 @@ If you do not supply `iv` to GMAC, `iv` is initialized to 0^128. (128bit 0s)
 var message = JsCrypto.Hex.parse("1063509E5A672C092CAD0B1DC6CE009A61AAAAAAAAAAAA");
 var key = JsCrypto.Hex.parse("55804F3AEB4E914DC91255944A1F565A");
 var iv = JsCrypto.Hex.parse("BBBBBBBBBBBBBBBBBBBBBBBB"); // 96bit(12byte) iv is recommended.
+var tagLength = 8; // 8byte. Optional. If omitted, tagLength will be set to 16(byte).
 
-var authTagWord = JsCrypto.GMAC(message, key, iv);
-authTagWord.toString(); // 44c955d63799428524e979936bedba96
-authTagWord.toString(JsCrypto.Base64); // "RMlV1jeZQoUk6XmTa+26lg=="
+var authTagWord = JsCrypto.GMAC(message, key, iv, tagLength);
+authTagWord.toString(); // 44c955d637994285
+authTagWord.toString(JsCrypto.Base64); // "RMlV1jeZQoU="
+```
+
+<h4 id='cbc-mac'>CBC-MAC</h4>
+
+Default Cipher: `AES`.  
+If you set `Nonce` below to falsy value like `null|undefined|0`, Nonce will be reset to `new Word32Array([0, 0], 8);` (64bit/8byte 0s).  
+In CBC-MAC, Nonce should always set to be 0s. So keep Nonce `undefined` unless you required to set a value to it.
+
+Please note that there are many implementations of CBC-MAC in the world. Some implementation says CBC-MAC is just
+the final processed block of CBC with iv=0.  
+So you need to take extra care what implementation is used if you are just told to "Go get Message-Authentication-Code with CBC-MAC".  
+For `jscrypto`, it implements `CBC-MAC` so that it satisfies [NIST 800-38C specification and its test vectors](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf).  
+
+For additional description, [please read this](#note-for-ccm-implementation).
+
+```js
+var Plaintext = JsCrypto.Hex.parse("20212223");
+var Message = JsCrypto.Hex.parse("0001020304050607");
+var Key = JsCrypto.Hex.parse("404142434445464748494a4b4c4d4e4f");
+var Nonce = undefined; // Nonce/iv shouldn't be used. Always set to be `undefined` or `new Word32Array([0,0], 8)`
+var tagLength = 32/8; // 32bit = 4byte
+
+var authTagWord = JsCrypto.CBCMAC(Plaintext, Message, Key, Nonce, tagLength);
+authTagWord.toString(); // "9bd4029e"
 ```
 
 ### Block Cipher
@@ -363,34 +388,6 @@ decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
 When you supply encryption key as a string password, it automatically generates 256bit key for encryption. (AES-256).
-
-<h4 id="aes-gcm">AES-GCM</h4>
-
-[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.
-
-```js
-////////////////////////////////////////////////////////////////////////////////////////
-// Authenticated encryption by AES-GCM
-////////////////////////////////////////////////////////////////////////////////////////
-var key = JsCrypto.Hex.parse("0123456789ABCDEF11113333555577770123456789ABCDEF1111333355557777");
-var msg = JsCrypto.Hex.parse("00000000000000000000000000000000");
-var iv = JsCrypto.Hex.parse("000000000000000000000000"); // 96bit(12byte) iv is recommended.
-var authData = JsCrypto.Utf8.parse("some plain text data for authentication. This will not be encrypted.");
-
-var encryptedData = JsCrypto.AES.encrypt(msg, key, { iv, mode: JsCrypto.mode.GCM, authData });
-
-// Encrypted message
-var cipherText = encryptedData.cipherText;
-// Authentication Tag
-var authTag = encryptedData.authTag;
-
-var decryptedData = JsCrypto.AES.decrypt(encryptedData, key, { iv, mode: JsCrypto.mode.GCM, authData });
-
-// Encrypt/Decrypt as usual
-decryptedData.toString() === msg.toString(); // true
-// Verify authentication code as well as HMAC
-authTag.toString() === JsCrypto.mode.GCM.hash(JsCrypto.AES, key, iv, authData, encryptedData.cipherText).toString(); // true
-```
 
 <h4 id="des">DES</h4>
 
@@ -735,21 +732,126 @@ var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: OFB, paddin
 decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
-<h4 id='gcm'>GCM</h4>
+<h4 id="gcm">GCM</h4>
 
-[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.
+[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.  
+
 GCM does not require encrypting data to be padded.  
 Changing Block padding has no effect.
-```js
-var message = JsCrypto.Utf8.parse("message"); // 7bytes.
-var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
-var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0], 3); // Recommended 96bit/12byte iv
 
-var GCM = JsCrypto.mode.GCM;
-var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: GCM });
-var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: GCM });
-decrypted.toString(JsCrypto.Utf8); // "message"
+For detailed specification, please read official NIST publication.  
+https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
+
+```js
+////////////////////////////////////////////////////////////////////////////////////////
+// Authenticated encryption by AES-GCM
+////////////////////////////////////////////////////////////////////////////////////////
+var key = JsCrypto.Hex.parse("0123456789ABCDEF11113333555577770123456789ABCDEF1111333355557777");
+var msg = JsCrypto.Hex.parse("00000000000000000000000000000000");
+var iv = JsCrypto.Hex.parse("000000000000000000000000"); // 96bit(12byte) iv is recommended.
+var authData = JsCrypto.Utf8.parse("some plain text data for authentication. This will not be encrypted.");
+
+var encryptedData = JsCrypto.AES.encrypt(msg, key, {iv, mode: JsCrypto.mode.GCM});
+
+// Encrypted message
+var cipherText = encryptedData.cipherText;
+// Authentication Tag
+// 16byte. Output tag length in byte. If you omit this option, default value 16 is used.
+var tagLength = 16; 
+var authTag = JsCrypto.mode.GCM.mac(JsCrypto.AES, key, iv, authData, cipherText, tagLength);
+
+// Base64 encoded encrypted data which can be safely shared in public.
+// DO NOT share original `encryptedData` itself without calling `toString()`.
+// Original encrypteData object contains key data, so if you share encryptedData variable in public,
+// it turns to be just a plain text.
+var encryptedPayload = encryptedData.toString();
+
+////////////////////////////////////////////////////////////////////////////////////////
+// Authenticated decryption by AES-GCM
+////////////////////////////////////////////////////////////////////////////////////////
+// Decrypting entity receives encryptedPayload, iv, authData. key should be share previously.
+var decryptedData = JsCrypto.AES.decrypt(encryptedPayload, key, {iv, mode: JsCrypto.mode.GCM});
+
+// Encrypt/Decrypt as usual
+decryptedData.toString() === msg.toString(); // true
+
+// Verify authentication code as well as HMAC
+var cipherText = JsCrypto.formatter.OpenSSLFormatter.parse(encryptedPayload).cipherText;
+// authTag, iv, authData, cipherText(encryptedPayload) may be shared in public.
+// key should be pre-shared in private.
+authTag.toString() === JsCrypto.mode.GCM.mac(JsCrypto.AES, key, iv, authData, cipherText).toString(); // true
 ```
+
+<h4 id="ccm">CCM</h4>
+
+[CCM Mode](https://en.wikipedia.org/wiki/CCM_mode) for authenticated encryption.  
+
+For detailed specification, please read official NIST publication.  
+https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+
+```js
+// Example test vectors
+// See page 17 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+// Klen=128bit, Tlen=32bit, Nlen=56bit, Alen=64bit, Plen=32bit
+var K = JsCrypto.Hex.parse("404142434445464748494a4b4c4d4e4f"); // key
+var N = JsCrypto.Hex.parse("10111213141516"); // Nonce/iv
+var A = JsCrypto.Hex.parse("0001020304050607"); // Associated Data
+var P = JsCrypto.Hex.parse("20212223"); // Payload/Plaintext
+var t = 32/8; // 4byte. tag length byte.
+
+// Generate CBC-MAC
+var cbcMac = JsCrypto.mode.CCM.mac(JsCrypto.AES, K, N, A, P, t);
+cbcMac.toString(); // "4dac255d"
+
+// Encryption
+var encrypted = JsCrypto.AES.encrypt(P, K, { iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding });
+var cipherText = encrypted.cipherText;
+cipherText.toString(); // "7162015b"
+
+// Combine encrypted block and MAC to be compatible with cipher output at Steps 8 in chapter 6.1, NIST-800-38C.
+// See page 9 through page 10 at https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+var nist80038cStyleCiphertext = JsCrypto.mode.CCM.combineCipherTextAndAuthTag(cipherText, cbcMac);
+nist80038cStyleCiphertext.toString(); // "7162015b4dac255d"
+
+// Decryption
+// Assuming you receive nist 800-38c style ciphertext and N, A, P, t from encrypting entity.
+// K(key) should be pre-shared privately.
+var cipherTextAndAuthTag = JsCrypto.mode.CCM.splitCipherTextAndAuthTag(nist80038cStyleCiphertext, t);
+var cipherText = cipherTextAndAuthTag.cipherText;
+var authTag = cipherTextAndAuthTag.authTag;
+var cp = new JsCrypto.CipherParams({cipherText});
+// Finally decrypt here
+var decrypted = JsCrypto.AES.decrypt(cp, K, {iv: N, mode: JsCrypto.mode.CCM, padding: JsCrypto.pad.NoPadding});
+decrypted.toString() === P.toString(); // true
+authTag.toString() === cbcMac.toString(); // true
+```
+
+<h5 id="note-for-ccm-implementation">Note for CCM implementation</h5>
+
+Since there are many CCM implementations out in the world, interoperability among those implementations can't be expected.  
+I can only say that CCM implementation of `jscrypto` follows NIST 800-38C style ciphertext.
+
+However, since I put an emphasis on coherence on this library,
+jscrypto requires you to take additional steps to reproduce exact the same cipher output as NIST 800-38C style ciphertext.
+
+- JsCrypto's CCM independently outputs ciphertext and authTag(mac).  
+  Each operation(encryption/generating mac) does not care opponent's internal state at all.
+- If you want to generate NIST 800-38C style ciphertext, you need to take steps as below.
+  1. encrypt plain text
+  2. generate CBC-MAC
+  3. combine outputs from above operations.
+
+![](./docs/how-jscrypto-CCM-handles-ciphertext.png)
+
+<h5 id="reason-why-it-takes-extra-steps-in-ccm">The reason why it takes extra steps</h5>
+
+You may notice that in NIST 800-38C style ciphertext, sizes of input plaintext and output ciphertext does not match
+because 800-38C's ciphertext is followed by MAC of input data(a.k.a. authTag). So size of output ciphertext is size of plaintext plus size of MAC(authTag).
+
+In `jscrypto`, block cipher takes fixed size block and produces the same size block and repeats it
+until all blocks which compose of input plaintext are consumed.  
+Even CCM is not an exception. CCM takes fixed size block and produce the same size encrypted block.  
+So if you want NIST 800-38C style ciphertext, you need to combine encrypted plaintext and MAC.
 
 ### Block Padding
 <h4 id='ansix923'>AnsiX923</h4>
@@ -922,3 +1024,49 @@ In OpenSSL
 echo "U2FsdGVkX1/a7+JWXjxGgCXR5T2J97jwBZAKtZNXZI4=" | openssl enc -d -aes-256-cbc -pass pass:password -base64 -pbkdf2 -S daefe2565e3c4680 -iter 10000
 # Output: message (Without newline)
 ```
+
+[MD5]: #md5
+[SHA1]: #sha1
+[SHA3]: #sha3
+[SHA224]: #sha224
+[SHA256]: #sha256
+[SHA384]: #sha384
+[SHA512]: #sha512
+[RIPEMD160]: #ripemd160
+[HMAC-MD5]: #hmac-md5
+[HMAC-SHA224]: #hmac-sha224
+[HMAC-SHA256]: #hmac-sha256
+[HMAC-SHA384]: #hmac-sha384
+[HMAC-SHA512]: #hmac-sha512
+[GMAC]: #gmac
+[CBC-MAC]: #cbc-mac
+[AES]: #aes
+[DES]: #des
+[Triple-DES]: #des3
+[Word32Array]: #word32array
+[Word64Array]: #mword64Array
+[Base64]: #base64
+[Hex]: #hex
+[Latin1]: #latin1
+[Utf8]: #utf8
+[Utf16]: #utf16
+[Rabbits]: #rabbits
+[RC4]: #rc4
+[RC4Drop]: #rc4drop
+[OpenSSLKDF]: #opensslkdf
+[EvpKDF]: #evpkdf
+[PBKDF2]: #pbkdf2
+[CBC]: #cbc
+[CFB]: #cfb
+[CTR]: #ctr
+[ECB]: #ecb
+[OFB]: #ofb
+[GCM]: #gcm
+[CCM]: #ccm
+[AnsiX923]: #ansix923
+[ISO10126]: #iso10126
+[ISO97971]: #iso97971
+[NoPadding]: #nopadding
+[Pkcs7]: #pkcs7
+[Zero]: #zero
+[OpenSSLFormatter]: #opensslformatter

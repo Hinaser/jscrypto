@@ -16,6 +16,7 @@ export {
 
 export {SerializableCipher} from "./lib/algorithm/cipher/SerializableCipher";
 export {PasswordBasedCipher} from "./lib/algorithm/cipher/PasswordBasedCipher";
+export {CipherParams} from "./lib/algorithm/cipher/CipherParams";
 
 export {Hmac} from "./Hmac";
 export {HmacMD5} from "./HmacMD5";
@@ -25,6 +26,7 @@ export {HmacSHA256} from "./HmacSHA256";
 export {HmacSHA384} from "./HmacSHA384";
 export {HmacSHA512} from "./HmacSHA512";
 export {GMAC} from "./GMAC";
+export {CBCMAC} from "./CBCMAC";
 export {MD5} from "./MD5";
 export {SHA1} from "./SHA1";
 export {SHA224} from "./SHA224";
@@ -46,6 +48,7 @@ import {CTR} from "./mode/CTR";
 import {ECB} from "./mode/ECB";
 import {OFB} from "./mode/OFB";
 import {GCM} from "./mode/GCM";
+import {CCM} from "./mode/CCM";
 export const mode = {
   CBC,
   CFB,
@@ -53,6 +56,7 @@ export const mode = {
   ECB,
   OFB,
   GCM,
+  CCM,
 };
 
 import {AnsiX923} from "./pad/AnsiX923";

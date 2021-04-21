@@ -1,6 +1,6 @@
 {
   "name": "jscrypto",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "main": "./index.js",
   "author": "Izumi Hoshino <rindo.hinase@gmail.com>",
   "license": "MIT",
@@ -21,8 +21,10 @@
     "DES",
     "Triple-DES",
     "OpenSSL",
-    "AES-GCM",
-    "GMAC"
+    "GCM",
+    "GMAC",
+    "CCM",
+    "CBC-MAC"
   ],
   "repository": {
     "type": "git",

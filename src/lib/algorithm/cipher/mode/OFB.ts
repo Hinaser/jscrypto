@@ -27,7 +27,7 @@ export class OFB extends BlockCipherMode {
   
       // Generate key stream
       if (iv) {
-        keyStream = this._keyStream = iv.slice(0);
+        keyStream = this._keyStream = iv.words.slice(0);
     
         // Remove IV for subsequent blocks
         this._iv = undefined;

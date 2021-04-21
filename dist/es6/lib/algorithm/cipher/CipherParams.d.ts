@@ -14,7 +14,6 @@ import type { Cipher } from "./Cipher";
  * @property {BlockCipherMode} mode The block mode used in the ciphering operation.
  * @property {Pad} padding The padding scheme used in the ciphering operation.
  * @property {number} blockSize The block size of the cipher.
- * @property {Word32Array} authTag Authentication tag for AAD.
  * @property {Formatter} formatter The default formatting strategy to convert this cipher params object to a string.
  */
 export declare class CipherParams {
@@ -26,8 +25,6 @@ export declare class CipherParams {
     mode?: BlockCipherMode;
     padding?: Pad;
     blockSize?: number;
-    authData?: Word32Array;
-    authTag?: Word32Array;
     formatter: Formatter;
     /**
      * Initializes a newly created cipher params object.

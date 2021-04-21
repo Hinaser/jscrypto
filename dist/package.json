@@ -21,9 +21,10 @@
     "DES",
     "Triple-DES",
     "OpenSSL",
-    "AES-GCM",
+    "GCM",
     "GMAC",
-    "AES-CCM"
+    "CCM",
+    "CBC-MAC"
   ],
   "repository": {
     "type": "git",

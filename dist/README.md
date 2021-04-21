@@ -9,7 +9,7 @@
   \*IE9/10 uses weak random generator on cipher encryption with string password. Use it at your own risk.  
   \*If only using decryption or hash/hmac, weak random generator does not cause any trouble.
 - Loadable with ES6/CommonJS/Typescript/Browser runtimes.
-- Support [`AES-GCM`][AES-GCM]/[`GMAC`][GMAC]/[`AES-CCM`][AES-CCM]/[`CBC-MAC`][CBC-MAC] :tada::tada::tada:
+- Support [`GCM`][GCM]/[`GMAC`][GMAC]/[`CCM`][CCM]/[`CBC-MAC`][CBC-MAC] :tada::tada::tada:
 - [CLI commands](#cli) available:  
   i.e. `npx jscrypto sha1 "message"`, `npx jscrypto aes enc "message" "password"`, etc.  
 - Written in Typescript with rich type declarations.
@@ -186,7 +186,7 @@ Check your `tsconfig.js` to be:
 ### *Popular*
 **Hash** [`MD5`][MD5], [`SHA1`][SHA1], [`SHA3`][SHA3], [`SHA224`][SHA224], [`SHA256`][SHA256], [`SHA384`][SHA384], [`SHA512`][SHA512], [`RIPEMD160`][RIPEMD160],  
 **Message/Key Hash** [`HMAC-MD5`][HMAC-MD5], [`HMAC-SHA224`][HMAC-SHA224], [`HMAC-SHA256`][HMAC-SHA256], [`HMAC-SHA384`][HMAC-SHA384], [`HMAC-SHA512`][HMAC-SHA512], [`GMAC`][GMAC], [`CBC-MAC`][CBC-MAC]  
-**Block Cipher** [`AES`][AES], [`AES-GCM`][AES-GCM], [`DES`][DES], [`Triple-DES`][Triple-DES]
+**Block Cipher** [`AES`][AES], [`DES`][DES], [`Triple-DES`][Triple-DES]
 
 ### *Basic structure*
 **Word** [`Word32Array`][Word32Array], [`Word64Array`][Word64Array]  

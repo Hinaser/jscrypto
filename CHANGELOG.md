@@ -1,9 +1,9 @@
-## [1.0.0]
+## [1.0.0] - 2021-04-22
 ### Added
 - Added [CCM block cipher mode (Counter mode/CBC-MAC)](https://github.com/Hinaser/jscrypto/blob/master/API.md#ccm)  
   https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
 - Added [CBC-MAC](https://github.com/Hinaser/jscrypto/blob/master/API.md#cbc-mac)
-- Added tag length option to [`GMAC`](https://github.com/Hinaser/jscrypto/blob/master/API.md#gmac) and [AES-GCM](https://github.com/Hinaser/jscrypto/blob/master/API.md#aes-gcm)
+- Added tag length option to [GMAC](https://github.com/Hinaser/jscrypto/blob/master/API.md#gmac) and [GCM](https://github.com/Hinaser/jscrypto/blob/master/API.md#gcm)
 - Exposed `CipherParams` class to public.
 
 ### Changed
@@ -22,7 +22,7 @@
 
 **Breaking change**
 - Changed GMAC hash function name from `GCM.hash()` to `GCM.mac()`.
-- Calculating authTag in GCM/CCM now requires developer to manually call authTag function.  
+- Calculating authTag in GCM now requires developer to manually call authTag function.  
   Encryption/Decryption and MAC Generation are now calculated independently.
   ```js
   //////////////////////

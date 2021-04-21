@@ -9,7 +9,7 @@
   \*IE9/10 uses weak random generator on cipher encryption with string password. Use it at your own risk.  
   \*If only using decryption or hash/hmac, weak random generator does not cause any trouble.
 - Loadable with ES6/CommonJS/Typescript/Browser runtimes.
-- Support [`AES-GCM`][AES-GCM]/[`GMAC`][GMAC]/[`AES-CCM`][AES-CCM]/[`CBC-MAC`][CBC-MAC] :tada::tada::tada:
+- Support [`GCM`][GCM]/[`GMAC`][GMAC]/[`CCM`][CCM]/[`CBC-MAC`][CBC-MAC] :tada::tada::tada:
 - [CLI commands](#cli) available:  
   i.e. `npx jscrypto sha1 "message"`, `npx jscrypto aes enc "message" "password"`, etc.  
 - Written in Typescript with rich type declarations.

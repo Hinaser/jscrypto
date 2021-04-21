@@ -478,16 +478,19 @@ authTag.toString() === cbcMac.toString(); // true
 ```
 
 <h5 id="note-for-ccm-implementation">Note for CCM implementation</h5>
+
 Since there are many CCM implementations out in the world, interoperability among those implementations can't be expected.  
 I can only say that CCM implementation of `jscrypto` follows NIST 800-38C style ciphertext.  
+
 However, since I put an emphasis on coherence on this library,
 jscrypto requires you to take additional steps to reproduce exact the same cipher output as NIST 800-38C style ciphertext.
-  - JsCrypto's CCM independently outputs ciphertext and authTag(mac).  
-    Each operation(encryption/generating mac) does not care opponent's internal state at all.
-  - If you want to generate NIST 800-38C style ciphertext, you need to take steps as below.
-    1. encrypt plain text
-    2. generate CBC-MAC
-    3. combine outputs from above operations.
+
+- JsCrypto's CCM independently outputs ciphertext and authTag(mac).  
+  Each operation(encryption/generating mac) does not care opponent's internal state at all.
+- If you want to generate NIST 800-38C style ciphertext, you need to take steps as below.  
+  1. encrypt plain text
+  2. generate CBC-MAC
+  3. combine outputs from above operations.
 
 ![](./docs/how-jscrypto-CCM-handles-ciphertext.png)
 

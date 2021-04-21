@@ -732,22 +732,6 @@ var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: OFB, paddin
 decrypted.toString(JsCrypto.Utf8); // "message"
 ```
 
-<h4 id='gcm'>GCM</h4>
-
-[Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.
-GCM does not require encrypting data to be padded.  
-Changing Block padding has no effect.
-```js
-var message = JsCrypto.Utf8.parse("message"); // 7bytes.
-var key = new JsCrypto.Word32Array([0x20212223, 0x24252627, 0x28292a2b, 0x2c2d2e2f]);
-var iv = new JsCrypto.Word32Array([0x30313233, 0x34353637, 0x38393a3b, 0], 3); // Recommended 96bit/12byte iv
-
-var GCM = JsCrypto.mode.GCM;
-var encrypted = JsCrypto.AES.encrypt(message, key, { iv: iv, mode: GCM });
-var decrypted = JsCrypto.AES.decrypt(encrypted, key, { iv: iv, mode: GCM });
-decrypted.toString(JsCrypto.Utf8); // "message"
-```
-
 <h4 id="gcm">GCM</h4>
 
 [Galois Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) for authenticated encryption.  

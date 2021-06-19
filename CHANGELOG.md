@@ -1,9 +1,9 @@
 # Changelog
 
-## [1.0.1]-beta.0
-(Not yet officially released)
+## [1.0.1]
 ### Fixed
-- Fixed an issue where webpack shows warning when compiling `jscrypto`.
+- Fixed an issue where building jscrypto with webpack shows warning messages like below:  
+  `Critical dependency: the request of a dependency is an expression`
 
 ## [1.0.0] - 2021-04-22
 ### Added

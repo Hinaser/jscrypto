@@ -9,3 +9,6 @@ Copyright (c) 2018-2020 LIN Chen
 
 [NIST Special Publication 800-38D](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)  
 NIST/Morris Dworkin
+
+[NIST Special Publication 800-38C](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf)  
+NIST/Morris Dworkin

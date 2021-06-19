@@ -1,3 +1,10 @@
+# Changelog
+
+## [1.0.1]
+### Fixed
+- Fixed an issue where building jscrypto with webpack shows warning messages like below:  
+  `Critical dependency: the request of a dependency is an expression`
+
 ## [1.0.0] - 2021-04-22
 ### Added
 - Added [CCM block cipher mode (Counter mode/CBC-MAC)](https://github.com/Hinaser/jscrypto/blob/master/API.md#ccm)  
@@ -86,9 +93,10 @@
 Initial release.
 
 <!-- [Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0 -->
+[1.0.1]: https://github.com/Hinaser/jscrypto/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Hinaser/jscrypto/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Hinaser/jscrypto/compare/v0.0.2...v0.1.0
-[0.0.2]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.2
-[0.0.1]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.1
-[0.0.0]: https://github.com/Hinaser/jscrypto/releases/tag/v0.0.0
+[0.0.2]: https://github.com/Hinaser/jscrypto/compare/v0.0.1...v0.0.2
+[0.0.1]: https://github.com/Hinaser/jscrypto/compare/v0.0.0...v0.0.1
+[0.0.0]: https://github.com/Hinaser/jscrypto/compare/tag/v0.0.0

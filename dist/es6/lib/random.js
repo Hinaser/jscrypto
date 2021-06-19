@@ -23,11 +23,9 @@ function makeRandFunction() {
     else if (typeof require === "function") {
         return function rand() {
             // Prevent webpack to automatically require("crypto").
-            let crypto = "crypt";
-            crypto += String.fromCharCode(111);
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            return __non_webpack_require__(crypto).randomBytes(4).readInt32LE();
+            return __non_webpack_require__("crypto").randomBytes(4).readInt32LE();
         };
     }
     throw new Error("Unable to find crypto module");

@@ -42,6 +42,9 @@
   "bin": {
     "jscrypto": "bin/cli.js"
   },
+  "browser": {
+    "crypto": false
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",

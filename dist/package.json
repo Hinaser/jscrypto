@@ -1,6 +1,6 @@
 {
   "name": "jscrypto",
-  "version": "1.0.1-beta.0",
+  "version": "1.0.1",
   "main": "./index.js",
   "author": "Izumi Hoshino <rindo.hinase@gmail.com>",
   "license": "MIT",

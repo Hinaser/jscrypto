@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.2]
+## [1.0.2] - 2021-07-08
 ### Fixed
 - Fixed an issue where invalid Hex string could be parsed without error.  
   For example, invalid Hex string `1g` was recognized as `0x01`.

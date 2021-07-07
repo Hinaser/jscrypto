@@ -14,4 +14,8 @@ describe("encoder/Hex", function(){
     const expectedValue = new Word32Array([0x12345678]).toString();
     expect(Hex.parse("12345678").toString()).to.be(expectedValue);
   });
+  
+  it("raises error on parsing invalid Hex string", function(){
+    expect(() => Hex.parse("1g")).to.throwException(/^Invalid Hex string: 1g$/);
+  });
 });

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.2]
+### Fixed
+- Fixed an issue where invalid Hex string could be parsed without error.  
+  For example, invalid Hex string `1g` was recognized as `0x01`.
+
 ## [1.0.1] - 2021-06-20
 ### Fixed
 - Fixed an issue where building jscrypto with webpack shows warning messages like below:  
@@ -93,6 +98,7 @@
 Initial release.
 
 <!-- [Unreleased]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0 -->
+[1.0.2]: https://github.com/Hinaser/jscrypto/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/Hinaser/jscrypto/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Hinaser/jscrypto/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/Hinaser/jscrypto/compare/v0.1.0...v0.2.0

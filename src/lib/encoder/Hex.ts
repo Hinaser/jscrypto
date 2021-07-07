@@ -37,6 +37,9 @@ export const Hex: IEncoder = {
     if(Len % 2 !== 0){
       throw new Error("Hex string count must be even");
     }
+    else if(!/^[a-fA-F0-9]+$/.test(hexStr)){
+      throw new Error(`Invalid Hex string: ${hexStr}`);
+    }
     const words: number[] = [];
     
     for(let i=0;i<Len;i+=2){

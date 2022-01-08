@@ -145,4 +145,47 @@ describe("mode/CCM", function(){
       expect(result.authTag.toString()).to.be(cbcMac.toString());
     });
   });
+
+  describe("Klen=128, Tlen=64, Nlen=104, Alen=0, Plen=72", function(){
+    const K = Hex.parse("0953fa93e7caac9638f58820220a398e");
+    const N = Hex.parse("00800148202345000012345678");
+    const A = new Word32Array([], 0);
+    const P = Hex.parse("120104320308ba072f");
+    const t = 64/8;
+    
+    it("test encryption/decryption/mac", function(){
+      // Test MAC
+      const cbcMac = CCM.mac(AES, K, N, A, P, t);
+      expect(cbcMac.toString()).to.be("ec129d20a620d01e");
+    });
+    
+    it("test encryption/decryption", function(){
+      // Test encryption
+      const encrypted = AES.encrypt(P, K, { iv: N, mode: CCM, padding: NoPadding });
+      expect(encrypted.cipherText.toString()).to.be("79d7dbc0c9b4d43eeb");
+      
+      // Test decryption
+      const decrypted = AES.decrypt(encrypted, K, {iv: N, mode: CCM, padding: NoPadding});
+      expect(decrypted.toString()).to.be(P.toString());
+    });
+    
+    it("test ciphertext/mac combining function", function(){
+      const cbcMac = CCM.mac(AES, K, N, A, P, t);
+      const encrypted = AES.encrypt(P, K, { iv: N, mode: CCM, padding: NoPadding });
+      const concatenatedCipherText = encrypted.cipherText.clone().concat(cbcMac);
+      
+      expect(concatenatedCipherText.toString()).to.be("79d7dbc0c9b4d43eebec129d20a620d01e");
+      expect(CCM.combineCipherTextAndAuthTag(encrypted.cipherText, cbcMac).toString()).to.be(concatenatedCipherText.toString())
+    });
+    
+    it("test ciphertext/mac split function", function(){
+      const cbcMac = CCM.mac(AES, K, N, A, P, t);
+      const encrypted = AES.encrypt(P, K, { iv: N, mode: CCM, padding: NoPadding });
+      const combinedCiphertext = CCM.combineCipherTextAndAuthTag(encrypted.cipherText, cbcMac);
+      const result = CCM.splitCipherTextAndAuthTag(combinedCiphertext, t);
+      
+      expect(result.cipherText.toString()).to.be(encrypted.cipherText.toString());
+      expect(result.authTag.toString()).to.be(cbcMac.toString());
+    });
+  });
 });

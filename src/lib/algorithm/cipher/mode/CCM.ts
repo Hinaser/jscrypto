@@ -95,7 +95,7 @@ export class CCM extends BlockCipherMode {
     }
   
     if(P.nSigBytes % 4){
-      ad.concat(new Word32Array([P.words[nAd]], P.nSigBytes % 4));
+      ad.concat(new Word32Array([P.words[nPayload]], P.nSigBytes % 4));
       ad.concat(new Word32Array([0], 4 - P.nSigBytes%4));
     }
   

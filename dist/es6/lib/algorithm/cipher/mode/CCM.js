@@ -78,7 +78,7 @@ export class CCM extends BlockCipherMode {
             ad.concat(new Word32Array([P.words[i]], 4));
         }
         if (P.nSigBytes % 4) {
-            ad.concat(new Word32Array([P.words[nAd]], P.nSigBytes % 4));
+            ad.concat(new Word32Array([P.words[nPayload]], P.nSigBytes % 4));
             ad.concat(new Word32Array([0], 4 - P.nSigBytes % 4));
         }
         // Align to 16byte block

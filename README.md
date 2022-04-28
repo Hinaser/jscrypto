@@ -52,7 +52,7 @@ This can greatly reduce bundle size by bundlers tree-shaking ability.
 Don't forget to add `/es6` following `jscrypto`
 ```ecmascript 6
 // Load whole library modules.
-import JsCrypto from "jscrypto/es6";
+import * as JsCrypto from "jscrypto/es6";
 console.log(JsCrypto.SHA256.hash("test").toString());
 ...
 import {SHA256} from "jscrypto/es6/SHA256"; // Recommended
